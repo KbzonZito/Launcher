@@ -24,7 +24,8 @@ class BackupManager(
      * @return Uri to the created backup archive
      */
     suspend fun backup(
-        uri: Uri
+        uri: Uri,
+        password: CharArray? = null, // [fork] si no es null, el archivo se cifra
     ) {
 
         val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
@@ -56,7 +57,10 @@ class BackupManager(
                 }
             }
 
-            createArchive(backupDir, outputStream)
+            val target = if (password != null && password.isNotEmpty()) {
+                BackupCrypto.encrypting(outputStream, password) // [fork]
+            } else outputStream
+            createArchive(backupDir, target)
             outputStream.close()
 
         }
@@ -64,6 +68,7 @@ class BackupManager(
 
     suspend fun restore(
         uri: Uri,
+        password: CharArray? = null, // [fork] para backups cifrados
     ) {
         val job = scope.launch {
             withContext(Dispatchers.IO) {
@@ -73,7 +78,8 @@ class BackupManager(
                     restoreDir.deleteRecursively()
                 }
                 restoreDir.mkdirs()
-                extractArchive(inputStream, restoreDir)
+                val source = if (password != null) BackupCrypto.decrypting(inputStream, password) else inputStream // [fork]
+                extractArchive(source, restoreDir)
                 inputStream.close()
 
                 for (component in components) {
@@ -90,11 +96,24 @@ class BackupManager(
         job.join()
     }
 
-    suspend fun readBackupMeta(uri: Uri): BackupMetadata? {
+    /** [fork] true si el backup está cifrado con contraseña. */
+    suspend fun isEncrypted(uri: Uri): Boolean = withContext(Dispatchers.IO) {
+        try {
+            context.contentResolver.openInputStream(uri)?.use { BackupCrypto.isEncrypted(it) } ?: false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * @throws BackupCrypto.WrongPasswordException si el backup está cifrado y la contraseña no es correcta.
+     */
+    suspend fun readBackupMeta(uri: Uri, password: CharArray? = null): BackupMetadata? {
         return withContext(Dispatchers.IO) {
             try {
-                val inputStream =
+                val rawStream =
                     context.contentResolver.openInputStream(uri) ?: return@withContext null
+                val inputStream = if (password != null) BackupCrypto.decrypting(rawStream, password) else rawStream // [fork]
                 ZipInputStream(inputStream).use { zipStream ->
                     var entry = zipStream.nextEntry
                     while (entry != null) {

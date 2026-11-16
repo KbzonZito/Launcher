@@ -93,6 +93,19 @@ fun RestoreBackupSheet(
                         }
                     }
 
+                    RestoreBackupState.NeedsPassword -> { // [fork]
+                        val wrong by viewModel.wrongPassword
+                        de.mm20.launcher2.ui.settings.backup.BackupPasswordStep(
+                            title = stringResource(R.string.fork_backup_restore_title),
+                            description = stringResource(R.string.fork_backup_restore_description),
+                            buttonLabel = stringResource(R.string.fork_backup_restore_button),
+                            confirm = false,
+                            allowEmpty = false,
+                            error = if (wrong) stringResource(R.string.fork_backup_wrong_password) else null,
+                            onSubmit = { viewModel.submitPassword(it) },
+                        )
+                    }
+
                     RestoreBackupState.InvalidFile -> {
                         LargeMessage(
                             modifier = Modifier.navigationBarsPadding(),

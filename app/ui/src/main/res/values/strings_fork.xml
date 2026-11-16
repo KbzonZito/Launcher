@@ -74,4 +74,14 @@
     <string name="fork_reset_usage_done">Usage statistics cleared</string>
     <string name="fork_preference_minimal_search">Minimal search style</string>
     <string name="fork_preference_minimal_search_summary">Dark veil and borderless results, matching the minimal home</string>
+    <string name="fork_backup_password">Password</string>
+    <string name="fork_backup_password_repeat">Repeat password</string>
+    <string name="fork_backup_password_mismatch">Passwords don\'t match</string>
+    <string name="fork_backup_create_title">Encrypt backup</string>
+    <string name="fork_backup_create_description">Optional. With a password the backup is encrypted (AES-256) and can only be restored with it. There is no way to recover a forgotten password.</string>
+    <string name="fork_backup_create_button">Choose where to save</string>
+    <string name="fork_backup_restore_title">Encrypted backup</string>
+    <string name="fork_backup_restore_description">Enter the password used when this backup was created.</string>
+    <string name="fork_backup_restore_button">Unlock</string>
+    <string name="fork_backup_wrong_password">Wrong password</string>
 </resources>

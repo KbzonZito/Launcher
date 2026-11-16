@@ -21,10 +21,44 @@ class RestoreBackupSheetVM : ViewModel(), KoinComponent {
     val metadata = mutableStateOf<BackupMetadata?>(null)
     val compatibility = mutableStateOf<BackupCompatibility?>(null)
 
-    fun setInputUri(uri: Uri) {
-        restoreUri = uri
+    // [fork] Backups cifrados
+    private var password: CharArray? = null
+    val wrongPassword = mutableStateOf(false)
+
+    fun submitPassword(value: String) {
+        val uri = restoreUri ?: return
         state.value = RestoreBackupState.Parsing
         viewModelScope.launch {
+            val pw = value.toCharArray()
+            val metadata = try {
+                backupManager.readBackupMeta(uri, pw)
+            } catch (e: de.mm20.launcher2.backup.BackupCrypto.WrongPasswordException) {
+                wrongPassword.value = true
+                state.value = RestoreBackupState.NeedsPassword
+                return@launch
+            }
+            wrongPassword.value = false
+            password = pw
+            if (metadata == null) {
+                state.value = RestoreBackupState.InvalidFile
+            } else {
+                state.value = RestoreBackupState.Ready
+                compatibility.value = backupManager.checkCompatibility(metadata)
+            }
+            this@RestoreBackupSheetVM.metadata.value = metadata
+        }
+    }
+
+    fun setInputUri(uri: Uri) {
+        restoreUri = uri
+        password = null
+        wrongPassword.value = false
+        state.value = RestoreBackupState.Parsing
+        viewModelScope.launch {
+            if (backupManager.isEncrypted(uri)) { // [fork]
+                state.value = RestoreBackupState.NeedsPassword
+                return@launch
+            }
             val metadata = backupManager.readBackupMeta(uri)
             if (metadata == null) {
                 state.value = RestoreBackupState.InvalidFile
@@ -41,7 +75,7 @@ class RestoreBackupSheetVM : ViewModel(), KoinComponent {
 
         viewModelScope.launch {
             state.value = RestoreBackupState.Restoring
-            backupManager.restore(uri)
+            backupManager.restore(uri, password)
             state.value = RestoreBackupState.Restored
         }
     }
@@ -49,6 +83,7 @@ class RestoreBackupSheetVM : ViewModel(), KoinComponent {
 
 enum class RestoreBackupState {
     Parsing,
+    NeedsPassword, // [fork]
     InvalidFile,
     Ready,
     Restoring,

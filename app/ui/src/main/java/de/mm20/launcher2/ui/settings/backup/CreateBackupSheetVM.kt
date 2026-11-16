@@ -19,10 +19,14 @@ class CreateBackupSheetVM : ViewModel(), KoinComponent {
         state.value = CreateBackupState.Ready
     }
 
+    /** [fork] Contraseña opcional elegida antes de escoger el archivo. */
+    var password: String = ""
+
     fun createBackup(uri: Uri) {
         viewModelScope.launch {
             state.value = CreateBackupState.BackingUp
-            backupManager.backup(uri)
+            backupManager.backup(uri, password.takeIf { it.isNotEmpty() }?.toCharArray())
+            password = ""
             state.value = CreateBackupState.BackedUp
         }
     }

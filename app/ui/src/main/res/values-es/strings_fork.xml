@@ -73,4 +73,14 @@
     <string name="fork_reset_usage_done">Estadísticas de uso borradas</string>
     <string name="fork_preference_minimal_search">Búsqueda minimalista</string>
     <string name="fork_preference_minimal_search_summary">Velo oscuro y resultados sin tarjetas, a juego con el inicio minimalista</string>
+    <string name="fork_backup_password">Contraseña</string>
+    <string name="fork_backup_password_repeat">Repetir contraseña</string>
+    <string name="fork_backup_password_mismatch">Las contraseñas no coinciden</string>
+    <string name="fork_backup_create_title">Cifrar backup</string>
+    <string name="fork_backup_create_description">Opcional. Con contraseña, el backup se cifra (AES-256) y solo se puede restaurar con ella. Si la olvidas, no hay forma de recuperarla.</string>
+    <string name="fork_backup_create_button">Elegir dónde guardarlo</string>
+    <string name="fork_backup_restore_title">Backup cifrado</string>
+    <string name="fork_backup_restore_description">Escribe la contraseña que usaste al crear este backup.</string>
+    <string name="fork_backup_restore_button">Desbloquear</string>
+    <string name="fork_backup_wrong_password">Contraseña incorrecta</string>
 </resources>
