@@ -121,6 +121,11 @@ data class LauncherSettingsData internal constructor(
     val minimalHomeTwoFingerDown: GestureAction = GestureAction.QuickSettings,
     /** clave de app → clave de lo que se abre al deslizarla a la izquierda */
     val minimalHomeAppSwipeLeft: Map<String, String> = emptyMap(),
+    // [fork] Reloj, agenda y apps vinculadas de la home minimalista.
+    val minimalHomeClockStyle: de.mm20.launcher2.preferences.home.MinimalClockStyle = de.mm20.launcher2.preferences.home.MinimalClockStyle.Thin,
+    val minimalHomeAgenda: Boolean = true,
+    val minimalHomeWeatherAppKey: String? = null,
+    val minimalHomeCalendarAppKey: String? = null,
 
     val badgesNotifications: Boolean = true,
     val badgesSuspendedApps: Boolean = true,

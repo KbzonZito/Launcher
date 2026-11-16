@@ -52,4 +52,17 @@
     <string name="fork_preference_two_finger_up">Two fingers up</string>
     <string name="fork_preference_two_finger_down">Two fingers down</string>
     <string name="fork_preference_app_swipe_hint">Per app: swipe right shows its shortcuts; swipe left opens the app you assign from its long-press menu.</string>
+    <string name="fork_preference_category_clock">Clock and glance</string>
+    <string name="fork_preference_clock_style">Clock style</string>
+    <string name="fork_clock_thin">Thin</string>
+    <string name="fork_clock_bold">Bold</string>
+    <string name="fork_clock_stacked">Stacked</string>
+    <string name="fork_clock_words">In words</string>
+    <string name="fork_clock_analog">Analog</string>
+    <string name="fork_clock_day_progress">Day progress</string>
+    <string name="fork_preference_agenda">Agenda</string>
+    <string name="fork_preference_agenda_summary">Show up to 3 upcoming events instead of only the next one</string>
+    <string name="fork_preference_weather_app">Weather opens</string>
+    <string name="fork_preference_calendar_app">Date opens</string>
+    <string name="fork_preference_linked_app_auto">Automatic</string>
 </resources>

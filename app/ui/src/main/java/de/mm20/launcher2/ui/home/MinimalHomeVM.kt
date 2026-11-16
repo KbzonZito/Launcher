@@ -22,6 +22,7 @@ import de.mm20.launcher2.icons.IconService
 import de.mm20.launcher2.icons.LauncherIcon
 import de.mm20.launcher2.permissions.PermissionGroup
 import de.mm20.launcher2.permissions.PermissionsManager
+import de.mm20.launcher2.preferences.home.MinimalClockStyle
 import de.mm20.launcher2.preferences.home.MinimalHomeSettings
 import de.mm20.launcher2.search.Application
 import de.mm20.launcher2.search.CalendarEvent
@@ -187,6 +188,48 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     fun selectLetter(letter: Char?) {
         selectedLetter.value = letter
     }
+
+    val clockStyle = homeSettings.clockStyle.stateIn(viewModelScope, SharingStarted.Eagerly, MinimalClockStyle.Thin)
+    val agendaEnabled = homeSettings.agenda.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
+    private fun resolveKey(keyFlow: Flow<String?>): StateFlow<SavableSearchable?> = keyFlow
+        .flatMapLatest { key ->
+            if (key == null) flowOf(null)
+            else searchableRepository.getByKeys(listOf(key)).map { it.firstOrNull() }
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    /** Apps que abren el clima y la fecha (null = automático). */
+    val weatherApp: StateFlow<SavableSearchable?> = resolveKey(homeSettings.weatherAppKey)
+    val calendarApp: StateFlow<SavableSearchable?> = resolveKey(homeSettings.calendarAppKey)
+
+    fun setWeatherApp(app: SavableSearchable?) {
+        app?.let { searchableRepository.insert(it) }
+        homeSettings.setWeatherAppKey(app?.key)
+    }
+
+    fun setCalendarApp(app: SavableSearchable?) {
+        app?.let { searchableRepository.insert(it) }
+        homeSettings.setCalendarAppKey(app?.key)
+    }
+
+    /** Próximos eventos (hasta 3) en las siguientes 36 h, incluidos los de todo el día de hoy. */
+    val upcomingEvents: StateFlow<List<CalendarEvent>> = permissionsManager
+        .hasPermission(PermissionGroup.Calendar)
+        .flatMapLatest { granted ->
+            if (!granted) flowOf(emptyList())
+            else {
+                val now = System.currentTimeMillis()
+                calendarRepository.findMany(from = now, to = now + 36 * 60 * 60 * 1000L)
+                    .map { events ->
+                        events
+                            .filter { it.isCompleted != true && it.endTime > now }
+                            .sortedWith(compareBy<CalendarEvent> { !it.allDay }.thenBy { it.startTime ?: it.endTime })
+                            .take(3)
+                    }
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val nextEvent: StateFlow<CalendarEvent?> = permissionsManager
         .hasPermission(PermissionGroup.Calendar)

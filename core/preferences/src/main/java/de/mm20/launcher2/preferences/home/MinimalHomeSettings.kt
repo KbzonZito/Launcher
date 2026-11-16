@@ -48,6 +48,29 @@ class MinimalHomeSettings internal constructor(
 
     fun setTwoFingerDown(action: GestureAction) = dataStore.update { it.copy(minimalHomeTwoFingerDown = action) }
 
+    val clockStyle: Flow<MinimalClockStyle>
+        get() = dataStore.data.map { it.minimalHomeClockStyle }.distinctUntilChanged()
+
+    fun setClockStyle(style: MinimalClockStyle) = dataStore.update { it.copy(minimalHomeClockStyle = style) }
+
+    /** Mostrar hasta 3 próximos eventos en vez de solo el siguiente. */
+    val agenda: Flow<Boolean>
+        get() = dataStore.data.map { it.minimalHomeAgenda }.distinctUntilChanged()
+
+    fun setAgenda(enabled: Boolean) = dataStore.update { it.copy(minimalHomeAgenda = enabled) }
+
+    /** App que abre el clima (clave de búsqueda); null = automático. */
+    val weatherAppKey: Flow<String?>
+        get() = dataStore.data.map { it.minimalHomeWeatherAppKey }.distinctUntilChanged()
+
+    fun setWeatherAppKey(key: String?) = dataStore.update { it.copy(minimalHomeWeatherAppKey = key) }
+
+    /** App que abre la fecha (clave de búsqueda); null = la de calendario por defecto. */
+    val calendarAppKey: Flow<String?>
+        get() = dataStore.data.map { it.minimalHomeCalendarAppKey }.distinctUntilChanged()
+
+    fun setCalendarAppKey(key: String?) = dataStore.update { it.copy(minimalHomeCalendarAppKey = key) }
+
     val appSwipeLeft: Flow<Map<String, String>>
         get() = dataStore.data.map { it.minimalHomeAppSwipeLeft }.distinctUntilChanged()
 
