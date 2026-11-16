@@ -126,6 +126,8 @@ data class LauncherSettingsData internal constructor(
     val minimalHomeAgenda: Boolean = true,
     val minimalHomeWeatherAppKey: String? = null,
     val minimalHomeCalendarAppKey: String? = null,
+    // [fork] Búsqueda con el estilo de la home minimalista (velo oscuro, sin tarjetas).
+    val minimalSearchStyle: Boolean = true,
 
     val badgesNotifications: Boolean = true,
     val badgesSuspendedApps: Boolean = true,

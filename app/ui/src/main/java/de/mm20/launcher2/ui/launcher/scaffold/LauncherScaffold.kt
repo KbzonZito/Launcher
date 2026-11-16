@@ -192,6 +192,8 @@ internal data class ScaffoldConfiguration(
      */
     val finishOnBack: Boolean = false,
     val darkSearchBar: Boolean = false,
+    /** [fork] Búsqueda con el tema minimalista (barra y resultados oscuros sobre el velo). */
+    val minimalStyle: Boolean = false,
 ) {
     val searchBarTap = ScaffoldGesture(
         component = searchComponent,
@@ -1373,33 +1375,36 @@ internal fun LauncherScaffold(
                             .asPaddingValues()
                     )
             ) {
-                LauncherSearchBar(
-                    modifier = Modifier
-                        .widthIn(max = 916.dp)
-                        .align(
-                            if (config.searchBarPosition == SearchBarPosition.Top) Alignment.TopCenter
-                            else Alignment.BottomCenter
-                        ),
-                    searchBarOffset = { state.currentSearchBarOffset.roundToInt() },
-                    style = config.searchBarStyle,
-                    focused = state.isSearchBarFocused,
-                    actions = searchActions,
-                    level = { state.searchBarLevel },
-                    bottomSearchBar = config.searchBarPosition == SearchBarPosition.Bottom,
-                    onFocusChange = {
-                        if (it) {
-                            scope.launch { state.onSearchBarTap() }
-                        }
-                        state.isSearchBarFocused = it
-                    },
-                    onKeyboardActionGo = if (launchOnEnter) {
-                        { searchVM.launchBestMatchOrAction(activity) }
-                    } else null,
-                    highlightedAction = highlightedResult as? SearchAction,
-                    darkColors = config.darkSearchBar,
-                    isSearchOpen = state.currentComponent is SearchComponent && state.isSettledOnSecondaryPage ||
-                            config.homeComponent is SearchComponent && !state.isSettledOnSecondaryPage,
-                )
+                val searchBar: @Composable () -> Unit = {
+                    LauncherSearchBar(
+                        modifier = Modifier
+                            .widthIn(max = 916.dp)
+                            .align(
+                                if (config.searchBarPosition == SearchBarPosition.Top) Alignment.TopCenter
+                                else Alignment.BottomCenter
+                            ),
+                        searchBarOffset = { state.currentSearchBarOffset.roundToInt() },
+                        style = config.searchBarStyle,
+                        focused = state.isSearchBarFocused,
+                        actions = searchActions,
+                        level = { state.searchBarLevel },
+                        bottomSearchBar = config.searchBarPosition == SearchBarPosition.Bottom,
+                        onFocusChange = {
+                            if (it) {
+                                scope.launch { state.onSearchBarTap() }
+                            }
+                            state.isSearchBarFocused = it
+                        },
+                        onKeyboardActionGo = if (launchOnEnter) {
+                            { searchVM.launchBestMatchOrAction(activity) }
+                        } else null,
+                        highlightedAction = highlightedResult as? SearchAction,
+                        darkColors = config.darkSearchBar,
+                        isSearchOpen = state.currentComponent is SearchComponent && state.isSettledOnSecondaryPage ||
+                                config.homeComponent is SearchComponent && !state.isSettledOnSecondaryPage,
+                    )
+                }
+                if (config.minimalStyle) de.mm20.launcher2.ui.search.MinimalSearchTheme(searchBar) else searchBar() // [fork]
             }
             if (isFilterBarVisible) {
                 Box(

@@ -161,7 +161,7 @@ Hoy Kvaesitso tiene 7: swipe ↑↓←→, doble tap, long press y botón home. 
 
 ### 5.4 Búsqueda
 
-> **Estado (fase 4):** se mantiene el motor y la UI de resultados de Kvaesitso. Agregado: prefijos `a` apps · `c` contactos · `e` eventos · `f` archivos · `s` atajos · `t` herramientas (los chips de filtro siguen al prefijo y se restauran al borrarlo); al entrar por `ASSIST` (botón lateral) el teclado se abre siempre; guía en Ajustes → Inicio minimalista → Búsqueda. Medido en emulador (release, proceso vivo): la búsqueda por `ASSIST` abre en ~30 ms. El restyle minimalista de los resultados queda para la fase 8.
+> **Estado (fase 4):** se mantiene el motor y la UI de resultados de Kvaesitso. Agregado: prefijos `a` apps · `c` contactos · `e` eventos · `f` archivos · `s` atajos · `t` herramientas (los chips de filtro siguen al prefijo y se restauran al borrarlo); al entrar por `ASSIST` (botón lateral) el teclado se abre siempre; guía en Ajustes → Inicio minimalista → Búsqueda. Medido en emulador (release, proceso vivo): la búsqueda por `ASSIST` abre en ~30 ms. **Restyle (PR #14):** con el inicio minimalista activo, la búsqueda y los paneles usan un velo oscuro, la barra y los resultados toman un tema oscuro con filas casi transparentes (`MinimalSearchTheme`), sin importar el modo claro/oscuro del sistema. Se puede apagar en Ajustes → Inicio minimalista → Búsqueda.
 
 - Reutilizar `services/search` (es lo mejor de Kvaesitso: apps, contactos, calendario, archivos, calculadora, conversor de unidades, shortcuts, ajustes).
 - UI nueva: campo arriba, resultados agrupados, el primero se lanza con Enter, ranking por frecencia + hora del día.
@@ -224,10 +224,10 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **5** | Bajar dividido (notificaciones / ajustes rápidos), dos dedos ↑↓ configurables, deslizar una app a la izquierda abre otra | ✅ PR #8 |
 | **6** | 6 estilos de reloj (fino, negrita, apilado, en palabras, analógico, progreso del día), agenda de hasta 3 eventos, apps de clima y fecha configurables | ✅ PR #9 |
 | **7** | Layout adaptativo: dos columnas en pantallas anchas en horizontal, una columna grande en la Tab en vertical, reloj escalado | ✅ PR #10 |
-| **8** | Baseline profile generado (34 k reglas + perfil de arranque), módulo `:baselineprofile` con generador y Macrobenchmark | ✅ PR #11 · pendiente: medir en el S24U, restyle de la búsqueda, pulido de animaciones |
+| **8** | Baseline profile generado (34 k reglas + perfil de arranque), módulo `:baselineprofile` con generador y Macrobenchmark | ✅ PR #11, restyle de la búsqueda en PR #14 · pendiente: medir en el S24U, pulido de animaciones |
 | continuo | `upstream-sync` mensual por tag | ⏳ |
 
-Pendientes sueltos: **nombre definitivo de la app** (hoy "Launcher"; ícono propio ya hecho) · probar en S24 Ultra y Tab S9 · restyle minimalista de la búsqueda · espacio privado propio · backups cifrados · widgets propios · regla de `main` que exija `build` (para auto-merge). Hechos fuera de fase: teclado físico en la home abre la búsqueda, borrar estadísticas de uso, mosaicos de mapa en modo offline (PR #13).
+Pendientes sueltos: **nombre definitivo de la app** (hoy "Launcher"; ícono propio ya hecho) · probar en S24 Ultra y Tab S9 · espacio privado propio · backups cifrados · widgets propios · regla de `main` que exija `build` (para auto-merge). Hechos fuera de fase: teclado físico en la home abre la búsqueda, borrar estadísticas de uso, mosaicos de mapa en modo offline (PR #13).
 
 ---
 

@@ -72,4 +72,6 @@
     <string name="fork_reset_usage_confirm">Frequent apps and search ranking will start learning from scratch. This can\'t be undone.</string>
     <string name="fork_reset_usage_action">Clear</string>
     <string name="fork_reset_usage_done">Usage statistics cleared</string>
+    <string name="fork_preference_minimal_search">Minimal search style</string>
+    <string name="fork_preference_minimal_search_summary">Dark veil and borderless results, matching the minimal home</string>
 </resources>

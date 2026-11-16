@@ -46,6 +46,7 @@ fun MinimalHomeSettingsScreen() {
     val showIcons by settings.showIcons.collectAsStateWithLifecycle(true)
     val railOnLeft by settings.railOnLeft.collectAsStateWithLifecycle(false)
     val notificationPreviews by settings.notificationPreviews.collectAsStateWithLifecycle(true)
+    val searchStyle by settings.searchStyle.collectAsStateWithLifecycle(true)
     val splitSwipeDown by settings.splitSwipeDown.collectAsStateWithLifecycle(true)
     val twoFingerUp by settings.twoFingerUp.collectAsStateWithLifecycle(null)
     val twoFingerDown by settings.twoFingerDown.collectAsStateWithLifecycle(null)
@@ -190,6 +191,14 @@ fun MinimalHomeSettingsScreen() {
         }
         item {
             PreferenceCategory(title = stringResource(R.string.fork_search_help_title)) {
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_minimal_search),
+                    summary = stringResource(R.string.fork_preference_minimal_search_summary),
+                    icon = R.drawable.search_24px,
+                    value = searchStyle,
+                    onValueChanged = settings::setSearchStyle,
+                    enabled = enabled,
+                )
                 Preference(
                     title = stringResource(R.string.fork_search_prefixes_title),
                     summary = stringResource(R.string.fork_search_prefixes_summary),

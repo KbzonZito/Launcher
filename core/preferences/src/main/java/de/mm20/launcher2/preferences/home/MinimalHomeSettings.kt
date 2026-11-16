@@ -71,6 +71,12 @@ class MinimalHomeSettings internal constructor(
 
     fun setCalendarAppKey(key: String?) = dataStore.update { it.copy(minimalHomeCalendarAppKey = key) }
 
+    /** Búsqueda (y paneles) con velo oscuro y filas transparentes, como la home. */
+    val searchStyle: Flow<Boolean>
+        get() = dataStore.data.map { it.minimalSearchStyle }.distinctUntilChanged()
+
+    fun setSearchStyle(enabled: Boolean) = dataStore.update { it.copy(minimalSearchStyle = enabled) }
+
     val appSwipeLeft: Flow<Map<String, String>>
         get() = dataStore.data.map { it.minimalHomeAppSwipeLeft }.distinctUntilChanged()
 
