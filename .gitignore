@@ -296,3 +296,8 @@ fabric.properties
 .idea/studiobot.xml
 
 .kotlin
+# [fork] Material de firma: nunca al repo (es público)
+*.p12
+*.pem
+signing.env
+keystore.properties

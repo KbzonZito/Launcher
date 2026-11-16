@@ -29,27 +29,37 @@ android {
             minorApiLevel = libs.versions.compileSdkMinor.get().toInt()
         }
     }
-    defaultConfig {
-        applicationId = "de.mm20.launcher2"
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = System.getenv("VERSION_CODE_OVERRIDE")?.toIntOrNull() ?: 2026091500
-        versionName = "1.41.0"
-        signingConfig = signingConfigs.getByName("debug")
+    // [fork] Firma personal: la misma clave PKCS12 que Bookloft (~/.config/biblioteca/release.p12).
+    // En local la exporta scripts/deploy.sh; en CI viene de los secretos del repo.
+    // Sin estas variables, release queda SIN firmar (no instalable) en vez de caer a la clave de debug.
+    val personalSigning = signingConfigs.create("personal") {
+        storeFile = System.getenv("KEYSTORE_PATH")?.let { file(it) }
+        storePassword = System.getenv("KEYSTORE_PASSWORD")
+        keyAlias = System.getenv("KEY_ALIAS")
+        keyPassword = System.getenv("KEYSTORE_PASSWORD")
+        storeType = "PKCS12"
+    }
+    val hasPersonalSigning = personalSigning.storeFile?.exists() == true &&
+            !personalSigning.storePassword.isNullOrEmpty() && !personalSigning.keyAlias.isNullOrEmpty()
+    if (!hasPersonalSigning) {
+        logger.warn("[signing] KEYSTORE_PATH/KEYSTORE_PASSWORD/KEY_ALIAS no definidos: release sin firmar, debug con clave de debug.")
     }
 
-    signingConfigs {
-        create("gh-actions") {
-            storeFile = file("${System.getenv("RUNNER_TEMP")}/keystore/keystore.jks")
-            storePassword = System.getenv("KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("SIGNING_KEY_ALIAS")
-            keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
-        }
+    defaultConfig {
+        // [fork] applicationId propio: convive con Kvaesitso oficial. El namespace Kotlin sigue siendo de.mm20.launcher2.
+        applicationId = "dev.kbzon.launcher"
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+        // [fork] versionCode = nº de commits de HEAD: siempre crece en main, así cada APK actualiza al anterior.
+        versionCode = System.getenv("VERSION_CODE_OVERRIDE")?.toIntOrNull()
+            ?: providers.exec { commandLine("git", "rev-list", "--count", "HEAD") }
+                .standardOutput.asText.get().trim().toInt()
+        versionName = "0.1.0"
+        signingConfig = if (hasPersonalSigning) personalSigning else null
     }
 
     buildTypes {
         release {
-            applicationIdSuffix = ".release"
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
@@ -58,15 +68,17 @@ android {
             )
         }
         debug {
-            applicationIdSuffix = ".debug"
+            // [fork] .dev: se instala junto al daily driver para probar sin romper la home.
+            applicationIdSuffix = ".dev"
             isDebuggable = true
+            signingConfig = if (hasPersonalSigning) personalSigning else signingConfigs.getByName("debug")
         }
         create("nightly") {
             initWith(getByName("release"))
             matchingFallbacks += "release"
             applicationIdSuffix = ".nightly"
             versionNameSuffix = "-${LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))}-nightly"
-            signingConfig = signingConfigs.findByName("gh-actions")
+            signingConfig = if (hasPersonalSigning) personalSigning else null
 
             isMinifyEnabled = true
             isShrinkResources = true
