@@ -86,4 +86,19 @@
     <string name="fork_backup_wrong_password">Wrong password</string>
     <string name="fork_preference_media_player">Media player</string>
     <string name="fork_preference_media_player_summary">Show what\'s playing with play/pause and skip, under the glance line. Needs notification access.</string>
+    <string name="fork_glance_setup_weather">Set up weather</string>
+    <string name="fork_lock_needs_accessibility">To turn the screen off, enable the launcher\'s accessibility service</string>
+    <string name="fork_preference_clock_app">Clock opens</string>
+    <string name="fork_preference_clock_app_auto">Clock app</string>
+    <string name="fork_preference_usage_suggestions">Suggest apps by usage</string>
+    <string name="fork_preference_usage_suggestions_summary">Frequent apps (◷ in the alphabet). Off: they disappear everywhere</string>
+    <string name="fork_preference_rail_double_tap">Double-tap the alphabet to lock</string>
+    <string name="fork_preference_rail_double_tap_summary">Turns the screen off. Needs the accessibility service</string>
+    <string name="fork_preference_wave">Wave intensity</string>
+    <string name="fork_wave_soft">Soft</string>
+    <string name="fork_wave_normal">Normal</string>
+    <string name="fork_wave_strong">Strong</string>
+    <string name="fork_preference_rail_both_edges">Alphabet from both edges</string>
+    <string name="fork_preference_rail_both_edges_summary">Slide along the opposite edge too; a bubble shows the letter</string>
+    <string name="fork_preference_category_rail">Alphabet</string>
 </resources>

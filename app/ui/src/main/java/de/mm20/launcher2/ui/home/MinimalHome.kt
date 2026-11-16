@@ -114,18 +114,25 @@ fun MinimalHome(
     val notificationPreviews by vm.notificationPreviews.collectAsState()
     val hiddenUnlocked by HiddenItemsLock.unlocked.collectAsState()
 
-    val railEntries = remember(appsByLetter.keys, hiddenApps.isNotEmpty()) {
+    val usageSuggestions by vm.usageSuggestions.collectAsState()
+    val railDoubleTapLock by vm.railDoubleTapLock.collectAsState()
+    val waveIntensity by vm.waveIntensity.collectAsState()
+    val railBothEdges by vm.railBothEdges.collectAsState()
+    val railState = remember { RailState() }
+
+    val railEntries = remember(appsByLetter.keys, hiddenApps.isNotEmpty(), usageSuggestions) {
         buildList {
             add(MinimalHomeVM.STAR)
-            add(MinimalHomeVM.RECENT)
+            if (usageSuggestions) add(MinimalHomeVM.RECENT)
             addAll(appsByLetter.keys)
             if (hiddenApps.isNotEmpty()) add(MinimalHomeVM.HIDDEN)
         }
     }
 
     // Las ocultas solo se ven desbloqueadas; si el candado se cierra, se vuelve a favoritos.
-    LaunchedEffect(hiddenUnlocked, selectedLetter) {
+    LaunchedEffect(hiddenUnlocked, selectedLetter, usageSuggestions) {
         if (selectedLetter == MinimalHomeVM.HIDDEN && !hiddenUnlocked) vm.selectLetter(null)
+        if (selectedLetter == MinimalHomeVM.RECENT && !usageSuggestions) vm.selectLetter(null)
     }
     DisposableEffect(selectedLetter) {
         HiddenItemsLock.hiddenContentVisible = selectedLetter == MinimalHomeVM.HIDDEN
@@ -171,11 +178,12 @@ fun MinimalHome(
                 val clockSection: @Composable () -> Unit = {
                     val clockStyle by vm.clockStyle.collectAsState()
                     val calendarApp by vm.calendarApp.collectAsState()
+                    val clockApp by vm.clockApp.collectAsState()
                     HomeClock(
                         style = clockStyle,
                         shadow = shadow,
                         accent = accent,
-                        onTimeClick = { context.tryStart(Intent(AlarmClock.ACTION_SHOW_ALARMS)) },
+                        onTimeClick = { clockApp?.let { vm.launch(context, it) } ?: context.openClockApp() },
                         onDateClick = { now ->
                             val app = calendarApp
                             if (app != null) vm.launch(context, app) else context.openCalendarAt(now)
@@ -278,25 +286,48 @@ fun MinimalHome(
                 }
             }
 
+            val onRailLetter: (Char) -> Unit = { entry ->
+                when (entry) {
+                    MinimalHomeVM.STAR -> vm.selectLetter(null)
+                    MinimalHomeVM.HIDDEN -> Unit // se resuelve al soltar, para no pedir la huella al pasar
+                    else -> vm.selectLetter(entry)
+                }
+            }
+            val onRailRelease: (Char) -> Unit = { entry ->
+                if (entry == MinimalHomeVM.HIDDEN) {
+                    HiddenItemsLock.requestUnlock { vm.selectLetter(MinimalHomeVM.HIDDEN) }
+                }
+            }
+            val onRailDoubleTap: (() -> Unit)? = if (railDoubleTapLock) ({ vm.lockScreen(context) }) else null
+
+            // Zona invisible en el borde contrario: el riel funciona desde ambos lados.
+            if (railBothEdges) {
+                RailMirrorZone(
+                    state = railState,
+                    letters = railEntries,
+                    onLetter = onRailLetter,
+                    onRelease = onRailRelease,
+                    onDoubleTap = onRailDoubleTap,
+                    onDragStateChange = {},
+                    accent = MaterialTheme.colorScheme.primary,
+                    onAccent = MaterialTheme.colorScheme.onPrimary,
+                    zoneOnLeft = !railOnLeft,
+                    modifier = Modifier.align(if (railOnLeft) Alignment.CenterEnd else Alignment.CenterStart),
+                )
+            }
+
             AlphabetRail(
+                state = railState,
                 letters = railEntries,
                 selected = selectedLetter ?: MinimalHomeVM.STAR,
-                onLetter = { entry ->
-                    when (entry) {
-                        MinimalHomeVM.STAR -> vm.selectLetter(null)
-                        MinimalHomeVM.HIDDEN -> Unit // se resuelve al soltar, para no pedir la huella al pasar
-                        else -> vm.selectLetter(entry)
-                    }
-                },
-                onRelease = { entry ->
-                    if (entry == MinimalHomeVM.HIDDEN) {
-                        HiddenItemsLock.requestUnlock { vm.selectLetter(MinimalHomeVM.HIDDEN) }
-                    }
-                },
+                onLetter = onRailLetter,
+                onRelease = onRailRelease,
+                onDoubleTap = onRailDoubleTap,
                 onDragStateChange = {},
                 color = contentColor,
                 accent = accent,
                 railOnLeft = railOnLeft,
+                intensity = waveIntensity,
                 modifier = Modifier
                     .align(if (railOnLeft) Alignment.CenterStart else Alignment.CenterEnd)
                     .padding(horizontal = 8.dp),
@@ -369,6 +400,21 @@ private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?) {
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            if (forecast == null) {
+                // Sin datos de clima: acceso directo para configurarlo (proveedor / ubicación).
+                GlanceItem(
+                    icon = R.drawable.light_mode_24px,
+                    text = stringResource(R.string.fork_glance_setup_weather),
+                    style = style,
+                    color = dim.copy(alpha = 0.6f),
+                    onClick = {
+                        context.tryStart(
+                            Intent().setClassName(context, "de.mm20.launcher2.ui.settings.SettingsActivity")
+                                .putExtra(de.mm20.launcher2.ui.settings.SettingsActivity.EXTRA_ROUTE, de.mm20.launcher2.ui.settings.SettingsActivity.ROUTE_WEATHER_INTEGRATION)
+                        )
+                    },
+                )
+            }
             forecast?.let { f ->
                 GlanceItem(
                     icon = null,
@@ -444,6 +490,13 @@ private fun Context.openCalendarAt(time: Long) {
         ContentUris.appendId(it, time)
     }.build()
     tryStart(Intent(Intent.ACTION_VIEW, uri))
+}
+
+/** Abre la app de reloj completa (la que atiende las alarmas), no solo la pantalla de alarmas. */
+private fun Context.openClockApp() {
+    val handler = packageManager.resolveActivity(Intent(AlarmClock.ACTION_SHOW_ALARMS), 0)?.activityInfo?.packageName
+    val launch = handler?.let { packageManager.getLaunchIntentForPackage(it) }
+    tryStart(launch ?: Intent(AlarmClock.ACTION_SHOW_ALARMS))
 }
 
 /** Abre la app de clima instalada (Samsung, Breezy, Google), en ese orden. Configurable en la fase 6. */

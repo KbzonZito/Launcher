@@ -205,6 +205,32 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     /** Apps que abren el clima y la fecha (null = automático). */
     val weatherApp: StateFlow<SavableSearchable?> = resolveKey(homeSettings.weatherAppKey)
     val calendarApp: StateFlow<SavableSearchable?> = resolveKey(homeSettings.calendarAppKey)
+    val clockApp: StateFlow<SavableSearchable?> = resolveKey(homeSettings.clockAppKey)
+
+    fun setClockApp(app: SavableSearchable?) {
+        app?.let { searchableRepository.insert(it) }
+        homeSettings.setClockAppKey(app?.key)
+    }
+
+    val usageSuggestions = homeSettings.usageSuggestions.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+    val railDoubleTapLock = homeSettings.railDoubleTapLock.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+    val waveIntensity = homeSettings.waveIntensity.stateIn(viewModelScope, SharingStarted.Eagerly, de.mm20.launcher2.preferences.home.WaveIntensity.Normal)
+    val railBothEdges = homeSettings.railBothEdges.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
+    /**
+     * Apaga la pantalla. Necesita el servicio de accesibilidad del launcher; si no está activo,
+     * avisa y abre el ajuste.
+     */
+    fun lockScreen(context: Context) {
+        if (permissionsManager.checkPermissionOnce(PermissionGroup.Accessibility)) {
+            globalActions.lockScreen()
+        } else {
+            android.widget.Toast.makeText(context, de.mm20.launcher2.ui.R.string.fork_lock_needs_accessibility, android.widget.Toast.LENGTH_LONG).show()
+            (context as? androidx.appcompat.app.AppCompatActivity)?.let {
+                permissionsManager.requestPermission(it, PermissionGroup.Accessibility)
+            }
+        }
+    }
 
     fun setWeatherApp(app: SavableSearchable?) {
         app?.let { searchableRepository.insert(it) }

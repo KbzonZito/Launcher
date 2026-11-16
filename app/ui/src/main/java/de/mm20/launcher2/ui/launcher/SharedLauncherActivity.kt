@@ -154,9 +154,9 @@ abstract class SharedLauncherActivity(
                         val searchBarColor by viewModel.searchBarColor.collectAsState()
                         val searchBarAutofocus by viewModel.autoFocusSearch.collectAsState(false)
                         val widgetsOnHomeScreen by viewModel.widgetsOnHomeScreen.collectAsState()
-                        val minimalHome by org.koin.compose.koinInject<de.mm20.launcher2.preferences.home.MinimalHomeSettings>().enabled.collectAsState(null) // [fork]
-                        val minimalSearchStyle by org.koin.compose.koinInject<de.mm20.launcher2.preferences.home.MinimalHomeSettings>().searchStyle.collectAsState(true) // [fork]
-                        val minimalUi = minimalHome == true && minimalSearchStyle // [fork]
+                        // [fork] Solo existe la home minimalista (y su búsqueda): ya no son opcionales.
+                        val minimalHome: Boolean? = true
+                        val minimalUi = true
                         val wallpaperBlur by viewModel.wallpaperBlur.collectAsState()
                         val wallpaperBlurRadius by viewModel.wallpaperBlurRadius.collectAsState()
 

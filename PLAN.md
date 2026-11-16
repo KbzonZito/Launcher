@@ -227,7 +227,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **6** | 6 estilos de reloj (fino, negrita, apilado, en palabras, analógico, progreso del día), agenda de hasta 3 eventos, apps de clima y fecha configurables | ✅ PR #9 |
 | **7** | Layout adaptativo: dos columnas en pantallas anchas en horizontal, una columna grande en la Tab en vertical, reloj escalado | ✅ PR #10 |
 | **8** | Baseline profile generado (34 k reglas + perfil de arranque), módulo `:baselineprofile` con generador y Macrobenchmark | ✅ PR #11, restyle de la búsqueda en PR #14 · pendiente: medir en el S24U, pulido de animaciones |
-| **9** | Correcciones rápidas: reloj abre la app completa, clima junto a la alarma, solo home minimalista, sugerencias desactivables, doble toque en el riel = bloquear, ola más marcada, riel desde ambos bordes | ⏳ v0.2.1 |
+| **9** | Correcciones rápidas: reloj abre la app completa, clima junto a la alarma, solo home minimalista, sugerencias desactivables, doble toque en el riel = bloquear, ola más marcada, riel desde ambos bordes | ✅ PR #20 |
 | **10** | Fork total: renombrar a `dev.kbzon.launcher`, sin upstream, Ko-fi, borrar lo que no se usa | ⏳ v0.3.0 |
 | **11** | Home configurable: popup al mantener pulsado, gestos unificados, botón de acción, editar diseño | ⏳ v0.4 |
 | **12** | Orden de lista por letra, carpetas (popup), reordenar favoritos | ⏳ v0.5 |
@@ -254,7 +254,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: fases 9 → 15 (§10)**, en este orden: correcciones rápidas → fork total → pantalla principal configurable → riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: fases 10 → 15 (§10)**, en este orden: fork total → pantalla principal configurable → riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -276,6 +276,7 @@ Decisiones tomadas (16-11-2026):
 - **Relojes**: el cambio de estilo funciona; se agregan más tipos.
 
 ### Fase 9 — Correcciones y ajustes rápidos (v0.2.1)
+> ✅ Hecha (PR #20). Ajustes nuevos en Inicio minimalista → *Alfabeto* (sugerencias por uso, doble toque para bloquear, ambos bordes, intensidad de la ola) y *Reloj y vistazo* (El reloj abre).
 1. **El reloj abre la app de reloj completa**, no solo las alarmas. Nuevo ajuste "El reloj abre" (como clima y fecha): por defecto la app de reloj del sistema (Samsung Reloj); se puede elegir otra.
 2. **Clima en la misma línea que la alarma**, siempre que haya datos. Si no hay proveedor o ubicación, mostrar un acceso "Configurar clima" en vez de nada (hoy simplemente no aparece).
 3. **Solo home minimalista**: quitar el interruptor; los homes de Kvaesitso (reloj + widgets) dejan de ser alcanzables. La búsqueda minimalista queda siempre activa.

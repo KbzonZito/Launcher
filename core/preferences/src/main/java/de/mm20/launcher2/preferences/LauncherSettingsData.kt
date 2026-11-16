@@ -129,6 +129,12 @@ data class LauncherSettingsData internal constructor(
     // [fork] Búsqueda con el estilo de la home minimalista (velo oscuro, sin tarjetas).
     val minimalSearchStyle: Boolean = true,
     val minimalHomeMediaPlayer: Boolean = true,
+    // [fork] Fase 9
+    val minimalHomeClockAppKey: String? = null,
+    val minimalHomeUsageSuggestions: Boolean = true,
+    val minimalHomeRailDoubleTapLock: Boolean = true,
+    val minimalHomeWaveIntensity: de.mm20.launcher2.preferences.home.WaveIntensity = de.mm20.launcher2.preferences.home.WaveIntensity.Normal,
+    val minimalHomeRailBothEdges: Boolean = true,
 
     val badgesNotifications: Boolean = true,
     val badgesSuspendedApps: Boolean = true,
