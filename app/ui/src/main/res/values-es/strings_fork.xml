@@ -36,4 +36,9 @@
     <string name="fork_menu_uninstall">Desinstalar</string>
     <string name="fork_preference_minimal_home_notification_previews">Vista previa de notificaciones</string>
     <string name="fork_preference_minimal_home_notification_previews_summary">Mostrar la última notificación debajo de cada app</string>
+    <string name="fork_search_help_title">Búsqueda</string>
+    <string name="fork_search_prefixes_title">Prefijos de búsqueda</string>
+    <string name="fork_search_prefixes_summary">Escribe una letra y un espacio para buscar en una sola categoría: a apps · c contactos · e eventos · f archivos · s atajos · t herramientas. Enter abre el primer resultado.</string>
+    <string name="fork_search_side_button_title">Buscar con el botón lateral</string>
+    <string name="fork_search_side_button_summary">Ajustes → Aplicaciones → Aplicaciones predeterminadas → Asistente digital → elige este launcher. Luego Ajustes → Funciones avanzadas → Botón lateral → Mantener pulsado → Asistente digital. Con Good Lock (RegiStar) también puedes asignar cualquier botón al atajo \"Buscar\".</string>
 </resources>

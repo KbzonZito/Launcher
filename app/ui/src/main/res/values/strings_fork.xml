@@ -37,4 +37,9 @@
     <string name="fork_menu_uninstall">Uninstall</string>
     <string name="fork_preference_minimal_home_notification_previews">Notification previews</string>
     <string name="fork_preference_minimal_home_notification_previews_summary">Show the latest notification under each app</string>
+    <string name="fork_search_help_title">Search</string>
+    <string name="fork_search_prefixes_title">Search prefixes</string>
+    <string name="fork_search_prefixes_summary">Type a letter and a space to search a single category: a apps · c contacts · e events · f files · s shortcuts · t tools. Enter opens the first result.</string>
+    <string name="fork_search_side_button_title">Search from the side button</string>
+    <string name="fork_search_side_button_summary">Settings → Apps → Default apps → Digital assistant app → choose this launcher. Then Settings → Advanced features → Side button → Press and hold → Digital assistant. With Good Lock (RegiStar) you can also map any button to the \"Search\" shortcut.</string>
 </resources>

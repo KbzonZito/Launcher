@@ -173,6 +173,7 @@ class SearchVM : ViewModel(), KoinComponent {
     }
 
     private var searchJob: Job? = null
+    private var filtersBeforePrefix: SearchFilters? = null // [fork]
     fun search(query: String, forceRestart: Boolean = false) {
         if (searchQuery.value == query && !forceRestart) return
         if (searchQuery.value != query) {
@@ -184,7 +185,18 @@ class SearchVM : ViewModel(), KoinComponent {
         searchQuery.value = query
         isSearchEmpty.value = query.isEmpty()
 
+        // [fork] Prefijos ("c ana" = solo contactos). La barra sigue mostrando el texto original;
+        // los filtros visibles pasan a la categoría del prefijo y se restauran al borrarlo.
+        val prefixed = de.mm20.launcher2.ui.search.SearchPrefixes.parse(query)
+        if (prefixed != null) {
+            val base = filtersBeforePrefix ?: filters.value.also { filtersBeforePrefix = it }
+            filters.value = with(de.mm20.launcher2.ui.search.SearchPrefixes) { prefixed.applyTo(base) }
+        } else {
+            filtersBeforePrefix?.let { filters.value = it }
+            filtersBeforePrefix = null
+        }
         val filters = filters.value
+        @Suppress("NAME_SHADOWING") val query = prefixed?.query ?: query
 
         if (filters.enabledCategories == 1) {
             expandedCategory.value = when {

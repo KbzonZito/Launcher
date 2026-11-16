@@ -7,6 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.mm20.launcher2.preferences.home.MinimalHomeSettings
 import de.mm20.launcher2.ui.R
+import de.mm20.launcher2.ui.component.preferences.Preference
 import de.mm20.launcher2.ui.component.preferences.PreferenceCategory
 import de.mm20.launcher2.ui.component.preferences.PreferenceScreen
 import de.mm20.launcher2.ui.component.preferences.SwitchPreference
@@ -57,6 +58,20 @@ fun MinimalHomeSettingsScreen() {
                     value = railOnLeft,
                     onValueChanged = settings::setRailOnLeft,
                     enabled = enabled,
+                )
+            }
+        }
+        item {
+            PreferenceCategory(title = stringResource(R.string.fork_search_help_title)) {
+                Preference(
+                    title = stringResource(R.string.fork_search_prefixes_title),
+                    summary = stringResource(R.string.fork_search_prefixes_summary),
+                    icon = R.drawable.search_24px,
+                )
+                Preference(
+                    title = stringResource(R.string.fork_search_side_button_title),
+                    summary = stringResource(R.string.fork_search_side_button_summary),
+                    icon = R.drawable.power_24px,
                 )
             }
         }

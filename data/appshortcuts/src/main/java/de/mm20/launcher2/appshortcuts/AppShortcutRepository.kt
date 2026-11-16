@@ -85,6 +85,8 @@ internal class AppShortcutRepositoryImpl(
                 launcherApps.getShortcuts(query, user)
             } catch (e: IllegalStateException) {
                 emptyList()
+            } catch (e: SecurityException) { // [fork] dejó de ser la home entre la comprobación y la llamada
+                emptyList()
             }
             val appShortcuts = mutableListOf<LauncherShortcut>()
             appShortcuts.addAll(
@@ -225,7 +227,13 @@ internal class AppShortcutRepositoryImpl(
                     LauncherApps.ShortcutQuery.FLAG_MATCH_CACHED or
                     LauncherApps.ShortcutQuery.FLAG_MATCH_PINNED_BY_ANY_LAUNCHER
         )
-        val result = launcherApps.getShortcuts(shortcutQuery, Process.myUserHandle()) ?: emptyList()
+        // [fork] El permiso de arriba puede estar desactualizado (p. ej. justo al dejar de ser la home
+        // por defecto): getShortcuts lanza SecurityException y tumbaba la app.
+        val result = try {
+            launcherApps.getShortcuts(shortcutQuery, Process.myUserHandle()) ?: emptyList()
+        } catch (e: SecurityException) {
+            emptyList()
+        }
         val normalized = result.mapNotNull {
             if ("${it.`package`}:${it.userHandle.getSerialNumber(context)}" in blocklist) return@mapNotNull null
             NormalizedShortcut(
