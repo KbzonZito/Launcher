@@ -132,7 +132,6 @@ dependencies {
 
     implementation(libs.koin.android)
 
-    implementation(project(":services:accounts"))
     implementation(project(":data:applications"))
     implementation(project(":data:appshortcuts"))
     implementation(project(":services:backup"))
@@ -153,9 +152,7 @@ dependencies {
     implementation(project(":services:icons"))
     implementation(project(":core:ktx"))
     implementation(project(":services:music"))
-    implementation(project(":libs:nextcloud"))
     implementation(project(":data:notifications"))
-    implementation(project(":libs:owncloud"))
     implementation(project(":core:permissions"))
     implementation(project(":core:profiles"))
     implementation(project(":core:preferences"))

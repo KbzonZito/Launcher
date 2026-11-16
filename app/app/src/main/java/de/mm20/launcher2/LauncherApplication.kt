@@ -4,7 +4,6 @@ import android.app.Application
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.SvgDecoder
-import de.mm20.launcher2.accounts.accountsModule
 import de.mm20.launcher2.applications.applicationsModule
 import de.mm20.launcher2.appshortcuts.appShortcutsModule
 import de.mm20.launcher2.backup.backupModule
@@ -63,7 +62,6 @@ class LauncherApplication : Application(), CoroutineScope, ImageLoaderFactory {
             androidContext(this@LauncherApplication)
             modules(
                 listOf(
-                    accountsModule,
                     applicationsModule,
                     appShortcutsModule,
                     baseModule,

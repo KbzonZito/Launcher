@@ -116,12 +116,8 @@ import de.mm20.launcher2.ui.settings.main.MainRoute
 import de.mm20.launcher2.ui.settings.main.MainSettingsScreen
 import de.mm20.launcher2.ui.settings.media.MediaIntegrationSettingsRoute
 import de.mm20.launcher2.ui.settings.media.MediaIntegrationSettingsScreen
-import de.mm20.launcher2.ui.settings.nextcloud.NextcloudSettingsRoute
-import de.mm20.launcher2.ui.settings.nextcloud.NextcloudSettingsScreen
 import de.mm20.launcher2.ui.settings.osm.OsmSettingsRoute
 import de.mm20.launcher2.ui.settings.osm.OsmSettingsScreen
-import de.mm20.launcher2.ui.settings.owncloud.OwncloudSettingsRoute
-import de.mm20.launcher2.ui.settings.owncloud.OwncloudSettingsScreen
 import de.mm20.launcher2.ui.settings.plugins.PluginSettingsRoute
 import de.mm20.launcher2.ui.settings.plugins.PluginSettingsScreen
 import de.mm20.launcher2.ui.settings.plugins.PluginsSettingsRoute
@@ -273,12 +269,6 @@ class SettingsActivity : BaseActivity() {
             }
             entry<IntegrationsSettingsRoute> {
                 IntegrationsSettingsScreen()
-            }
-            entry<NextcloudSettingsRoute> {
-                NextcloudSettingsScreen()
-            }
-            entry<OwncloudSettingsRoute> {
-                OwncloudSettingsScreen()
             }
             entry<TasksIntegrationSettingsRoute> {
                 TasksIntegrationSettingsScreen()
