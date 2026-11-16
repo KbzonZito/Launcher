@@ -77,6 +77,12 @@ class MinimalHomeSettings internal constructor(
 
     fun setSearchStyle(enabled: Boolean) = dataStore.update { it.copy(minimalSearchStyle = enabled) }
 
+    /** Mini reproductor en la home cuando hay música sonando o en pausa. */
+    val mediaPlayer: Flow<Boolean>
+        get() = dataStore.data.map { it.minimalHomeMediaPlayer }.distinctUntilChanged()
+
+    fun setMediaPlayer(enabled: Boolean) = dataStore.update { it.copy(minimalHomeMediaPlayer = enabled) }
+
     val appSwipeLeft: Flow<Map<String, String>>
         get() = dataStore.data.map { it.minimalHomeAppSwipeLeft }.distinctUntilChanged()
 

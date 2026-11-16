@@ -84,4 +84,6 @@
     <string name="fork_backup_restore_description">Enter the password used when this backup was created.</string>
     <string name="fork_backup_restore_button">Unlock</string>
     <string name="fork_backup_wrong_password">Wrong password</string>
+    <string name="fork_preference_media_player">Media player</string>
+    <string name="fork_preference_media_player_summary">Show what\'s playing with play/pause and skip, under the glance line. Needs notification access.</string>
 </resources>

@@ -60,6 +60,7 @@ fun MinimalHomeSettingsScreen() {
     }.collectAsStateWithLifecycle(emptyList())
     val clockStyle by settings.clockStyle.collectAsStateWithLifecycle(MinimalClockStyle.Thin)
     val agenda by settings.agenda.collectAsStateWithLifecycle(true)
+    val mediaPlayer by settings.mediaPlayer.collectAsStateWithLifecycle(true)
     val weatherKey by settings.weatherAppKey.collectAsStateWithLifecycle(null)
     val calendarKey by settings.calendarAppKey.collectAsStateWithLifecycle(null)
     val linkedKeys = listOfNotNull(weatherKey, calendarKey)
@@ -134,6 +135,14 @@ fun MinimalHomeSettingsScreen() {
                     icon = R.drawable.event_24px,
                     value = agenda,
                     onValueChanged = settings::setAgenda,
+                    enabled = enabled,
+                )
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_media_player),
+                    summary = stringResource(R.string.fork_preference_media_player_summary),
+                    icon = R.drawable.play_circle_24px,
+                    value = mediaPlayer,
+                    onValueChanged = settings::setMediaPlayer,
                     enabled = enabled,
                 )
                 Preference(
