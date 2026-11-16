@@ -2,6 +2,11 @@ package de.mm20.launcher2.ui.settings.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import de.mm20.launcher2.preferences.GestureAction
+import de.mm20.launcher2.searchable.SavableSearchableRepository
+import de.mm20.launcher2.ui.settings.gestures.GesturePreference
+import kotlinx.coroutines.flow.flowOf
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
@@ -25,6 +30,24 @@ fun MinimalHomeSettingsScreen() {
     val showIcons by settings.showIcons.collectAsStateWithLifecycle(true)
     val railOnLeft by settings.railOnLeft.collectAsStateWithLifecycle(false)
     val notificationPreviews by settings.notificationPreviews.collectAsStateWithLifecycle(true)
+    val splitSwipeDown by settings.splitSwipeDown.collectAsStateWithLifecycle(true)
+    val twoFingerUp by settings.twoFingerUp.collectAsStateWithLifecycle(null)
+    val twoFingerDown by settings.twoFingerDown.collectAsStateWithLifecycle(null)
+    val searchableRepository: SavableSearchableRepository = koinInject()
+    val launchKeys = listOfNotNull(
+        (twoFingerUp as? GestureAction.Launch)?.key,
+        (twoFingerDown as? GestureAction.Launch)?.key,
+    )
+    val launchTargets by remember(launchKeys) {
+        if (launchKeys.isEmpty()) flowOf(emptyList()) else searchableRepository.getByKeys(launchKeys)
+    }.collectAsStateWithLifecycle(emptyList())
+    val gestureOptions = remember {
+        setOf(
+            GestureAction.NoAction::class, GestureAction.Notifications::class, GestureAction.QuickSettings::class,
+            GestureAction.ScreenLock::class, GestureAction.Search::class, GestureAction.PowerMenu::class,
+            GestureAction.Recents::class, GestureAction.Launch::class,
+        )
+    }
 
     PreferenceScreen(title = stringResource(R.string.fork_preference_screen_minimal_home)) {
         item {
@@ -58,6 +81,41 @@ fun MinimalHomeSettingsScreen() {
                     value = railOnLeft,
                     onValueChanged = settings::setRailOnLeft,
                     enabled = enabled,
+                )
+            }
+        }
+        item {
+            PreferenceCategory(title = stringResource(R.string.fork_preference_category_gestures)) {
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_split_swipe_down),
+                    summary = stringResource(R.string.fork_preference_split_swipe_down_summary),
+                    icon = R.drawable.swipe_down_alt_24px,
+                    value = splitSwipeDown,
+                    onValueChanged = settings::setSplitSwipeDown,
+                    enabled = enabled,
+                )
+                GesturePreference(
+                    title = stringResource(R.string.fork_preference_two_finger_up),
+                    icon = R.drawable.swipe_up_alt_24px,
+                    value = twoFingerUp,
+                    onValueChanged = { action, target -> target?.let { searchableRepository.insert(it) }; settings.setTwoFingerUp(action) },
+                    options = gestureOptions,
+                    shortcutOptions = launchTargets,
+                    widgetOptions = emptyList(),
+                )
+                GesturePreference(
+                    title = stringResource(R.string.fork_preference_two_finger_down),
+                    icon = R.drawable.swipe_down_alt_24px,
+                    value = twoFingerDown,
+                    onValueChanged = { action, target -> target?.let { searchableRepository.insert(it) }; settings.setTwoFingerDown(action) },
+                    options = gestureOptions,
+                    shortcutOptions = launchTargets,
+                    widgetOptions = emptyList(),
+                )
+                Preference(
+                    title = stringResource(R.string.fork_menu_shortcuts),
+                    summary = stringResource(R.string.fork_preference_app_swipe_hint),
+                    icon = R.drawable.swipe_right_alt_24px,
                 )
             }
         }

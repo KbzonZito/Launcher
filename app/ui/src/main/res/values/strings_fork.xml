@@ -42,4 +42,14 @@
     <string name="fork_search_prefixes_summary">Type a letter and a space to search a single category: a apps · c contacts · e events · f files · s shortcuts · t tools. Enter opens the first result.</string>
     <string name="fork_search_side_button_title">Search from the side button</string>
     <string name="fork_search_side_button_summary">Settings → Apps → Default apps → Digital assistant app → choose this launcher. Then Settings → Advanced features → Side button → Press and hold → Digital assistant. With Good Lock (RegiStar) you can also map any button to the \"Search\" shortcut.</string>
+    <string name="fork_menu_swipe_left">Swipe left opens…</string>
+    <string name="fork_menu_swipe_left_change">Change swipe-left app</string>
+    <string name="fork_menu_swipe_left_clear">Remove swipe-left app</string>
+    <string name="fork_swipe_left_picker_title">Swiping %1$s left opens</string>
+    <string name="fork_preference_category_gestures">Gestures</string>
+    <string name="fork_preference_split_swipe_down">Split swipe down</string>
+    <string name="fork_preference_split_swipe_down_summary">Left half opens notifications, right half opens quick settings</string>
+    <string name="fork_preference_two_finger_up">Two fingers up</string>
+    <string name="fork_preference_two_finger_down">Two fingers down</string>
+    <string name="fork_preference_app_swipe_hint">Per app: swipe right shows its shortcuts; swipe left opens the app you assign from its long-press menu.</string>
 </resources>
