@@ -19,6 +19,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -46,6 +47,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.unit.Dp
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -153,89 +156,123 @@ fun MinimalHome(
                 )
                 .padding(insets)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        start = if (railOnLeft) 56.dp else 28.dp,
-                        end = if (railOnLeft) 28.dp else 56.dp,
-                    ),
-            ) {
-                Spacer(Modifier.height(40.dp))
-                val clockStyle by vm.clockStyle.collectAsState()
-                val calendarApp by vm.calendarApp.collectAsState()
-                HomeClock(
-                    style = clockStyle,
-                    shadow = shadow,
-                    accent = accent,
-                    onTimeClick = { context.tryStart(Intent(AlarmClock.ACTION_SHOW_ALARMS)) },
-                    onDateClick = { now ->
-                        val app = calendarApp
-                        if (app != null) vm.launch(context, app) else context.openCalendarAt(now)
-                    },
-                )
-                GlanceLine(vm = vm, shadow = shadow)
-                Spacer(Modifier.weight(1f))
-
-                AnimatedContent(
-                    targetState = selectedLetter,
-                    transitionSpec = {
-                        (fadeIn(spring(stiffness = 900f)) + slideInVertically(spring(dampingRatio = 0.85f, stiffness = 700f)) { it / 8 })
-                            .togetherWith(fadeOut(spring(stiffness = 1500f)) + slideOutVertically { -it / 12 })
-                    },
-                    contentAlignment = Alignment.BottomStart,
-                    label = "homeList",
-                ) { letter ->
-                    val (header, items) = when (letter) {
-                        null -> null to favorites
-                        MinimalHomeVM.RECENT -> stringResource(R.string.fork_minimal_home_frequent) to frequentApps
-                        MinimalHomeVM.HIDDEN -> stringResource(R.string.fork_minimal_home_hidden) to hiddenApps
-                        else -> letter.toString() to appsByLetter[letter].orEmpty()
-                    }
-                    Column {
-                        if (header != null) {
-                            Text(
-                                text = header,
-                                color = accent,
-                                style = TextStyle(
-                                    fontSize = if (header.length == 1) 44.sp else 28.sp,
-                                    fontWeight = FontWeight.Light,
-                                    shadow = shadow,
-                                ),
-                                modifier = Modifier.padding(bottom = 4.dp).combinedClickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null,
-                                    onClick = { vm.selectLetter(null) },
-                                ),
-                            )
-                        }
-                        if (items.isEmpty()) {
-                            Text(
-                                text = stringResource(
-                                    if (letter == null) R.string.fork_minimal_home_empty_favorites
-                                    else R.string.fork_minimal_home_empty_section
-                                ),
-                                style = TextStyle(fontSize = 15.sp, shadow = shadow),
-                                color = contentColor.copy(alpha = 0.7f),
-                                modifier = Modifier.padding(bottom = 8.dp),
-                            )
-                        } else {
-                            HomeList(
-                                items = items,
-                                vm = vm,
-                                showIcons = showIcons,
-                                notifications = notificationsByPackage,
-                                showPreview = notificationPreviews,
-                                isHiddenSection = letter == MinimalHomeVM.HIDDEN,
-                                shadow = shadow,
-                                accent = accent,
-                                listState = listState,
-                                onLaunch = onLaunch,
-                            )
+            // [fork] Pantallas anchas (Tab S9, plegables abiertos): dos columnas.
+            BoxWithConstraints(Modifier.fillMaxSize()) {
+                val large = maxWidth >= 600.dp
+                // Dos columnas solo en horizontal; la Tab en vertical usa una columna más grande.
+                val wide = large && maxWidth > maxHeight
+                val listMaxHeight = when {
+                    wide -> maxHeight * 0.8f
+                    large -> maxHeight * 0.5f
+                    else -> 460.dp
+                }
+                val clockScale = if (large) 1.5f else 1f
+                val clockSection: @Composable () -> Unit = {
+                    val clockStyle by vm.clockStyle.collectAsState()
+                    val calendarApp by vm.calendarApp.collectAsState()
+                    HomeClock(
+                        style = clockStyle,
+                        shadow = shadow,
+                        accent = accent,
+                        onTimeClick = { context.tryStart(Intent(AlarmClock.ACTION_SHOW_ALARMS)) },
+                        onDateClick = { now ->
+                            val app = calendarApp
+                            if (app != null) vm.launch(context, app) else context.openCalendarAt(now)
+                        },
+                        scale = clockScale,
+                    )
+                    GlanceLine(vm = vm, shadow = shadow)
+                }
+                val listSection: @Composable () -> Unit = {
+                    CompositionLocalProvider(LocalHomeListMaxHeight provides listMaxHeight) {
+                        AnimatedContent(
+                            targetState = selectedLetter,
+                            transitionSpec = {
+                                (fadeIn(spring(stiffness = 900f)) + slideInVertically(spring(dampingRatio = 0.85f, stiffness = 700f)) { it / 8 })
+                                    .togetherWith(fadeOut(spring(stiffness = 1500f)) + slideOutVertically { -it / 12 })
+                            },
+                            contentAlignment = Alignment.BottomStart,
+                            label = "homeList",
+                        ) { letter ->
+                            val (header, items) = when (letter) {
+                                null -> null to favorites
+                                MinimalHomeVM.RECENT -> stringResource(R.string.fork_minimal_home_frequent) to frequentApps
+                                MinimalHomeVM.HIDDEN -> stringResource(R.string.fork_minimal_home_hidden) to hiddenApps
+                                else -> letter.toString() to appsByLetter[letter].orEmpty()
+                            }
+                            Column {
+                                if (header != null) {
+                                    Text(
+                                        text = header,
+                                        color = accent,
+                                        style = TextStyle(
+                                            fontSize = if (header.length == 1) 44.sp else 28.sp,
+                                            fontWeight = FontWeight.Light,
+                                            shadow = shadow,
+                                        ),
+                                        modifier = Modifier.padding(bottom = 4.dp).combinedClickable(
+                                            interactionSource = remember { MutableInteractionSource() },
+                                            indication = null,
+                                            onClick = { vm.selectLetter(null) },
+                                        ),
+                                    )
+                                }
+                                if (items.isEmpty()) {
+                                    Text(
+                                        text = stringResource(
+                                            if (letter == null) R.string.fork_minimal_home_empty_favorites
+                                            else R.string.fork_minimal_home_empty_section
+                                        ),
+                                        style = TextStyle(fontSize = 15.sp, shadow = shadow),
+                                        color = contentColor.copy(alpha = 0.7f),
+                                        modifier = Modifier.padding(bottom = 8.dp),
+                                    )
+                                } else {
+                                    HomeList(
+                                        items = items,
+                                        vm = vm,
+                                        showIcons = showIcons,
+                                        notifications = notificationsByPackage,
+                                        showPreview = notificationPreviews,
+                                        isHiddenSection = letter == MinimalHomeVM.HIDDEN,
+                                        shadow = shadow,
+                                        accent = accent,
+                                        listState = listState,
+                                        onLaunch = onLaunch,
+                                    )
+                                }
+                            }
                         }
                     }
                 }
-                Spacer(Modifier.height(32.dp))
+                val sidePadding = Modifier.padding(
+                    start = if (railOnLeft) 56.dp else 28.dp,
+                    end = if (railOnLeft) 28.dp else 56.dp,
+                )
+                if (wide) {
+                    Row(Modifier.fillMaxSize().then(sidePadding).padding(horizontal = 24.dp)) {
+                        Column(
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            clockSection()
+                        }
+                        Spacer(Modifier.width(48.dp))
+                        Column(Modifier.weight(1f).fillMaxHeight()) {
+                            Spacer(Modifier.weight(1f))
+                            listSection()
+                            Spacer(Modifier.height(32.dp))
+                        }
+                    }
+                } else {
+                    Column(Modifier.fillMaxSize().then(sidePadding)) {
+                        Spacer(Modifier.height(40.dp))
+                        clockSection()
+                        Spacer(Modifier.weight(1f))
+                        listSection()
+                        Spacer(Modifier.height(32.dp))
+                    }
+                }
             }
 
             AlphabetRail(
@@ -281,7 +318,7 @@ private fun HomeList(
     val swipeLeftTargets by vm.swipeLeftTargets.collectAsState()
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxWidth().heightIn(max = 460.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(max = LocalHomeListMaxHeight.current),
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         items(items, key = { it.key }) { item ->
@@ -404,3 +441,6 @@ private fun Context.openWeatherApp() {
         return
     }
 }
+
+/** Alto máximo de la lista de la home (más alto en pantallas anchas). */
+private val LocalHomeListMaxHeight = staticCompositionLocalOf { 460.dp }
