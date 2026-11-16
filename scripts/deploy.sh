@@ -27,8 +27,8 @@ export KEYSTORE_PASSWORD KEY_ALIAS
 export KEYSTORE_PATH="$DIR/release.p12"
 
 case "$BUILD_TYPE" in
-  release) TASK=assembleDefaultRelease; APK=app/app/build/outputs/apk/default/release/app-default-release.apk ;;
-  debug)   TASK=assembleDefaultDebug;   APK=app/app/build/outputs/apk/default/debug/app-default-debug.apk ;;
+  release) TASK=assembleRelease; APK=app/app/build/outputs/apk/release/app-release.apk ;;
+  debug)   TASK=assembleDebug;   APK=app/app/build/outputs/apk/debug/app-debug.apk ;;
   *) echo "Uso: $0 [release|debug]" >&2; exit 1 ;;
 esac
 

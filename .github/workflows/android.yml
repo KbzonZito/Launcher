@@ -49,12 +49,12 @@ jobs:
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-        run: ./gradlew :app:app:assembleDefaultRelease
+        run: ./gradlew :app:app:assembleRelease
 
       - name: Collect APK
         id: apk
         run: |
-          APK=$(ls app/app/build/outputs/apk/default/release/*.apk | head -1)
+          APK=$(ls app/app/build/outputs/apk/release/*.apk | head -1)
           NAME="launcher-$(git rev-list --count HEAD)-$(git rev-parse --short HEAD).apk"
           cp "$APK" "$RUNNER_TEMP/$NAME"
           echo "path=$RUNNER_TEMP/$NAME" >> "$GITHUB_OUTPUT"

@@ -1,6 +1,6 @@
 // [fork] Genera el baseline profile del launcher y mide el arranque (Macrobenchmark).
-//   ./gradlew :app:app:generateDefaultReleaseBaselineProfile   (con un dispositivo/emulador conectado)
-//   ./gradlew :baselineprofile:connectedDefaultBenchmarkReleaseAndroidTest
+//   ./gradlew :app:app:generateReleaseBaselineProfile   (con un dispositivo/emulador conectado)
+//   ./gradlew :baselineprofile:connectedBenchmarkReleaseAndroidTest
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -23,12 +23,6 @@ android {
     }
 
     targetProjectPath = ":app:app"
-
-    flavorDimensions += "variant"
-    productFlavors {
-        create("default") { dimension = "variant" }
-        create("fdroid") { dimension = "variant" }
-    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

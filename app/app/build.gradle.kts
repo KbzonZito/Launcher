@@ -10,8 +10,7 @@ plugins {
 android {
     androidResources {
         generateLocaleConfig = true
-        // [fork] Solo español e inglés en el APK; las traducciones siguen en el repo para no generar conflictos con upstream.
-        localeFilters += listOf("en", "es")
+        localeFilters += listOf("en", "es") // [fork] solo español e inglés
     }
 
     packaging {
@@ -75,31 +74,6 @@ android {
             applicationIdSuffix = ".dev"
             isDebuggable = true
             signingConfig = if (hasPersonalSigning) personalSigning else signingConfigs.getByName("debug")
-        }
-        create("nightly") {
-            initWith(getByName("release"))
-            matchingFallbacks += "release"
-            applicationIdSuffix = ".nightly"
-            versionNameSuffix = "-${LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))}-nightly"
-            signingConfig = if (hasPersonalSigning) personalSigning else null
-
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-
-        flavorDimensions += "variant"
-        productFlavors {
-            create("default") {
-                dimension = "variant"
-            }
-            create("fdroid") {
-                dimension = "variant"
-                versionNameSuffix = "-fdroid"
-            }
         }
     }
 

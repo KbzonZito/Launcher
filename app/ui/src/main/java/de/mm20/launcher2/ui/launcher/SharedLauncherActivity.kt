@@ -53,8 +53,6 @@ import de.mm20.launcher2.ui.launcher.scaffold.ScaffoldAnimation
 import de.mm20.launcher2.ui.launcher.scaffold.ScaffoldConfiguration
 import de.mm20.launcher2.ui.launcher.scaffold.ScaffoldGesture
 import de.mm20.launcher2.ui.launcher.scaffold.SearchBarPosition
-import de.mm20.launcher2.ui.launcher.scaffold.components.ClockAndWidgetsHomeComponent
-import de.mm20.launcher2.ui.launcher.scaffold.components.ClockHomeComponent
 import de.mm20.launcher2.ui.launcher.scaffold.components.DismissComponent
 import de.mm20.launcher2.ui.launcher.scaffold.components.FeedComponent
 import de.mm20.launcher2.ui.launcher.scaffold.components.LaunchComponent
@@ -365,13 +363,7 @@ abstract class SharedLauncherActivity(
                                     val gestures = gestures!!
 
                                     val config = ScaffoldConfiguration(
-                                        homeComponent = if (minimalHome == true) {
-                                            de.mm20.launcher2.ui.launcher.scaffold.components.MinimalHomeComponent // [fork]
-                                        } else if (widgetsOnHomeScreen == true) {
-                                            ClockAndWidgetsHomeComponent
-                                        } else {
-                                            ClockHomeComponent
-                                        },
+                                        homeComponent = de.mm20.launcher2.ui.launcher.scaffold.components.MinimalHomeComponent, // [fork] única home
                                         searchComponent = searchComponent,
                                         swipeUp = getScaffoldGesture(
                                             gestures.swipeUpAction,
