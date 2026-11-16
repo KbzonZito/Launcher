@@ -64,3 +64,4 @@ include(":core:devicepose")
 include(":core:profiles")
 include(":data:i18n")
 include(":services:feed")
+include(":baselineprofile") // [fork] baseline profile + benchmarks
