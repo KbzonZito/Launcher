@@ -3,6 +3,22 @@ package de.mm20.launcher2.ui.settings.home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import de.mm20.launcher2.preferences.home.MinimalClockStyle
+import de.mm20.launcher2.ui.common.SearchablePicker
+import de.mm20.launcher2.ui.component.DismissableBottomSheet
+import de.mm20.launcher2.ui.component.preferences.ListPreference
+import de.mm20.launcher2.ui.component.preferences.ListPreferenceItem
 import de.mm20.launcher2.preferences.GestureAction
 import de.mm20.launcher2.searchable.SavableSearchableRepository
 import de.mm20.launcher2.ui.settings.gestures.GesturePreference
@@ -41,6 +57,23 @@ fun MinimalHomeSettingsScreen() {
     val launchTargets by remember(launchKeys) {
         if (launchKeys.isEmpty()) flowOf(emptyList()) else searchableRepository.getByKeys(launchKeys)
     }.collectAsStateWithLifecycle(emptyList())
+    val clockStyle by settings.clockStyle.collectAsStateWithLifecycle(MinimalClockStyle.Thin)
+    val agenda by settings.agenda.collectAsStateWithLifecycle(true)
+    val weatherKey by settings.weatherAppKey.collectAsStateWithLifecycle(null)
+    val calendarKey by settings.calendarAppKey.collectAsStateWithLifecycle(null)
+    val linkedKeys = listOfNotNull(weatherKey, calendarKey)
+    val linkedApps by remember(linkedKeys) {
+        if (linkedKeys.isEmpty()) flowOf(emptyList()) else searchableRepository.getByKeys(linkedKeys)
+    }.collectAsStateWithLifecycle(emptyList())
+    var pickingFor by remember { mutableStateOf<String?>(null) } // "weather" | "calendar"
+    val clockLabels = mapOf(
+        MinimalClockStyle.Thin to R.string.fork_clock_thin,
+        MinimalClockStyle.Bold to R.string.fork_clock_bold,
+        MinimalClockStyle.Stacked to R.string.fork_clock_stacked,
+        MinimalClockStyle.Words to R.string.fork_clock_words,
+        MinimalClockStyle.Analog to R.string.fork_clock_analog,
+        MinimalClockStyle.DayProgress to R.string.fork_clock_day_progress,
+    )
     val gestureOptions = remember {
         setOf(
             GestureAction.NoAction::class, GestureAction.Notifications::class, GestureAction.QuickSettings::class,
@@ -80,6 +113,42 @@ fun MinimalHomeSettingsScreen() {
                     icon = R.drawable.gesture_24px,
                     value = railOnLeft,
                     onValueChanged = settings::setRailOnLeft,
+                    enabled = enabled,
+                )
+            }
+        }
+        item {
+            PreferenceCategory(title = stringResource(R.string.fork_preference_category_clock)) {
+                ListPreference(
+                    title = stringResource(R.string.fork_preference_clock_style),
+                    icon = R.drawable.schedule_24px,
+                    items = MinimalClockStyle.entries.map { ListPreferenceItem(stringResource(clockLabels.getValue(it)), it) },
+                    value = clockStyle,
+                    onValueChanged = settings::setClockStyle,
+                    enabled = enabled,
+                )
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_agenda),
+                    summary = stringResource(R.string.fork_preference_agenda_summary),
+                    icon = R.drawable.event_24px,
+                    value = agenda,
+                    onValueChanged = settings::setAgenda,
+                    enabled = enabled,
+                )
+                Preference(
+                    title = stringResource(R.string.fork_preference_weather_app),
+                    summary = linkedApps.firstOrNull { it.key == weatherKey }?.let { it.labelOverride ?: it.label }
+                        ?: stringResource(R.string.fork_preference_linked_app_auto),
+                    icon = R.drawable.light_mode_24px,
+                    onClick = { pickingFor = "weather" },
+                    enabled = enabled,
+                )
+                Preference(
+                    title = stringResource(R.string.fork_preference_calendar_app),
+                    summary = linkedApps.firstOrNull { it.key == calendarKey }?.let { it.labelOverride ?: it.label }
+                        ?: stringResource(R.string.fork_preference_linked_app_auto),
+                    icon = R.drawable.calendar_today_24px,
+                    onClick = { pickingFor = "calendar" },
                     enabled = enabled,
                 )
             }
@@ -132,6 +201,34 @@ fun MinimalHomeSettingsScreen() {
                     icon = R.drawable.power_24px,
                 )
             }
+        }
+    }
+
+    DismissableBottomSheet(expanded = pickingFor != null, onDismissRequest = { pickingFor = null }) {
+        val forWeather = pickingFor == "weather"
+        Column {
+            Text(
+                stringResource(if (forWeather) R.string.fork_preference_weather_app else R.string.fork_preference_calendar_app),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+            )
+            TextButton(
+                onClick = {
+                    if (forWeather) settings.setWeatherAppKey(null) else settings.setCalendarAppKey(null)
+                    pickingFor = null
+                },
+                modifier = Modifier.padding(horizontal = 12.dp),
+            ) { Text(stringResource(R.string.fork_preference_linked_app_auto)) }
+            SearchablePicker(
+                value = linkedApps.firstOrNull { it.key == (if (forWeather) weatherKey else calendarKey) },
+                onValueChanged = { app ->
+                    app?.let { searchableRepository.insert(it) }
+                    if (forWeather) settings.setWeatherAppKey(app?.key) else settings.setCalendarAppKey(app?.key)
+                    pickingFor = null
+                },
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
+            )
         }
     }
 }

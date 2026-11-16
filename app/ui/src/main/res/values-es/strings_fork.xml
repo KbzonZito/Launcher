@@ -51,4 +51,17 @@
     <string name="fork_preference_two_finger_up">Dos dedos hacia arriba</string>
     <string name="fork_preference_two_finger_down">Dos dedos hacia abajo</string>
     <string name="fork_preference_app_swipe_hint">Por app: deslizar a la derecha muestra sus atajos; deslizar a la izquierda abre la app que le asignes desde su menú.</string>
+    <string name="fork_preference_category_clock">Reloj y vistazo</string>
+    <string name="fork_preference_clock_style">Estilo de reloj</string>
+    <string name="fork_clock_thin">Fino</string>
+    <string name="fork_clock_bold">Negrita</string>
+    <string name="fork_clock_stacked">Apilado</string>
+    <string name="fork_clock_words">En palabras</string>
+    <string name="fork_clock_analog">Analógico</string>
+    <string name="fork_clock_day_progress">Progreso del día</string>
+    <string name="fork_preference_agenda">Agenda</string>
+    <string name="fork_preference_agenda_summary">Mostrar hasta 3 próximos eventos en vez de solo el siguiente</string>
+    <string name="fork_preference_weather_app">El clima abre</string>
+    <string name="fork_preference_calendar_app">La fecha abre</string>
+    <string name="fork_preference_linked_app_auto">Automático</string>
 </resources>

@@ -162,7 +162,18 @@ fun MinimalHome(
                     ),
             ) {
                 Spacer(Modifier.height(40.dp))
-                HomeClock(shadow = shadow)
+                val clockStyle by vm.clockStyle.collectAsState()
+                val calendarApp by vm.calendarApp.collectAsState()
+                HomeClock(
+                    style = clockStyle,
+                    shadow = shadow,
+                    accent = accent,
+                    onTimeClick = { context.tryStart(Intent(AlarmClock.ACTION_SHOW_ALARMS)) },
+                    onDateClick = { now ->
+                        val app = calendarApp
+                        if (app != null) vm.launch(context, app) else context.openCalendarAt(now)
+                    },
+                )
                 GlanceLine(vm = vm, shadow = shadow)
                 Spacer(Modifier.weight(1f))
 
@@ -291,45 +302,14 @@ private fun HomeList(
     }
 }
 
-@Composable
-private fun HomeClock(shadow: Shadow?) {
-    val context = LocalContext.current
-    val now by produceState(System.currentTimeMillis()) {
-        while (true) {
-            value = System.currentTimeMillis()
-            delay(60_000 - value % 60_000)
-        }
-    }
-    val is24h = DateFormat.is24HourFormat(context)
-    val time = DateFormat.format(if (is24h) "HH:mm" else "h:mm", now).toString()
-    val datePattern = DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM")
-    val date = DateFormat.format(datePattern, now).toString().replaceFirstChar { it.uppercase() }
-
-    Text(
-        text = time,
-        style = TextStyle(fontSize = 76.sp, fontWeight = FontWeight.Thin, letterSpacing = (-2).sp, shadow = shadow),
-        modifier = Modifier.combinedClickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null,
-            onClick = { context.tryStart(Intent(AlarmClock.ACTION_SHOW_ALARMS)) },
-        ),
-    )
-    Text(
-        text = date,
-        style = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.Medium, shadow = shadow),
-        modifier = Modifier.combinedClickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null,
-            onClick = { context.openCalendarAt(now) },
-        ),
-    )
-}
-
 /** Próximo evento · clima · próxima alarma, cada uno abre su app. */
 @Composable
 private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?) {
     val context = LocalContext.current
     val event by vm.nextEvent.collectAsState()
+    val upcoming by vm.upcomingEvents.collectAsState()
+    val agenda by vm.agendaEnabled.collectAsState()
+    val weatherApp by vm.weatherApp.collectAsState()
     val forecast by vm.weather.collectAsState()
     val alarm by remember { vm.nextAlarm(context) }.collectAsState(null)
     val measurementSystem = LocalMeasurementSystem.current
@@ -337,7 +317,8 @@ private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?) {
     val dim = LocalContentColor.current.copy(alpha = 0.85f)
 
     Column(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        event?.let { ev ->
+        val events = if (agenda) upcoming else listOfNotNull(event)
+        events.forEach { ev ->
             GlanceItem(
                 icon = R.drawable.event_24px,
                 text = ev.glanceText(context),
@@ -353,7 +334,7 @@ private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?) {
                     text = "${formatTemperature(context, f.temperature.toFloat(), measurementSystem)} ${f.condition}",
                     style = style,
                     color = dim,
-                    onClick = { context.openWeatherApp() },
+                    onClick = { weatherApp?.let { vm.launch(context, it) } ?: context.openWeatherApp() },
                 )
             }
             alarm?.takeIf { it - System.currentTimeMillis() < 24 * 60 * 60 * 1000L }?.let { t ->
@@ -389,7 +370,14 @@ private fun GlanceItem(icon: Int?, text: String, style: TextStyle, color: Color,
 
 private fun CalendarEvent.glanceText(context: Context): String {
     val start = startTime
-    val time = if (start != null) DateFormat.getTimeFormat(context).format(Date(start)) else ""
+    val time = when {
+        allDay || start == null -> ""
+        else -> {
+            val t = DateFormat.getTimeFormat(context).format(Date(start))
+            if (android.text.format.DateUtils.isToday(start)) t
+            else "${DateFormat.format("EEE", start)} $t"
+        }
+    }
     return listOf(time, labelOverride ?: label).filter { it.isNotBlank() }.joinToString("  ")
 }
 

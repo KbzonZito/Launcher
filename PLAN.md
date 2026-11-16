@@ -169,9 +169,15 @@ Hoy Kvaesitso tiene 7: swipe ↑↓←→, doble tap, long press y botón home. 
 - Atajos de búsqueda con prefijo (`g ` web, `c ` contactos, `>` comandos/acciones, `=` calculadora).
 
 ### 5.5 Relojes
+
+> **Estado (fase 6):** `ui/home/HomeClocks.kt` con 6 estilos: fino, negrita, apilado (minutos en color de acento), en palabras (español/inglés, redondeado a 5 min), analógico minimalista (aguja de minutos con resorte) y progreso del día. Se elige en Ajustes → Inicio minimalista → Reloj y vistazo. Pendiente: flip, reloj mundial/dual (para la Tab), fuente/peso configurables, AOD.
+
 Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números grandes apilados, reloj de palabras ("son las diez y cuarto"), analógico minimal de un trazo, flip, anillo de progreso del día/semana, reloj dual/mundial (útil en la Tab), y estilo "solo hora en bold + fecha en thin". Todos con fuente, peso y color configurables, y AOD-friendly.
 
 ### 5.6 Widgets y apps existentes (calendario y clima)
+
+> **Estado (fase 6):** agenda en la línea de un vistazo (hasta 3 eventos en 36 h, primero los de todo el día; los de mañana llevan el día); tocar un evento lo abre en tu app de calendario; "El clima abre" y "La fecha abre" se eligen entre tus apps (automático por defecto). Los widgets de terceros (Samsung Weather, etc.) siguen disponibles en el panel de widgets de Kvaesitso (deslizar hacia arriba). Pendiente: widgets propios (batería de dispositivos, temporizador, notas) y widgets incrustados en la home minimalista.
+
 - **Calendario**: `data/calendar` ya lee `CalendarContract` → funciona con Samsung Calendar y Google Calendar. Widgets propios: agenda compacta, próximo evento en la glance line, mini mes. Tocar un evento → abre **tu** app de calendario en ese evento (`ACTION_VIEW` sobre el URI del evento); el destino es configurable.
 - **Clima**: los datos vienen de Open‑Meteo (sin clave, sin cuenta) o Breezy Weather (ya hay provider). Tocar el clima → abre la app de clima que elijas (Samsung Weather, Google, Breezy).
 - **Widgets nativos de terceros**: el `AppWidgetHost` existente permite poner el widget de Samsung Weather/Calendar tal cual, en línea dentro de la lista o en una página de widgets.
@@ -205,7 +211,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **3** | Riel ★ ◷ 🔒, notificaciones en la lista, shortcuts al deslizar, menú propio | ✅ PR #6 |
 | **4** | Prefijos de búsqueda, botón lateral con teclado inmediato, guía de configuración, fix de crash de shortcuts | ✅ PR #7 (restyle visual de resultados → fase 8) |
 | **5** | Bajar dividido (notificaciones / ajustes rápidos), dos dedos ↑↓ configurables, deslizar una app a la izquierda abre otra | ✅ PR #8 |
-| **6** | Relojes nuevos + widgets de calendario/clima + app de clima configurable | ⏳ |
+| **6** | 6 estilos de reloj (fino, negrita, apilado, en palabras, analógico, progreso del día), agenda de hasta 3 eventos, apps de clima y fecha configurables | ✅ PR #9 |
 | **7** | Layout de tablet | ⏳ |
 | **8** | Baseline profiles, benchmarks, pulido de animaciones, medir arranque en el S24U | ⏳ |
 | continuo | `upstream-sync` mensual por tag | ⏳ |
