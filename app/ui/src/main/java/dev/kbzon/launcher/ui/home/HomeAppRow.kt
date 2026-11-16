@@ -154,6 +154,7 @@ fun HomeAppRow(
                         indication = null,
                         onClick = { onLaunch(item, rowBounds) },
                         onLongClick = {
+                            HomeLongPressGuard.markChildLongPress()
                             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                             menuOpen = true
                         },

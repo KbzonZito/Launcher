@@ -116,7 +116,7 @@ data class LauncherSettingsData internal constructor(
     val minimalHomeRailOnLeft: Boolean = false,
     val minimalHomeNotificationPreviews: Boolean = true,
     // [fork] Gestos de la home minimalista.
-    val minimalHomeSplitSwipeDown: Boolean = true,
+    val minimalHomeSplitSwipeDown: Boolean = false, // [fork] por defecto ↓ = buscar
     val minimalHomeTwoFingerUp: GestureAction = GestureAction.NoAction,
     val minimalHomeTwoFingerDown: GestureAction = GestureAction.QuickSettings,
     /** clave de app → clave de lo que se abre al deslizarla a la izquierda */
@@ -135,6 +135,11 @@ data class LauncherSettingsData internal constructor(
     val minimalHomeRailDoubleTapLock: Boolean = true,
     val minimalHomeWaveIntensity: dev.kbzon.launcher.preferences.home.WaveIntensity = dev.kbzon.launcher.preferences.home.WaveIntensity.Normal,
     val minimalHomeRailBothEdges: Boolean = true,
+    // [fork] Fase 11
+    val minimalHomeActionButton: Boolean = true,
+    val minimalHomeActionButtonActions: dev.kbzon.launcher.preferences.home.ActionButtonActions = dev.kbzon.launcher.preferences.home.ActionButtonActions(),
+    val minimalHomeLayoutPortrait: dev.kbzon.launcher.preferences.home.HomeLayout = dev.kbzon.launcher.preferences.home.HomeLayout(),
+    val minimalHomeLayoutLandscape: dev.kbzon.launcher.preferences.home.HomeLayout = dev.kbzon.launcher.preferences.home.HomeLayout(),
 
     val badgesNotifications: Boolean = true,
     val badgesSuspendedApps: Boolean = true,

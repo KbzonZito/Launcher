@@ -41,6 +41,8 @@ import dev.kbzon.launcher.ui.component.ShapedLauncherIcon
 import dev.kbzon.launcher.ui.component.preferences.GuardedPreference
 import dev.kbzon.launcher.ui.component.preferences.ListPreference
 import dev.kbzon.launcher.ui.component.preferences.PreferenceCategory
+import dev.kbzon.launcher.ui.component.preferences.Preference
+import dev.kbzon.launcher.ui.component.preferences.SwitchPreference
 import dev.kbzon.launcher.ui.component.preferences.PreferenceScreen
 import dev.kbzon.launcher.ui.ktx.toPixels
 import kotlinx.serialization.Serializable
@@ -73,6 +75,9 @@ fun GestureSettingsScreen() {
         if (FeatureFlags.feed) {
             options + GestureAction.Feed::class
         } else options
+
+    // [fork] Acciones disponibles para dos dedos y el botón de acción.
+    val homeOptions = options
 
 
     val context = LocalContext.current
@@ -164,22 +169,6 @@ fun GestureSettingsScreen() {
                     )
                 }
 
-                val longPress by viewModel.longPress.collectAsStateWithLifecycle(null)
-                GuardedPreference(
-                    locked = hasPermission == false && requiresAccessibilityService(longPress),
-                    description = stringResource(R.string.missing_permission_accessibility_gesture_settings),
-                    onUnlock = { viewModel.requestPermission(context as AppCompatActivity) },
-                ) {
-                    GesturePreference(
-                        title = stringResource(R.string.preference_gesture_long_press),
-                        icon = R.drawable.circle_24px,
-                        value = longPress,
-                        onValueChanged = viewModel::setLongPress,
-                        options = options,
-                        shortcutOptions = shortcutOptions,
-                        widgetOptions = widgetOptions,
-                    )
-                }
                 val homeButton by viewModel.homeButton.collectAsStateWithLifecycle(null)
                 GuardedPreference(
                     locked = hasPermission == false && requiresAccessibilityService(homeButton),
@@ -195,6 +184,78 @@ fun GestureSettingsScreen() {
                         shortcutOptions = shortcutOptions,
                         widgetOptions = widgetOptions,
                     )
+                }
+            }
+        }
+        // [fork] Gestos propios de la home minimalista.
+        item {
+            val split by viewModel.splitSwipeDown.collectAsStateWithLifecycle(false)
+            val twoUp by viewModel.twoFingerUp.collectAsStateWithLifecycle(null)
+            val twoDown by viewModel.twoFingerDown.collectAsStateWithLifecycle(null)
+            PreferenceCategory(title = stringResource(R.string.fork_preference_category_home_gestures)) {
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_split_swipe_down),
+                    summary = stringResource(R.string.fork_preference_split_swipe_down_override),
+                    icon = R.drawable.swipe_down_alt_24px,
+                    value = split,
+                    onValueChanged = viewModel::setSplitSwipeDown,
+                )
+                GesturePreference(
+                    title = stringResource(R.string.fork_preference_two_finger_up),
+                    icon = R.drawable.swipe_up_alt_24px,
+                    value = twoUp,
+                    onValueChanged = viewModel::setTwoFingerUp,
+                    options = homeOptions,
+                    shortcutOptions = shortcutOptions,
+                    widgetOptions = widgetOptions,
+                )
+                GesturePreference(
+                    title = stringResource(R.string.fork_preference_two_finger_down),
+                    icon = R.drawable.swipe_down_alt_24px,
+                    value = twoDown,
+                    onValueChanged = viewModel::setTwoFingerDown,
+                    options = homeOptions,
+                    shortcutOptions = shortcutOptions,
+                    widgetOptions = widgetOptions,
+                )
+                Preference(
+                    title = stringResource(R.string.preference_gesture_long_press),
+                    summary = stringResource(R.string.fork_gesture_long_press_fixed),
+                    icon = R.drawable.circle_24px,
+                )
+            }
+        }
+        item {
+            val buttonEnabled by viewModel.actionButton.collectAsStateWithLifecycle(true)
+            val actions by viewModel.actionButtonActions.collectAsStateWithLifecycle(null)
+            PreferenceCategory(title = stringResource(R.string.fork_preference_category_action_button)) {
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_action_button),
+                    summary = stringResource(R.string.fork_preference_action_button_summary),
+                    icon = R.drawable.radio_button_checked_24px,
+                    value = buttonEnabled,
+                    onValueChanged = viewModel::setActionButton,
+                )
+                val a = actions
+                if (buttonEnabled && a != null) {
+                    @Composable
+                    fun row(title: Int, icon: Int, value: GestureAction, set: (dev.kbzon.launcher.preferences.home.ActionButtonActions, GestureAction) -> dev.kbzon.launcher.preferences.home.ActionButtonActions) =
+                        GesturePreference(
+                            title = stringResource(title),
+                            icon = icon,
+                            value = value,
+                            onValueChanged = { action, searchable -> viewModel.setActionButtonAction(searchable) { set(it, action) } },
+                            options = homeOptions,
+                            shortcutOptions = shortcutOptions,
+                            widgetOptions = widgetOptions,
+                        )
+                    row(R.string.fork_button_tap, R.drawable.adjust_24px, a.tap) { c, v -> c.copy(tap = v) }
+                    row(R.string.fork_button_double_tap, R.drawable.adjust_24px, a.doubleTap) { c, v -> c.copy(doubleTap = v) }
+                    row(R.string.fork_button_long_press, R.drawable.circle_24px, a.longPress) { c, v -> c.copy(longPress = v) }
+                    row(R.string.fork_button_swipe_up, R.drawable.swipe_up_alt_24px, a.swipeUp) { c, v -> c.copy(swipeUp = v) }
+                    row(R.string.fork_button_swipe_down, R.drawable.swipe_down_alt_24px, a.swipeDown) { c, v -> c.copy(swipeDown = v) }
+                    row(R.string.fork_button_swipe_left, R.drawable.swipe_left_alt_24px, a.swipeLeft) { c, v -> c.copy(swipeLeft = v) }
+                    row(R.string.fork_button_swipe_right, R.drawable.swipe_right_alt_24px, a.swipeRight) { c, v -> c.copy(swipeRight = v) }
                 }
             }
         }

@@ -390,11 +390,7 @@ abstract class SharedLauncherActivity(
                                             gestures.doubleTapApp,
                                             Gesture.DoubleTap,
                                         ),
-                                        longPress = getScaffoldGesture(
-                                            gestures.longPressAction,
-                                            gestures.longPressApp,
-                                            Gesture.LongPress,
-                                        ),
+                                        longPress = null, // [fork] mantener pulsado = menú rápido de la home
                                         homeButton = getScaffoldGesture(
                                             gestures.homeButtonAction,
                                             gestures.homeButtonApp,

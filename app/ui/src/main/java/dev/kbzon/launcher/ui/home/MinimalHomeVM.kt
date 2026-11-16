@@ -217,6 +217,18 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     val waveIntensity = homeSettings.waveIntensity.stateIn(viewModelScope, SharingStarted.Eagerly, dev.kbzon.launcher.preferences.home.WaveIntensity.Normal)
     val railBothEdges = homeSettings.railBothEdges.stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
+    // Fase 11: botón de acción, diseño y ajustes del menú rápido
+    val actionButtonEnabled = homeSettings.actionButton.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+    val actionButtonActions = homeSettings.actionButtonActions
+        .stateIn(viewModelScope, SharingStarted.Eagerly, dev.kbzon.launcher.preferences.home.ActionButtonActions())
+    fun layout(landscape: Boolean): Flow<dev.kbzon.launcher.preferences.home.HomeLayout> = homeSettings.layout(landscape)
+    fun saveLayout(landscape: Boolean, layout: dev.kbzon.launcher.preferences.home.HomeLayout) = homeSettings.setLayout(landscape, layout)
+    fun setClockStyle(style: MinimalClockStyle) = homeSettings.setClockStyle(style)
+    fun setRailOnLeft(left: Boolean) = homeSettings.setRailOnLeft(left)
+    fun setShowIcons(show: Boolean) = homeSettings.setShowIcons(show)
+    fun setSplitSwipeDown(enabled: Boolean) = homeSettings.setSplitSwipeDown(enabled)
+    fun setActionButton(enabled: Boolean) = homeSettings.setActionButton(enabled)
+
     /**
      * Apaga la pantalla. Necesita el servicio de accesibilidad del launcher; si no está activo,
      * avisa y abre el ajuste.

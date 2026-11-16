@@ -66,10 +66,10 @@ class RailState {
     var currentIndex by mutableIntStateOf(-1)
 }
 
-/** Alto del riel: 62 % del disponible, como mucho [maxLetterHeight] por letra. */
-fun Modifier.railHeight(letterCount: Int, maxLetterHeight: Dp = 28.dp): Modifier = layout { measurable, constraints ->
+/** Alto del riel: [fraction] del disponible, como mucho [maxLetterHeight] por letra. */
+fun Modifier.railHeight(letterCount: Int, fraction: Float = 0.62f, maxLetterHeight: Dp = 28.dp): Modifier = layout { measurable, constraints ->
     val cap = (maxLetterHeight * letterCount).roundToPx()
-    val h = min((constraints.maxHeight * 0.62f).toInt(), cap)
+    val h = min((constraints.maxHeight * fraction).toInt(), cap)
     val placeable = measurable.measure(constraints.copy(minHeight = h, maxHeight = h))
     layout(placeable.width, h) { placeable.place(0, 0) }
 }
@@ -160,6 +160,7 @@ fun AlphabetRail(
     railOnLeft: Boolean,
     intensity: WaveIntensity,
     modifier: Modifier = Modifier,
+    heightFraction: Float = 0.62f,
 ) {
     if (letters.isEmpty()) return
     val view = LocalView.current
@@ -181,7 +182,7 @@ fun AlphabetRail(
     Box(
         modifier = modifier
             .width(40.dp)
-            .railHeight(letters.size)
+            .railHeight(letters.size, heightFraction)
             .layout { m, c ->
                 val p = m.measure(c)
                 state.heightPx = p.height
@@ -250,6 +251,7 @@ fun RailMirrorZone(
     onAccent: Color,
     zoneOnLeft: Boolean,
     modifier: Modifier = Modifier,
+    heightFraction: Float = 0.62f,
 ) {
     if (letters.isEmpty()) return
     val view = LocalView.current
@@ -264,7 +266,7 @@ fun RailMirrorZone(
     Box(
         modifier = modifier
             .width(zoneWidth)
-            .railHeight(letters.size)
+            .railHeight(letters.size, heightFraction)
             .railTouch(state, letters, mirror = true, view, { currentOnLetter }, { currentOnRelease }, { currentOnDoubleTap }, { currentOnDrag }),
     ) {
         val idx = state.currentIndex

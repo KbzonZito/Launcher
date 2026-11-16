@@ -87,11 +87,41 @@ internal class GestureSettingsScreenVM : ViewModel(), KoinComponent {
         gestureSettings.setHomeButton(action)
     }
 
+    // [fork] Gestos propios de la home y botón de acción (todo en esta pantalla).
+    private val homeSettings: dev.kbzon.launcher.preferences.home.MinimalHomeSettings by inject()
+    val splitSwipeDown = homeSettings.splitSwipeDown
+    fun setSplitSwipeDown(enabled: Boolean) = homeSettings.setSplitSwipeDown(enabled)
+    val twoFingerUp = homeSettings.twoFingerUp
+    val twoFingerDown = homeSettings.twoFingerDown
+    fun setTwoFingerUp(action: GestureAction, searchable: SavableSearchable?) {
+        saveShortcut(searchable); homeSettings.setTwoFingerUp(action)
+    }
+    fun setTwoFingerDown(action: GestureAction, searchable: SavableSearchable?) {
+        saveShortcut(searchable); homeSettings.setTwoFingerDown(action)
+    }
+    val actionButton = homeSettings.actionButton
+    fun setActionButton(enabled: Boolean) = homeSettings.setActionButton(enabled)
+    val actionButtonActions = homeSettings.actionButtonActions
+    fun setActionButtonAction(
+        searchable: SavableSearchable?,
+        transform: (dev.kbzon.launcher.preferences.home.ActionButtonActions) -> dev.kbzon.launcher.preferences.home.ActionButtonActions,
+    ) {
+        saveShortcut(searchable); homeSettings.updateActionButtonActions(transform)
+    }
+
     private fun saveShortcut(searchable: SavableSearchable?) {
         searchable?.let { searchableRepository.insert(it) }
     }
 
-    val shortcutOptions: Flow<List<SavableSearchable>> = gestureSettings.flatMapLatest {
+    val shortcutOptions: Flow<List<SavableSearchable>> = combine(
+        gestureSettings, homeSettings.twoFingerUp, homeSettings.twoFingerDown, homeSettings.actionButtonActions,
+    ) { g, up, down, button -> listOf(g.swipeUp, g.swipeLeft, g.swipeRight, g.swipeDown, g.doubleTap, g.homeButton, g.longPress, up, down) + button.all }
+        .flatMapLatest { actions ->
+            searchableRepository.getByKeys(actions.mapNotNull { (it as? GestureAction.Launch)?.key })
+        }
+
+    @Suppress("unused")
+    private val legacyShortcutOptions: Flow<List<SavableSearchable>> = gestureSettings.flatMapLatest {
         val keys = listOfNotNull(
             (it.swipeUp as? GestureAction.Launch)?.key,
             (it.swipeLeft as? GestureAction.Launch)?.key,
@@ -108,8 +138,7 @@ internal class GestureSettingsScreenVM : ViewModel(), KoinComponent {
         combine(uiSettings.homeScreenWidgets, gestureSettings) { home, gestures ->
             val options = mutableListOf<WidgetPageOption>()
             for (target in WidgetScreenTarget.entries) {
-                // Never offer the default screen as an option when widgets on home is enabled
-                if (home && target == WidgetScreenTarget.Default) continue
+                // [fork] La home minimalista no lleva widgets: el panel por defecto siempre es una opción.
                 val widgets = widgetRepository.get(
                     parent = target.id,
                 ).first()

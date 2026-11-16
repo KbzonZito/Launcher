@@ -56,9 +56,16 @@ internal object MinimalHomeComponent : ScaffoldComponent() {
         LaunchedEffect(state.currentComponent) {
             if (state.currentComponent == null) runCatching { focusRequester.requestFocus() }
         }
+        val scaffoldScope = rememberCoroutineScope()
         MinimalHome(
             insets = insets,
             listState = listState,
+            openSearch = { scaffoldScope.launch { state.onSearchBarTap() } },
+            openWidgets = {
+                scaffoldScope.launch {
+                    state.gestureFor { it is WidgetsComponent }?.let { state.navigateToPage(it) }
+                }
+            },
             modifier = modifier
                 .focusRequester(focusRequester)
                 .focusable()

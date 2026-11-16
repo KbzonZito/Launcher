@@ -229,7 +229,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **8** | Baseline profile generado (34 k reglas + perfil de arranque), módulo `:baselineprofile` con generador y Macrobenchmark | ✅ PR #11, restyle de la búsqueda en PR #14 · pendiente: medir en el S24U, pulido de animaciones |
 | **9** | Correcciones rápidas: reloj abre la app completa, clima junto a la alarma, solo home minimalista, sugerencias desactivables, doble toque en el riel = bloquear, ola más marcada, riel desde ambos bordes | ✅ PR #20 |
 | **10** | Fork total: código renombrado a `dev.kbzon.launcher`, sin upstream, plugins eliminados, Ko-fi, README propio, sin flavors ni traducciones extra | ✅ PR #21 |
-| **11** | Home configurable: popup al mantener pulsado, gestos unificados, botón de acción, editar diseño | ⏳ v0.4 |
+| **11** | Home configurable: menú rápido al mantener pulsado, gestos unificados en Ajustes → Gestos, botón de acción con 7 gestos, editar diseño (reloj y alfabeto movibles) | ✅ PR #22 |
 | **12** | Orden de lista por letra, carpetas (popup), reordenar favoritos | ⏳ v0.5 |
 | **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ⏳ v0.6 |
 | **14** | Búsqueda minimalista 2.0 | ⏳ v0.7 |
@@ -247,6 +247,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.1.0 | Fases 0–8: home minimalista con riel, privacidad, gestos, relojes, tablet, baseline profile |
 | v0.1.1 | Identidad propia: nombre "Launcher", ícono, enlaces |
 | v0.2.0 | Búsqueda minimalista, teclado físico, borrar estadísticas, mapas offline, apertura animada, Espacio privado en el candado, batería en el vistazo, backups cifrados, mini reproductor |
+| v0.3.0 | Fases 9–11: correcciones del riel/reloj/clima, fork total (código propio, sin plugins, Ko-fi), home configurable (menú rápido, gestos unificados, botón de acción, editar diseño) |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -254,7 +255,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: fases 11 → 15 (§10)**, en este orden: pantalla principal configurable → riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: fases 12 → 15 (§10)**, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -298,6 +299,13 @@ Decisiones tomadas (16-11-2026):
 6. **Borrar lo que no se usa**: homes y widgets de Kvaesitso que ya no se alcanzan, build types `nightly`/`fdroid`, traducciones distintas de es/en.
 
 ### Fase 11 — Pantalla principal configurable (v0.4)
+> ✅ Hecha (PR #22). Notas:
+> - **Gestos en un solo lugar**: Ajustes → Gestos (pantalla heredada, ahora propia) suma *Bajar dividido* (reemplaza ↓), dos dedos ↑↓ y el botón de acción. Migración única: ↓ = buscar.
+> - **Mantener pulsado** un espacio vacío abre siempre el menú rápido (estilo de reloj, lado del alfabeto, ↓ buscar/dividido, íconos, botón de acción, Editar diseño, Gestos, Ajustes).
+> - **Botón de acción** (abajo, lado del alfabeto). Por defecto: toque = buscar, doble toque = bloquear, mantener = ajustes rápidos, ↑ = recientes, ↓ = notificaciones, ← → = nada. Buscar y el panel de widgets se abren con la animación del scaffold.
+> - **Editar diseño**: el reloj y el alfabeto se arrastran; el asa del alfabeto cambia su alto; se guarda por orientación.
+> - Se corrigió el color de acento de la home (usaba un color que el tema no define).
+> - Pendiente de revisar en el teléfono: la acción *Recientes* no abrió la vista de recientes en el emulador.
 1. **Mantener pulsado un espacio vacío → popup de ajustes rápidos**: gestos, botón de acción, lado y posición del riel, estilo de reloj, estilo de íconos, tema; botón "Editar diseño" y botón "Ajustes". (Hoy ese gesto va al scaffold de Kvaesitso; se intercepta en la home.)
 2. **Gestos configurables en la home, todos en un solo lugar**: deslizar ↑ ↓ ← →, doble toque, dos dedos ↑ ↓, pellizcar; "bajar dividido" pasa a ser una opción de deslizar ↓. Acciones: buscar, notificaciones, ajustes rápidos, bloquear, recientes, apagado, abrir app/atajo, panel de widgets, linterna, nada. Por defecto: ↓ = buscar (tu ejemplo), ↑ = panel de widgets.
 3. **Botón de acción** (abajo, lado del riel): toque, doble toque, mantener y deslizar ↑ ↓ ← →, cada uno con su acción. Al arrastrar muestra hacia dónde va y vibra al cruzar el umbral. Por defecto: toque = buscar.
@@ -309,6 +317,7 @@ Decisiones tomadas (16-11-2026):
 3. **Reordenar favoritos arrastrando** directamente en la home.
 
 ### Fase 13 — Personalización visual (v0.6)
+> **Preferencias del usuario (16-11-2026):** fuente **Manrope** y la **fuente del sistema** como opciones; estilo **minimalista con tarjetas**. El resto queda a criterio de diseño.
 1. **Estilo unificado** (`DESIGN.md`): paleta y roles de color, escala tipográfica, espaciados, radios, sombras (ninguna) y curvas de animación. Se aplica a la home, búsqueda, menús, hojas y ajustes, para que todo se vea como una sola app.
 2. **Temas**: temas predeterminados (p. ej. *Grafito*, *Medianoche OLED*, *Papel*, *Bosque*, *Arena*) y editor para crear y editar. Un tema agrupa colores, forma, tipografía, transparencias y estilo de íconos. Se apoya en el editor de temas de Kvaesitso, simplificado.
 3. **Fuente y tamaño**: fuentes incluidas con licencia libre (Inter, Manrope, Space Grotesk, IBM Plex Sans, la del sistema) y tamaño ajustable para la lista, el reloj y el vistazo.
@@ -335,5 +344,4 @@ Eliminar los ajustes heredados de Kvaesitso que no aplican a esta app (reloj y w
 - **Ajustes por dispositivo** (teléfono / Tab) para posición del riel y diseño, ya que tienen proporciones muy distintas.
 
 ### Preguntas abiertas
-- Gestos por defecto de la home y del botón de acción: ¿están bien los propuestos?
-- Temas predeterminados y fuentes: ¿algún estilo o fuente que quieras sí o sí?
+- (ninguna por ahora)

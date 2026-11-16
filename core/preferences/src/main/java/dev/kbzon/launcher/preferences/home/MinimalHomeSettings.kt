@@ -115,6 +115,25 @@ class MinimalHomeSettings internal constructor(
 
     fun setRailBothEdges(enabled: Boolean) = dataStore.update { it.copy(minimalHomeRailBothEdges = enabled) }
 
+    val actionButton: Flow<Boolean>
+        get() = dataStore.data.map { it.minimalHomeActionButton }.distinctUntilChanged()
+
+    fun setActionButton(enabled: Boolean) = dataStore.update { it.copy(minimalHomeActionButton = enabled) }
+
+    val actionButtonActions: Flow<ActionButtonActions>
+        get() = dataStore.data.map { it.minimalHomeActionButtonActions }.distinctUntilChanged()
+
+    fun updateActionButtonActions(transform: (ActionButtonActions) -> ActionButtonActions) = dataStore.update {
+        it.copy(minimalHomeActionButtonActions = transform(it.minimalHomeActionButtonActions))
+    }
+
+    fun layout(landscape: Boolean): Flow<HomeLayout> =
+        dataStore.data.map { if (landscape) it.minimalHomeLayoutLandscape else it.minimalHomeLayoutPortrait }.distinctUntilChanged()
+
+    fun setLayout(landscape: Boolean, layout: HomeLayout) = dataStore.update {
+        if (landscape) it.copy(minimalHomeLayoutLandscape = layout) else it.copy(minimalHomeLayoutPortrait = layout)
+    }
+
     val appSwipeLeft: Flow<Map<String, String>>
         get() = dataStore.data.map { it.minimalHomeAppSwipeLeft }.distinctUntilChanged()
 
