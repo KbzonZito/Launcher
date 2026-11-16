@@ -63,7 +63,7 @@ android {
     lint {
         abortOnError = false
     }
-    namespace = "de.mm20.launcher2.ui"
+    namespace = "dev.kbzon.launcher.ui"
 }
 
 

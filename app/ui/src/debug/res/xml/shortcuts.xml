@@ -8,7 +8,7 @@
         android:shortcutShortLabel="@string/search_bar_placeholder">
         <intent
             android:action="android.intent.action.ASSIST"
-            android:targetClass="de.mm20.launcher2.ui.assistant.AssistantActivity"
+            android:targetClass="dev.kbzon.launcher.ui.assistant.AssistantActivity"
             android:targetPackage="dev.kbzon.launcher.dev" />
     </shortcut>
 

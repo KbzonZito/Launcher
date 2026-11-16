@@ -37,7 +37,7 @@ android {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    namespace = "de.mm20.launcher2.crashreporter"
+    namespace = "dev.kbzon.launcher.crashreporter"
     buildFeatures {
         buildConfig = true
     }

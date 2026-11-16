@@ -1,0 +1,91 @@
+package dev.kbzon.launcher.ui.common
+
+import android.net.Uri
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dev.kbzon.launcher.backup.BackupCompatibility
+import dev.kbzon.launcher.backup.BackupManager
+import dev.kbzon.launcher.backup.BackupMetadata
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+class RestoreBackupSheetVM : ViewModel(), KoinComponent {
+
+    private val backupManager: BackupManager by inject()
+
+    private var restoreUri: Uri? = null
+
+    val state = mutableStateOf(RestoreBackupState.Parsing)
+    val metadata = mutableStateOf<BackupMetadata?>(null)
+    val compatibility = mutableStateOf<BackupCompatibility?>(null)
+
+    // [fork] Backups cifrados
+    private var password: CharArray? = null
+    val wrongPassword = mutableStateOf(false)
+
+    fun submitPassword(value: String) {
+        val uri = restoreUri ?: return
+        state.value = RestoreBackupState.Parsing
+        viewModelScope.launch {
+            val pw = value.toCharArray()
+            val metadata = try {
+                backupManager.readBackupMeta(uri, pw)
+            } catch (e: dev.kbzon.launcher.backup.BackupCrypto.WrongPasswordException) {
+                wrongPassword.value = true
+                state.value = RestoreBackupState.NeedsPassword
+                return@launch
+            }
+            wrongPassword.value = false
+            password = pw
+            if (metadata == null) {
+                state.value = RestoreBackupState.InvalidFile
+            } else {
+                state.value = RestoreBackupState.Ready
+                compatibility.value = backupManager.checkCompatibility(metadata)
+            }
+            this@RestoreBackupSheetVM.metadata.value = metadata
+        }
+    }
+
+    fun setInputUri(uri: Uri) {
+        restoreUri = uri
+        password = null
+        wrongPassword.value = false
+        state.value = RestoreBackupState.Parsing
+        viewModelScope.launch {
+            if (backupManager.isEncrypted(uri)) { // [fork]
+                state.value = RestoreBackupState.NeedsPassword
+                return@launch
+            }
+            val metadata = backupManager.readBackupMeta(uri)
+            if (metadata == null) {
+                state.value = RestoreBackupState.InvalidFile
+            } else {
+                state.value = RestoreBackupState.Ready
+                compatibility.value = backupManager.checkCompatibility(metadata)
+            }
+            this@RestoreBackupSheetVM.metadata.value = metadata
+        }
+    }
+
+    fun restore() {
+        val uri = restoreUri ?: return
+
+        viewModelScope.launch {
+            state.value = RestoreBackupState.Restoring
+            backupManager.restore(uri, password)
+            state.value = RestoreBackupState.Restored
+        }
+    }
+}
+
+enum class RestoreBackupState {
+    Parsing,
+    NeedsPassword, // [fork]
+    InvalidFile,
+    Ready,
+    Restoring,
+    Restored,
+}

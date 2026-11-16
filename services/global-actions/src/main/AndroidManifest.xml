@@ -3,7 +3,7 @@
 
     <application>
         <service
-            android:name=".LauncherAccessibilityService"
+            android:name="de.mm20.launcher2.globalactions.LauncherAccessibilityService"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>

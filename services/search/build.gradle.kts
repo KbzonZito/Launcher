@@ -37,7 +37,7 @@ android {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    namespace = "de.mm20.launcher2.search"
+    namespace = "dev.kbzon.launcher.search"
 }
 
 dependencies {

@@ -1,11 +1,16 @@
 package de.mm20.launcher2.notifications
 
+// [fork] Nombre de clase conservado a propósito: Android guarda por este nombre el permiso
+// concedido (acceso a notificaciones / accesibilidad). Cambiarlo obligaría a concederlo de nuevo.
+
+import dev.kbzon.launcher.notifications.Notification
+import dev.kbzon.launcher.notifications.NotificationRepository
 import android.app.Service
 import android.content.Intent
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
-import de.mm20.launcher2.permissions.PermissionsManager
+import dev.kbzon.launcher.permissions.PermissionsManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

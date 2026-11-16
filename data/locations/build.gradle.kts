@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "de.mm20.launcher2.openstreetmaps"
+    namespace = "dev.kbzon.launcher.openstreetmaps"
     compileSdk {
         version = release(libs.versions.compileSdk.get().toInt()) {
             minorApiLevel = libs.versions.compileSdkMinor.get().toInt()

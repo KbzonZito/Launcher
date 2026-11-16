@@ -1,0 +1,37 @@
+package dev.kbzon.launcher.preferences.search
+
+import dev.kbzon.launcher.preferences.KeyboardFilterBarItem
+import dev.kbzon.launcher.preferences.LauncherDataStore
+import dev.kbzon.launcher.search.SearchFilters
+import kotlinx.coroutines.flow.map
+
+class SearchFilterSettings internal constructor(
+    private val launcherDataStore: LauncherDataStore,
+) {
+    val defaultFilter
+        get() = launcherDataStore.data.map { it.searchFilter }
+
+    fun setDefaultFilter(filter: SearchFilters) {
+        launcherDataStore.update {
+            it.copy(searchFilter = filter)
+        }
+    }
+
+    val filterBar
+        get() = launcherDataStore.data.map { it.searchFilterBar }
+
+    fun setFilterBar(filterBar: Boolean) {
+        launcherDataStore.update {
+            it.copy(searchFilterBar = filterBar)
+        }
+    }
+
+    val filterBarItems
+        get() = launcherDataStore.data.map { it.searchFilterBarItems.distinct() }
+
+    fun setFilterBarItems(items: List<KeyboardFilterBarItem>) {
+        launcherDataStore.update {
+            it.copy(searchFilterBarItems = items)
+        }
+    }
+}

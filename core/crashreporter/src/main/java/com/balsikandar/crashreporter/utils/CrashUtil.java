@@ -28,7 +28,7 @@ import java.util.Locale;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import de.mm20.launcher2.crashreporter.R;
+import dev.kbzon.launcher.crashreporter.R;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.balsikandar.crashreporter.utils.Constants.CHANNEL_NOTIFICATION_ID;
@@ -118,8 +118,8 @@ public class CrashUtil {
             String filePath = new File(getDefaultPath(), fileName).getAbsolutePath();
 
             Intent intent = new Intent();
-            intent.setComponent(new ComponentName(context.getPackageName(), "de.mm20.launcher2.ui.settings.SettingsActivity"));
-            intent.putExtra("de.mm20.launcher2.settings.ROUTE", "settings/debug/crashreport");
+            intent.setComponent(new ComponentName(context.getPackageName(), "dev.kbzon.launcher.ui.settings.SettingsActivity"));
+            intent.putExtra("dev.kbzon.launcher.settings.ROUTE", "settings/debug/crashreport");
             intent.putExtra("crash_report_path", filePath);
             intent.setAction(Long.toString(System.currentTimeMillis()));
 

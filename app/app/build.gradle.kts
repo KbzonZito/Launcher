@@ -48,7 +48,7 @@ android {
     }
 
     defaultConfig {
-        // [fork] applicationId propio: convive con Kvaesitso oficial. El namespace Kotlin sigue siendo de.mm20.launcher2.
+        // [fork] applicationId propio: convive con Kvaesitso oficial. El namespace Kotlin sigue siendo dev.kbzon.launcher.
         applicationId = "dev.kbzon.launcher"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
@@ -90,7 +90,7 @@ android {
     lint {
         abortOnError = false
     }
-    namespace = "de.mm20.launcher2"
+    namespace = "dev.kbzon.launcher"
     buildFeatures {
         buildConfig = true
     }
@@ -108,6 +108,7 @@ dependencies {
     implementation(libs.coil.svg)
 
     implementation(libs.koin.android)
+    implementation(libs.androidx.work) // [fork] migración de tareas tras el renombrado
     implementation(libs.androidx.profileinstaller) // [fork] instala el baseline profile
     baselineProfile(project(":baselineprofile")) // [fork]
 

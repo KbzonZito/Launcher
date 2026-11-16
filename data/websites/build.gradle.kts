@@ -37,7 +37,7 @@ android {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    namespace = "de.mm20.launcher2.websites"
+    namespace = "dev.kbzon.launcher.websites"
 }
 
 dependencies {
