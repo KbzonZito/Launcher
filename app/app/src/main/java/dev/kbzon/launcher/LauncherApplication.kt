@@ -106,6 +106,14 @@ class LauncherApplication : Application(), CoroutineScope, ImageLoaderFactory {
                 )
             )
         }
+
+        // [fork] Fase 11: gestos propuestos — ↓ abre la búsqueda (el "bajar dividido" pasa a ser opcional).
+        if (!migrations.getBoolean("gestures_v2", false)) {
+            org.koin.java.KoinJavaComponent.get<dev.kbzon.launcher.preferences.home.MinimalHomeSettings>(
+                dev.kbzon.launcher.preferences.home.MinimalHomeSettings::class.java
+            ).setSplitSwipeDown(false)
+            migrations.edit().putBoolean("gestures_v2", true).apply()
+        }
     }
 
     override fun newImageLoader(): ImageLoader {

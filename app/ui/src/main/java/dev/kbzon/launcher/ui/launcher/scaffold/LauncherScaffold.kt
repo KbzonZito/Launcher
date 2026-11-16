@@ -870,6 +870,10 @@ internal class LauncherScaffoldState(
         isOpeningSearch = false
     }
 
+    /** [fork] Gesto configurado que abre un componente dado (p. ej. el panel de widgets), o null. */
+    internal fun gestureFor(predicate: (ScaffoldComponent) -> Boolean): Gesture? =
+        Gesture.entries.firstOrNull { g -> config[g]?.component?.let(predicate) == true }
+
     suspend fun navigateToPage(gesture: Gesture) {
         currentGesture = gesture
         val anim = config[gesture]?.animation ?: return

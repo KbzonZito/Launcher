@@ -206,36 +206,12 @@ fun MinimalHomeSettingsScreen() {
         }
         item {
             PreferenceCategory(title = stringResource(R.string.fork_preference_category_gestures)) {
-                SwitchPreference(
-                    title = stringResource(R.string.fork_preference_split_swipe_down),
-                    summary = stringResource(R.string.fork_preference_split_swipe_down_summary),
-                    icon = R.drawable.swipe_down_alt_24px,
-                    value = splitSwipeDown,
-                    onValueChanged = settings::setSplitSwipeDown,
-                    enabled = enabled,
-                )
-                GesturePreference(
-                    title = stringResource(R.string.fork_preference_two_finger_up),
-                    icon = R.drawable.swipe_up_alt_24px,
-                    value = twoFingerUp,
-                    onValueChanged = { action, target -> target?.let { searchableRepository.insert(it) }; settings.setTwoFingerUp(action) },
-                    options = gestureOptions,
-                    shortcutOptions = launchTargets,
-                    widgetOptions = emptyList(),
-                )
-                GesturePreference(
-                    title = stringResource(R.string.fork_preference_two_finger_down),
-                    icon = R.drawable.swipe_down_alt_24px,
-                    value = twoFingerDown,
-                    onValueChanged = { action, target -> target?.let { searchableRepository.insert(it) }; settings.setTwoFingerDown(action) },
-                    options = gestureOptions,
-                    shortcutOptions = launchTargets,
-                    widgetOptions = emptyList(),
-                )
+                val backStack = dev.kbzon.launcher.ui.locals.LocalBackStack.current
                 Preference(
-                    title = stringResource(R.string.fork_menu_shortcuts),
-                    summary = stringResource(R.string.fork_preference_app_swipe_hint),
-                    icon = R.drawable.swipe_right_alt_24px,
+                    title = stringResource(R.string.fork_preference_gestures_link),
+                    summary = stringResource(R.string.fork_preference_gestures_link_summary),
+                    icon = R.drawable.gesture_24px,
+                    onClick = { backStack.add(dev.kbzon.launcher.ui.settings.gestures.GesturesSettingsRoute) },
                 )
             }
         }

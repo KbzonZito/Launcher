@@ -6,6 +6,26 @@ import android.content.Intent
 import android.provider.AlarmClock
 import android.provider.CalendarContract
 import android.text.format.DateFormat
+import android.content.res.Configuration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.ui.BiasAlignment
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.IntOffset
+import dev.kbzon.launcher.preferences.GestureAction
+import dev.kbzon.launcher.preferences.home.HomeLayout
+import dev.kbzon.launcher.ui.settings.SettingsActivity
+import kotlin.math.roundToInt
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.spring
@@ -56,6 +76,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -93,6 +114,8 @@ fun MinimalHome(
     insets: PaddingValues,
     listState: LazyListState,
     modifier: Modifier = Modifier,
+    openSearch: () -> Unit = {},
+    openWidgets: () -> Unit = {},
 ) {
     val vm: MinimalHomeVM = viewModel()
     val context = LocalContext.current
@@ -101,7 +124,12 @@ fun MinimalHome(
     val darkContent = LocalPreferDarkContentOverWallpaper.current
     val contentColor = if (darkContent) Color(0xE6000000) else Color.White
     val shadow = if (darkContent) null else Shadow(Color(0x66000000), blurRadius = 8f)
-    val accent = MaterialTheme.colorScheme.primaryFixedDim
+    // Acento legible sobre el fondo de pantalla: el tono claro del primario sobre fondos oscuros y el oscuro
+    // sobre fondos claros. (primaryFixedDim no lo define el tema heredado y quedaba sin especificar.)
+    val scheme = MaterialTheme.colorScheme
+    val accent = listOf(scheme.primary, scheme.inversePrimary).let { tones ->
+        if (darkContent) tones.minBy { it.luminance() } else tones.maxBy { it.luminance() }
+    }
 
     val appsByLetter by vm.appsByLetter.collectAsState()
     val favorites by vm.favorites.collectAsState()
@@ -147,10 +175,37 @@ fun MinimalHome(
         if (vm.launch(context, item, bounds)) vm.selectLetter(null)
     }
 
+    // [fork] Fase 11: acciones (pasan por el scaffold cuando hace falta animarlas), diseño y menú rápido.
+    val runAction: (GestureAction) -> Unit = { action ->
+        when (action) {
+            is GestureAction.Search -> openSearch()
+            is GestureAction.Widgets -> openWidgets()
+            else -> vm.runGestureAction(context, action)
+        }
+    }
+    val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val storedLayout by remember(landscape) { vm.layout(landscape) }.collectAsState(HomeLayout())
+    var editMode by remember { mutableStateOf(false) }
+    var draftLayout by remember { mutableStateOf<HomeLayout?>(null) }
+    val layout = draftLayout ?: storedLayout
+    var quickMenuY by remember { mutableStateOf<Float?>(null) }
+    var outerHeightPx by remember { mutableIntStateOf(1) }
+    val actionButtonEnabled by vm.actionButtonEnabled.collectAsState()
+    val actionButtonActions by vm.actionButtonActions.collectAsState()
+    val splitSwipeDown by vm.splitSwipeDown.collectAsState()
+    val clockStyleNow by vm.clockStyle.collectAsState()
+    BackHandler(enabled = editMode || quickMenuY != null) {
+        if (quickMenuY != null) quickMenuY = null else { editMode = false; draftLayout = null }
+    }
+    fun updateDraft(transform: (HomeLayout) -> HomeLayout) {
+        draftLayout = transform(draftLayout ?: storedLayout)
+    }
+
     CompositionLocalProvider(LocalContentColor provides contentColor) {
         Box(
             modifier = modifier
                 .fillMaxSize()
+                .onSizeChanged { outerHeightPx = it.height.coerceAtLeast(1) }
                 .homeGestures(
                     splitSwipeDown = { vm.splitSwipeDown.value },
                     onSwipeDown = { leftHalf ->
@@ -159,7 +214,13 @@ fun MinimalHome(
                     },
                     onTwoFinger = { up ->
                         view.performHapticFeedback(HapticFeedbackConstants.GESTURE_END)
-                        vm.runGestureAction(context, if (up) vm.twoFingerUp.value else vm.twoFingerDown.value)
+                        runAction(if (up) vm.twoFingerUp.value else vm.twoFingerDown.value)
+                    },
+                    onLongPress = { pos ->
+                        if (!editMode) {
+                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                            quickMenuY = pos.y
+                        }
                     },
                 )
                 .padding(insets)
@@ -193,6 +254,25 @@ fun MinimalHome(
                     GlanceLine(vm = vm, shadow = shadow)
                     val mediaPlayerEnabled by vm.mediaPlayerEnabled.collectAsState()
                     if (mediaPlayerEnabled) HomeMediaPlayer(shadow = shadow)
+                }
+                val maxHeightPx = constraints.maxHeight.toFloat().coerceAtLeast(1f)
+                val clockBlock: @Composable () -> Unit = {
+                    Column(
+                        Modifier
+                            .offset { IntOffset(0, (layout.clockOffset * maxHeightPx).roundToInt()) }
+                            .then(
+                                if (editMode) Modifier
+                                    .border(1.5.dp, accent, RoundedCornerShape(16.dp))
+                                    .padding(8.dp)
+                                    .pointerInput(Unit) {
+                                        detectVerticalDragGestures { change, dy ->
+                                            change.consume()
+                                            updateDraft { it.copy(clockOffset = (it.clockOffset + dy / maxHeightPx).coerceIn(-0.25f, 0.6f)) }
+                                        }
+                                    }
+                                else Modifier
+                            )
+                    ) { clockSection() }
                 }
                 val listSection: @Composable () -> Unit = {
                     CompositionLocalProvider(LocalHomeListMaxHeight provides listMaxHeight) {
@@ -266,7 +346,7 @@ fun MinimalHome(
                             modifier = Modifier.weight(1f).fillMaxHeight(),
                             verticalArrangement = Arrangement.Center,
                         ) {
-                            clockSection()
+                            clockBlock()
                         }
                         Spacer(Modifier.width(48.dp))
                         Column(Modifier.weight(1f).fillMaxHeight()) {
@@ -278,7 +358,7 @@ fun MinimalHome(
                 } else {
                     Column(Modifier.fillMaxSize().then(sidePadding)) {
                         Spacer(Modifier.height(40.dp))
-                        clockSection()
+                        clockBlock()
                         Spacer(Modifier.weight(1f))
                         listSection()
                         Spacer(Modifier.height(32.dp))
@@ -312,7 +392,8 @@ fun MinimalHome(
                     accent = MaterialTheme.colorScheme.primary,
                     onAccent = MaterialTheme.colorScheme.onPrimary,
                     zoneOnLeft = !railOnLeft,
-                    modifier = Modifier.align(if (railOnLeft) Alignment.CenterEnd else Alignment.CenterStart),
+                    modifier = Modifier.align(BiasAlignment(if (railOnLeft) 1f else -1f, layout.railCenter * 2f - 1f)),
+                    heightFraction = layout.railHeight,
                 )
             }
 
@@ -328,12 +409,106 @@ fun MinimalHome(
                 accent = accent,
                 railOnLeft = railOnLeft,
                 intensity = waveIntensity,
+                heightFraction = layout.railHeight,
                 modifier = Modifier
-                    .align(if (railOnLeft) Alignment.CenterStart else Alignment.CenterEnd)
+                    .align(BiasAlignment(if (railOnLeft) -1f else 1f, layout.railCenter * 2f - 1f))
                     .padding(horizontal = 8.dp),
+            )
+
+            if (actionButtonEnabled && !editMode) {
+                HomeActionButton(
+                    actions = actionButtonActions,
+                    onAction = runAction,
+                    accent = accent,
+                    modifier = Modifier
+                        .align(if (railOnLeft) Alignment.BottomStart else Alignment.BottomEnd)
+                        .padding(horizontal = 14.dp, vertical = 18.dp),
+                )
+            }
+
+            if (editMode) {
+                // Marco arrastrable sobre el alfabeto: mover (arrastrar) y cambiar el alto (asa inferior).
+                Box(
+                    Modifier
+                        .align(BiasAlignment(if (railOnLeft) -1f else 1f, layout.railCenter * 2f - 1f))
+                        .padding(horizontal = 4.dp)
+                        .width(48.dp)
+                        .railHeight(railEntries.size, layout.railHeight)
+                        .border(1.5.dp, accent, RoundedCornerShape(16.dp))
+                        .pointerInput(Unit) {
+                            detectVerticalDragGestures { change, dy ->
+                                change.consume()
+                                updateDraft { it.copy(railCenter = (it.railCenter + dy / outerHeightPx).coerceIn(0.15f, 0.85f)) }
+                            }
+                        }
+                ) {
+                    Box(
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .offset(y = 14.dp)
+                            .size(width = 36.dp, height = 28.dp)
+                            .pointerInput(Unit) {
+                                detectVerticalDragGestures { change, dy ->
+                                    change.consume()
+                                    updateDraft { it.copy(railHeight = (it.railHeight + dy / outerHeightPx).coerceIn(0.3f, 0.9f)) }
+                                }
+                            },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Box(Modifier.size(width = 28.dp, height = 6.dp).background(accent, RoundedCornerShape(3.dp)))
+                    }
+                }
+                Surface(
+                    shape = RoundedCornerShape(24.dp),
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp).widthIn(max = 420.dp),
+                ) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text(stringResource(R.string.fork_edit_layout_hint), style = MaterialTheme.typography.bodyMedium)
+                        Spacer(Modifier.height(12.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(onClick = { draftLayout = HomeLayout() }, modifier = Modifier.weight(1f)) {
+                                Text(stringResource(R.string.fork_edit_layout_reset))
+                            }
+                            Button(
+                                onClick = {
+                                    draftLayout?.let { vm.saveLayout(landscape, it) }
+                                    draftLayout = null
+                                    editMode = false
+                                },
+                                modifier = Modifier.weight(1f),
+                            ) { Text(stringResource(R.string.fork_edit_layout_done)) }
+                        }
+                    }
+                }
+            }
+
+            HomeQuickMenu(
+                visible = quickMenuY != null,
+                anchorY = quickMenuY ?: 0f,
+                clockStyle = clockStyleNow,
+                onClockStyle = vm::setClockStyle,
+                railOnLeft = railOnLeft,
+                onRailOnLeft = vm::setRailOnLeft,
+                splitSwipeDown = splitSwipeDown,
+                onSplitSwipeDown = vm::setSplitSwipeDown,
+                showIcons = showIcons,
+                onShowIcons = vm::setShowIcons,
+                actionButton = actionButtonEnabled,
+                onActionButton = vm::setActionButton,
+                onEditLayout = { quickMenuY = null; editMode = true; draftLayout = storedLayout },
+                onGestures = { quickMenuY = null; context.openSettings(SettingsActivity.ROUTE_GESTURES) },
+                onSettings = { quickMenuY = null; context.openSettings(null) },
+                onDismiss = { quickMenuY = null },
             )
         }
     }
+}
+
+private fun Context.openSettings(route: String?) {
+    val intent = Intent(this, SettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    if (route != null) intent.putExtra(SettingsActivity.EXTRA_ROUTE, route)
+    try { startActivity(intent) } catch (_: Exception) { }
 }
 
 @Composable
