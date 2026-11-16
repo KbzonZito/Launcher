@@ -193,6 +193,7 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
 
     val clockStyle = homeSettings.clockStyle.stateIn(viewModelScope, SharingStarted.Eagerly, MinimalClockStyle.Thin)
     val agendaEnabled = homeSettings.agenda.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+    val mediaPlayerEnabled = homeSettings.mediaPlayer.stateIn(viewModelScope, SharingStarted.Eagerly, true)
 
     private fun resolveKey(keyFlow: Flow<String?>): StateFlow<SavableSearchable?> = keyFlow
         .flatMapLatest { key ->

@@ -183,6 +183,8 @@ fun MinimalHome(
                         scale = clockScale,
                     )
                     GlanceLine(vm = vm, shadow = shadow)
+                    val mediaPlayerEnabled by vm.mediaPlayerEnabled.collectAsState()
+                    if (mediaPlayerEnabled) HomeMediaPlayer(shadow = shadow)
                 }
                 val listSection: @Composable () -> Unit = {
                     CompositionLocalProvider(LocalHomeListMaxHeight provides listMaxHeight) {

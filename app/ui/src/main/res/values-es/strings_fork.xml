@@ -83,4 +83,6 @@
     <string name="fork_backup_restore_description">Escribe la contraseña que usaste al crear este backup.</string>
     <string name="fork_backup_restore_button">Desbloquear</string>
     <string name="fork_backup_wrong_password">Contraseña incorrecta</string>
+    <string name="fork_preference_media_player">Reproductor</string>
+    <string name="fork_preference_media_player_summary">Mostrar lo que suena con reproducir/pausa y saltar, debajo del vistazo. Necesita acceso a notificaciones.</string>
 </resources>
