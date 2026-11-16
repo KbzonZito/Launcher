@@ -71,4 +71,6 @@
     <string name="fork_reset_usage_confirm">Las apps frecuentes y el orden de la búsqueda empezarán a aprender desde cero. No se puede deshacer.</string>
     <string name="fork_reset_usage_action">Borrar</string>
     <string name="fork_reset_usage_done">Estadísticas de uso borradas</string>
+    <string name="fork_preference_minimal_search">Búsqueda minimalista</string>
+    <string name="fork_preference_minimal_search_summary">Velo oscuro y resultados sin tarjetas, a juego con el inicio minimalista</string>
 </resources>

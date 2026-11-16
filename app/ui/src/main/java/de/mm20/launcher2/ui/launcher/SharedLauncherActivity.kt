@@ -155,12 +155,15 @@ abstract class SharedLauncherActivity(
                         val searchBarAutofocus by viewModel.autoFocusSearch.collectAsState(false)
                         val widgetsOnHomeScreen by viewModel.widgetsOnHomeScreen.collectAsState()
                         val minimalHome by org.koin.compose.koinInject<de.mm20.launcher2.preferences.home.MinimalHomeSettings>().enabled.collectAsState(null) // [fork]
+                        val minimalSearchStyle by org.koin.compose.koinInject<de.mm20.launcher2.preferences.home.MinimalHomeSettings>().searchStyle.collectAsState(true) // [fork]
+                        val minimalUi = minimalHome == true && minimalSearchStyle // [fork]
                         val wallpaperBlur by viewModel.wallpaperBlur.collectAsState()
                         val wallpaperBlurRadius by viewModel.wallpaperBlurRadius.collectAsState()
 
                         val fixedRotation by viewModel.fixedRotation.collectAsState()
 
-                        val backgroundColor = MaterialTheme.colorScheme.surfaceContainer
+                        // [fork] Con la UI minimalista, búsqueda y paneles sobre un velo oscuro.
+                        val backgroundColor = if (minimalUi) androidx.compose.ui.graphics.Color(0xFF0B0D10) else MaterialTheme.colorScheme.surfaceContainer
 
                         if (gestures == null || widgetsOnHomeScreen == null || minimalHome == null) return@ProvideCompositionLocals
 
@@ -245,6 +248,7 @@ abstract class SharedLauncherActivity(
                                 hideNav,
                                 widgetsOnHomeScreen,
                                 minimalHome, // [fork]
+                                minimalUi, // [fork]
                                 searchBarAutofocus,
                                 wallpaperBlur,
                                 wallpaperBlurRadius,
@@ -253,6 +257,7 @@ abstract class SharedLauncherActivity(
                                     val searchComponent = SearchComponent(
                                         reverse = reverseSearchResults,
                                         openKeyboard = true, // [fork] botón lateral → escribir de inmediato
+                                        minimalStyle = minimalUi, // [fork]
                                     )
                                     val dismissComponent =
                                         DismissComponent(this@SharedLauncherActivity)
@@ -272,11 +277,14 @@ abstract class SharedLauncherActivity(
                                         searchBarPosition = if (bottomSearchBar) SearchBarPosition.Bottom else SearchBarPosition.Top,
                                         finishOnBack = true,
                                         backgroundColor = backgroundColor,
+                                        darkSearchBar = minimalUi, // [fork]
+                                        minimalStyle = minimalUi, // [fork]
                                     )
                                 } else {
                                     val searchComponent = SearchComponent(
                                         reverse = reverseSearchResults,
                                         openKeyboard = searchBarAutofocus,
+                                        minimalStyle = minimalUi, // [fork]
                                     )
 
                                     fun getScaffoldGesture(
@@ -408,7 +416,8 @@ abstract class SharedLauncherActivity(
                                         backgroundColor = backgroundColor,
                                         showStatusBar = !hideStatus,
                                         showNavBar = !hideNav,
-                                        darkSearchBar = darkSearchBar,
+                                        darkSearchBar = darkSearchBar || minimalUi, // [fork]
+                                        minimalStyle = minimalUi, // [fork]
                                         wallpaperBlurRadius = if (wallpaperBlur) wallpaperBlurRadius.dp else 0.dp,
                                     )
 

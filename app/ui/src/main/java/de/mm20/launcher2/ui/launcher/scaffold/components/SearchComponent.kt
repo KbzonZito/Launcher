@@ -29,6 +29,7 @@ import de.mm20.launcher2.ui.launcher.search.SearchVM
 internal class SearchComponent(
     private val reverse: Boolean = false,
     private val openKeyboard: Boolean = true,
+    private val minimalStyle: Boolean = false, // [fork]
 ) : ScaffoldComponent() {
 
     private val lazyListState = LazyListState()
@@ -87,19 +88,22 @@ internal class SearchComponent(
             contentAlignment = Alignment.Center
         ) {
 
-            SearchColumn(
-                modifier = Modifier
-                    .nestedScroll(scrollConnection)
-                    .widthIn(max = 916.dp)
-                    .fillMaxHeight(),
-                paddingValues = insets,
-                state = lazyListState,
-                reverse = reverse,
-                userScrollEnabled = !state.isDragged,
-                onHideKeyboard = {
-                    state.isSearchBarFocused = false
-                }
-            )
+            val column: @Composable () -> Unit = {
+                SearchColumn(
+                    modifier = Modifier
+                        .nestedScroll(scrollConnection)
+                        .widthIn(max = 916.dp)
+                        .fillMaxHeight(),
+                    paddingValues = insets,
+                    state = lazyListState,
+                    reverse = reverse,
+                    userScrollEnabled = !state.isDragged,
+                    onHideKeyboard = {
+                        state.isSearchBarFocused = false
+                    }
+                )
+            }
+            if (minimalStyle) de.mm20.launcher2.ui.search.MinimalSearchTheme(column) else column()
         }
     }
 
