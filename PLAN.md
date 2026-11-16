@@ -255,7 +255,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: fases 12 → 15 (§10)**, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: corrección de bugs de v0.3.0 (§9) y luego fases 12 → 15 (§10)**, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -266,6 +266,33 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 - Animación de cierre: la app vuelve a la fila de la que salió.
 - Tablet: S Pen hover; widgets o agenda en la columna izquierda.
 - Accesibilidad: etiquetas de TalkBack en el riel, el botón de acción y las entradas especiales.
+
+### Corrección de bugs reportados en v0.3.0 (16-11-2026) — próximo trabajo
+> El plan de implementación se arma en la próxima sesión.
+
+**Favoritos**
+1. A veces desaparecen (al desbloquear o al volver de una app). Deben verse siempre en la pantalla principal.
+2. Orden fijo definido por el usuario: no deben moverse con el uso.
+
+**Alfabeto y márgenes**
+3. Margen estándar a ambos lados de la pantalla, calculado para que el alfabeto quepa en cualquiera de los dos; hoy el borde izquierdo es muy angosto para deslizar.
+4. Ola más suave: subida y bajada más largas, menos puntiaguda.
+5. La burbuja con la letra (la que aparece al usar el borde contrario) debe salir siempre, del lado donde está el alfabeto.
+
+**Botón de acción**
+6. Con el alfabeto a la izquierda, el botón choca con la lista de apps: reacomodar hacia el centro en ese caso.
+7. Posición del botón elegible.
+8. Está muy pegado al borde lateral: moverlo más adentro para el pulgar.
+
+**Editar diseño**
+9. Los gestos de la home siguen activos mientras se edita y no dejan mover los elementos.
+10. El reloj no se puede mover.
+11. El aviso inferior estorba (hacerlo más discreto o quitarlo).
+
+**Vistazo**
+12. Clima: elegir proveedor no hace nada. Permitir elegir una app de clima de la que se muestre el clima actual y que se abra al tocarlo (igual que el reloj).
+13. La alarma mostrada (22:30) no existe: revisar de dónde sale (probablemente una alarma de otra app o un `nextAlarmClock` de sistema que no es del reloj).
+14. Mostrar apps de música/medios al conectar un dispositivo Bluetooth.
 
 ## 10. Plan de funciones v0.3 → v1.0
 
