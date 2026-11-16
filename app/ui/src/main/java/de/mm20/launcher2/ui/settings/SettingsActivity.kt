@@ -168,6 +168,9 @@ class SettingsActivity : BaseActivity() {
             entry<MainRoute> {
                 MainSettingsScreen()
             }
+            entry<de.mm20.launcher2.ui.settings.privacy.PrivacySettingsRoute> { // [fork]
+                de.mm20.launcher2.ui.settings.privacy.PrivacySettingsScreen()
+            }
             entry<AppearanceSettingsRoute> {
                 AppearanceSettingsScreen()
             }

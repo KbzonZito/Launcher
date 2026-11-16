@@ -165,8 +165,8 @@ internal class OpenWeatherMapApi {
                 path("data", "2.5", "weather")
                 parameter("q", q)
                 parameter("id", id)
-                parameter("lat", lat)
-                parameter("lon", lon)
+                parameter("lat", lat?.let { String.format(java.util.Locale.ROOT, "%.2f", it) }) // [fork] ~1 km
+                parameter("lon", lon?.let { String.format(java.util.Locale.ROOT, "%.2f", it) }) // [fork] ~1 km
                 parameter("appid", appid)
                 parameter("lang", lang)
             }
@@ -186,8 +186,8 @@ internal class OpenWeatherMapApi {
                 path("data", "2.5", "forecast")
                 parameter("q", q)
                 parameter("id", id)
-                parameter("lat", lat)
-                parameter("lon", lon)
+                parameter("lat", lat?.let { String.format(java.util.Locale.ROOT, "%.2f", it) }) // [fork] ~1 km
+                parameter("lon", lon?.let { String.format(java.util.Locale.ROOT, "%.2f", it) }) // [fork] ~1 km
                 parameter("appid", appid)
                 parameter("lang", lang)
             }

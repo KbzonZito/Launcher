@@ -1,6 +1,10 @@
 package de.mm20.launcher2.currencies
 
 import android.content.Context
+import de.mm20.launcher2.preferences.privacy.PrivacySettings
+import kotlinx.coroutines.flow.first
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -16,8 +20,12 @@ import java.text.SimpleDateFormat
 import javax.xml.parsers.DocumentBuilderFactory
 
 class ExchangeRateWorker(val context: Context, params: WorkerParameters) :
-    CoroutineWorker(context, params) {
+    CoroutineWorker(context, params), KoinComponent {
+    private val privacySettings: PrivacySettings by inject() // [fork]
+
     override suspend fun doWork(): Result {
+        // [fork] Modo offline: no descargar el tipo de cambio.
+        if (privacySettings.offlineMode.first()) return Result.success()
         Log.d("MM20", "Updating currency exchange rates")
         val httpClient = HttpClient()
         try {

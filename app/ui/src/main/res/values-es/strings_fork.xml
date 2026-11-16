@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fork_preference_screen_privacy">Privacidad</string>
+    <string name="fork_preference_screen_privacy_summary">Modo offline, acceso a la red</string>
+    <string name="fork_preference_offline_mode">Modo offline</string>
+    <string name="fork_preference_offline_mode_summary">Bloquea todo acceso a la red: resultados online, actualización del clima y del tipo de cambio, e imágenes remotas</string>
+    <string name="fork_preference_offline_mode_info">Breezy Weather y los plugins de clima siguen funcionando porque leen los datos de apps del dispositivo.</string>
+</resources>

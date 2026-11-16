@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
@@ -50,13 +51,16 @@ internal class SearchServiceImpl(
     private val searchActionService: SearchActionService,
     private val customAttributesRepository: CustomAttributesRepository,
     private val profileManager: ProfileManager,
+    private val privacySettings: de.mm20.launcher2.preferences.privacy.PrivacySettings, // [fork]
 ) : SearchService {
 
     override fun search(
         query: String,
-        filters: SearchFilters,
+        requestedFilters: SearchFilters,
         initialResults: SearchResults?,
     ): Flow<SearchResults> = flow {
+        // [fork] El modo offline anula el filtro "online" sin importar lo que pida la UI.
+        val filters = if (privacySettings.offlineMode.first()) requestedFilters.copy(allowNetwork = false) else requestedFilters
         supervisorScope {
             val results = MutableStateFlow(
                 initialResults?.let {

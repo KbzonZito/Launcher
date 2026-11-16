@@ -208,11 +208,18 @@ class WeatherUpdateWorker(
     private val appDatabase: AppDatabase by inject()
     private val settings: WeatherSettings by inject()
     private val locationProvider: DevicePoseProvider by inject()
+    private val privacySettings: de.mm20.launcher2.preferences.privacy.PrivacySettings by inject() // [fork]
 
     override suspend fun doWork(): Result {
         Log.d("WeatherUpdateWorker", "Requesting weather data")
         val settingsData = settings.first()
         val provider = WeatherProvider.getInstance(settingsData.provider)
+
+        // [fork] Breezy Weather y los plugins leen de apps locales; el resto usa internet.
+        if (settingsData.provider in setOf("metno", "owm", "brightsky") && privacySettings.offlineMode.first()) {
+            Log.d("WeatherUpdateWorker", "Offline mode: skipping weather update")
+            return Result.success()
+        }
 
         val updateInterval = provider.getUpdateInterval()
         val lastUpdate = settingsData.lastUpdate

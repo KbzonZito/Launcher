@@ -92,13 +92,17 @@ data class LauncherSettingsData internal constructor(
     val calculatorEnabled: Boolean = true,
 
     val unitConverterEnabled: Boolean = true,
-    val unitConverterCurrencies: Boolean = true,
+    // [fork] Desactivado por defecto: descarga cada hora el tipo de cambio desde el BCE.
+    val unitConverterCurrencies: Boolean = false,
 
     val wikipediaSearchEnabled: Boolean = true,
     val wikipediaSearchImages: Boolean = true,
     val wikipediaCustomUrl: String? = null,
 
     val websiteSearchEnabled: Boolean = true,
+
+    // [fork] Modo offline: corta toda la red de la app (búsqueda online, clima, divisas, imágenes remotas).
+    val privacyOfflineMode: Boolean = false,
 
     val badgesNotifications: Boolean = true,
     val badgesSuspendedApps: Boolean = true,
