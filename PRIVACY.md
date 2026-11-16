@@ -32,6 +32,8 @@ Ajustes → Privacidad → *En este dispositivo*:
 - **Borrar estadísticas de uso**: pone a cero lo aprendido (favoritos fijados y ocultas se mantienen).
 - **Proteger la búsqueda de capturas** (activado por defecto): `FLAG_SECURE` mientras hay texto en la búsqueda, el filtro de ocultas activo o la hoja de ocultas abierta. La home normal sí se puede capturar.
 
+## Backups cifrados ✅
+Al crear un backup se puede poner una contraseña (opcional): el archivo se cifra con AES-256-GCM, clave derivada con PBKDF2-SHA256 (210 000 iteraciones) y sal/IV aleatorios. Al restaurar, se pide la contraseña; una incorrecta o un archivo alterado se rechazan (GCM verifica la integridad). Sin contraseña no hay forma de recuperarlo.
+
 ## Pendiente
 - Espacio privado propio y, más adelante, integración con la Carpeta segura de Samsung / Private Space de Android.
-- Backups cifrados con contraseña.

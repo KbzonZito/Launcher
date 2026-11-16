@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    testImplementation(libs.junit) // [fork]
     implementation(libs.bundles.kotlin)
     implementation(libs.androidx.core)
 

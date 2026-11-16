@@ -43,7 +43,11 @@ fun CreateBackupSheet(
         )
         LaunchedEffect(null) {
             viewModel.reset()
-            val fileName = "launcher-${ // [fork]
+        }
+        // [fork] Antes de elegir el archivo: contraseña opcional para cifrar el backup.
+        val startBackup: (String) -> Unit = { password ->
+            viewModel.password = password
+            val fileName = "launcher-${
                 ZonedDateTime.now().format(
                     DateTimeFormatter.ISO_INSTANT
                 ).replace(":", "_")
@@ -58,7 +62,16 @@ fun CreateBackupSheet(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            if (it == CreateBackupState.BackingUp) {
+            if (it == CreateBackupState.Ready) {
+                BackupPasswordStep(
+                    title = stringResource(R.string.fork_backup_create_title),
+                    description = stringResource(R.string.fork_backup_create_description),
+                    buttonLabel = stringResource(R.string.fork_backup_create_button),
+                    confirm = true,
+                    allowEmpty = true,
+                    onSubmit = startBackup,
+                )
+            } else if (it == CreateBackupState.BackingUp) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
