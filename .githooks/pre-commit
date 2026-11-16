@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# [fork] El repo es público: bloquea cualquier material de firma o secretos en el commit.
+# Se activa una vez con: git config core.hooksPath .githooks
+bad=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(p12|jks|keystore|pem)$|(^|/)(signing\.env|keystore\.properties|local\.properties)$' || true)
+if [ -n "$bad" ]; then
+  echo "pre-commit: no se permiten claves ni secretos en el repo:" >&2
+  echo "$bad" >&2
+  exit 1
+fi
+if git diff --cached -U0 | grep -E '^\+.*(KEYSTORE_PASSWORD|KEY_PASSWORD)\s*=\s*[A-Za-z0-9]{8,}' >/dev/null; then
+  echo "pre-commit: parece que hay una contraseña de firma en el diff." >&2
+  exit 1
+fi
