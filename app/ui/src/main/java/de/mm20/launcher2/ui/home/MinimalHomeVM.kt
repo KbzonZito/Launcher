@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.core.app.ActivityOptionsCompat
+import androidx.compose.ui.unit.IntRect
 import androidx.core.content.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -146,8 +147,9 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     /** Apps ocultas (solo se muestran tras desbloquear). */
     val hiddenApps: StateFlow<List<Application>> = combine(allApps, hiddenAppKeys) { all, hiddenKeys ->
         val collator = Collator.getInstance().apply { strength = Collator.PRIMARY }
-        (all.standardProfileApps + all.workProfileApps + all.privateSpaceApps)
-            .filter { hiddenKeys.contains(it.key) }
+        // Ocultas de cualquier perfil + todas las del Espacio privado de Android (siempre tras el candado).
+        ((all.standardProfileApps + all.workProfileApps).filter { hiddenKeys.contains(it.key) } + all.privateSpaceApps)
+            .distinctBy { it.key }
             .sortedWith { a, b -> collator.compare(a.displayLabel, b.displayLabel) }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
@@ -265,11 +267,40 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
         awaitClose { context.unregisterReceiver(receiver) }
     }
 
+    data class BatteryState(val percent: Int, val charging: Boolean)
+
+    /** Batería del teléfono (sin permisos: intent "sticky" ACTION_BATTERY_CHANGED). */
+    fun battery(context: Context): Flow<BatteryState?> = callbackFlow {
+        fun parse(intent: Intent?): BatteryState? {
+            intent ?: return null
+            val level = intent.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, -1)
+            val scale = intent.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, 100)
+            val status = intent.getIntExtra(android.os.BatteryManager.EXTRA_STATUS, -1)
+            if (level < 0 || scale <= 0) return null
+            val charging = status == android.os.BatteryManager.BATTERY_STATUS_CHARGING ||
+                    status == android.os.BatteryManager.BATTERY_STATUS_FULL
+            return BatteryState(level * 100 / scale, charging)
+        }
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                trySend(parse(intent))
+            }
+        }
+        trySend(parse(context.registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))))
+        awaitClose { context.unregisterReceiver(receiver) }
+    }
+
     fun icon(searchable: SavableSearchable, size: Int): Flow<LauncherIcon?> =
         iconService.getIcon(searchable, size)
 
-    fun launch(context: Context, searchable: SavableSearchable): Boolean {
-        val options = ActivityOptionsCompat.makeBasic().toBundle()
+    fun launch(context: Context, searchable: SavableSearchable, bounds: IntRect? = null): Boolean {
+        // La app se abre expandiéndose desde la fila tocada (si se conocen sus límites).
+        val view = (context as? android.app.Activity)?.window?.decorView
+        val options = if (bounds != null && view != null) {
+            ActivityOptionsCompat.makeScaleUpAnimation(view, bounds.left, bounds.top, bounds.width, bounds.height)
+        } else {
+            ActivityOptionsCompat.makeBasic()
+        }.toBundle()
         return if (searchable.launch(context, options)) {
             favoritesService.reportLaunch(searchable)
             true
