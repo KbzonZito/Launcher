@@ -184,6 +184,9 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 - Widgets propios nuevos: batería de dispositivos (Galaxy Buds/Watch vía `BatteryManager` + bluetooth), temporizador/cronómetro, notas rápidas, contador de pasos (Health Connect, opcional), música.
 
 ### 5.7 Tablet (Tab S9)
+
+> **Estado (fase 7):** `MinimalHome` decide con `BoxWithConstraints`: ≥ 600 dp de ancho y en horizontal → dos columnas (reloj y vistazo centrados a la izquierda, lista y riel a la derecha, lista hasta el 80 % del alto); ≥ 600 dp en vertical → una columna con reloj ×1.5 y lista hasta el 50 % del alto; teléfono sin cambios. Probado en el emulador Tablet (2560×1600). Pendiente: teclado físico (escribir en la home abre la búsqueda), S Pen hover, reloj dual.
+
 - Layout adaptativo con `WindowSizeClass`: en horizontal, dos columnas (reloj + widgets | lista + riel). En vertical, lista más ancha con el riel más grande.
 - Soporte de rotación, teclado físico (búsqueda escribiendo directo en la home, navegación con flechas) y S Pen hover.
 
@@ -212,7 +215,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **4** | Prefijos de búsqueda, botón lateral con teclado inmediato, guía de configuración, fix de crash de shortcuts | ✅ PR #7 (restyle visual de resultados → fase 8) |
 | **5** | Bajar dividido (notificaciones / ajustes rápidos), dos dedos ↑↓ configurables, deslizar una app a la izquierda abre otra | ✅ PR #8 |
 | **6** | 6 estilos de reloj (fino, negrita, apilado, en palabras, analógico, progreso del día), agenda de hasta 3 eventos, apps de clima y fecha configurables | ✅ PR #9 |
-| **7** | Layout de tablet | ⏳ |
+| **7** | Layout adaptativo: dos columnas en pantallas anchas en horizontal, una columna grande en la Tab en vertical, reloj escalado | ✅ PR #10 |
 | **8** | Baseline profiles, benchmarks, pulido de animaciones, medir arranque en el S24U | ⏳ |
 | continuo | `upstream-sync` mensual por tag | ⏳ |
 

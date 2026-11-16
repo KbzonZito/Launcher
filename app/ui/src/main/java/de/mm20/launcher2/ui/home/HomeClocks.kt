@@ -59,6 +59,7 @@ fun HomeClock(
     accent: Color,
     onTimeClick: () -> Unit,
     onDateClick: (Long) -> Unit,
+    scale: Float = 1f,
 ) {
     val context = LocalContext.current
     val now = rememberNow()
@@ -72,13 +73,13 @@ fun HomeClock(
     val dateText: @Composable (TextStyle) -> Unit = { st ->
         Text(date, style = st.copy(shadow = shadow), modifier = Modifier.noRippleClick { onDateClick(now) })
     }
-    val dateStyle = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.Medium)
+    val dateStyle = TextStyle(fontSize = (17 * scale).sp, fontWeight = FontWeight.Medium)
 
     when (style) {
         MinimalClockStyle.Thin -> Column {
             Text(
                 "$hours:$minutes",
-                style = TextStyle(fontSize = 76.sp, fontWeight = FontWeight.Thin, letterSpacing = (-2).sp, shadow = shadow),
+                style = TextStyle(fontSize = (76 * scale).sp, fontWeight = FontWeight.Thin, letterSpacing = (-2).sp, shadow = shadow),
                 modifier = timeModifier,
             )
             dateText(dateStyle)
@@ -87,14 +88,14 @@ fun HomeClock(
         MinimalClockStyle.Bold -> Column {
             Text(
                 "$hours:$minutes",
-                style = TextStyle(fontSize = 68.sp, fontWeight = FontWeight.Black, letterSpacing = (-3).sp, shadow = shadow),
+                style = TextStyle(fontSize = (68 * scale).sp, fontWeight = FontWeight.Black, letterSpacing = (-3).sp, shadow = shadow),
                 modifier = timeModifier,
             )
-            dateText(dateStyle.copy(fontWeight = FontWeight.Light, fontSize = 18.sp))
+            dateText(dateStyle.copy(fontWeight = FontWeight.Light, fontSize = (18 * scale).sp))
         }
 
         MinimalClockStyle.Stacked -> Column(modifier = timeModifier) {
-            val big = TextStyle(fontSize = 104.sp, fontWeight = FontWeight.Light, lineHeight = 92.sp, letterSpacing = (-4).sp, shadow = shadow)
+            val big = TextStyle(fontSize = (104 * scale).sp, fontWeight = FontWeight.Light, lineHeight = (92 * scale).sp, letterSpacing = (-4).sp, shadow = shadow)
             Text(hours.padStart(2, '0'), style = big)
             Text(minutes, style = big, color = accent)
             Spacer(Modifier.height(8.dp))
@@ -104,7 +105,7 @@ fun HomeClock(
         MinimalClockStyle.Words -> Column {
             Text(
                 timeInWords(now, Locale.getDefault()),
-                style = TextStyle(fontSize = 40.sp, fontWeight = FontWeight.Light, lineHeight = 44.sp, shadow = shadow),
+                style = TextStyle(fontSize = (40 * scale).sp, fontWeight = FontWeight.Light, lineHeight = (44 * scale).sp, shadow = shadow),
                 modifier = timeModifier.padding(end = 24.dp),
             )
             Spacer(Modifier.height(10.dp))
@@ -112,7 +113,7 @@ fun HomeClock(
         }
 
         MinimalClockStyle.Analog -> Column {
-            AnalogClock(modifier = timeModifier.size(150.dp), accent = accent)
+            AnalogClock(modifier = timeModifier.size(150.dp * scale), accent = accent)
             Spacer(Modifier.height(14.dp))
             dateText(dateStyle)
         }
@@ -120,7 +121,7 @@ fun HomeClock(
         MinimalClockStyle.DayProgress -> Column {
             Text(
                 "$hours:$minutes",
-                style = TextStyle(fontSize = 64.sp, fontWeight = FontWeight.Thin, letterSpacing = (-2).sp, shadow = shadow),
+                style = TextStyle(fontSize = (64 * scale).sp, fontWeight = FontWeight.Thin, letterSpacing = (-2).sp, shadow = shadow),
                 modifier = timeModifier,
             )
             dateText(dateStyle)
