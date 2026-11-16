@@ -25,6 +25,8 @@ Empezar de cero solo tendría sentido si quisiéramos otra arquitectura (p. ej. 
 
 ## 1. Repositorio y forma de trabajar con el fork
 
+> **Cambio de rumbo (16-11-2026):** se decidió un **fork total** (§10, Fase 10). Cuando se haga, las reglas de sincronización con upstream de §1.2–1.3 dejan de aplicar: no se traen más cambios de Kvaesitso y el código se renombra a `dev.kbzon.launcher`.
+
 ### 1.1 Remotos
 El repo sigue siendo el fork público `KbzonZito/Launcher` (cumple la GPL‑3 sin esfuerzo extra). Solo se agrega upstream:
 
@@ -225,7 +227,14 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **6** | 6 estilos de reloj (fino, negrita, apilado, en palabras, analógico, progreso del día), agenda de hasta 3 eventos, apps de clima y fecha configurables | ✅ PR #9 |
 | **7** | Layout adaptativo: dos columnas en pantallas anchas en horizontal, una columna grande en la Tab en vertical, reloj escalado | ✅ PR #10 |
 | **8** | Baseline profile generado (34 k reglas + perfil de arranque), módulo `:baselineprofile` con generador y Macrobenchmark | ✅ PR #11, restyle de la búsqueda en PR #14 · pendiente: medir en el S24U, pulido de animaciones |
-| continuo | `upstream-sync` mensual por tag | ⏳ |
+| **9** | Correcciones rápidas: reloj abre la app completa, clima junto a la alarma, solo home minimalista, sugerencias desactivables, doble toque en el riel = bloquear, ola más marcada, riel desde ambos bordes | ⏳ v0.2.1 |
+| **10** | Fork total: renombrar a `dev.kbzon.launcher`, sin upstream, Ko-fi, borrar lo que no se usa | ⏳ v0.3.0 |
+| **11** | Home configurable: popup al mantener pulsado, gestos unificados, botón de acción, editar diseño | ⏳ v0.4 |
+| **12** | Orden de lista por letra, carpetas (popup), reordenar favoritos | ⏳ v0.5 |
+| **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ⏳ v0.6 |
+| **14** | Búsqueda minimalista 2.0 | ⏳ v0.7 |
+| **15** | Limpieza de ajustes heredados | ⏳ futuro |
+| ~~continuo~~ | ~~`upstream-sync` mensual por tag~~ — cancelado por el fork total | — |
 
 Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), apertura animada + Espacio privado en el candado + batería en el vistazo (PR #15), búsqueda minimalista (PR #14), teclado físico + borrar estadísticas + mapas offline (PR #13), identidad propia (PR #12). Pendientes: ver §9.
 
@@ -243,27 +252,84 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 ## 9. Próximas mejoras (backlog priorizado)
 
-> Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta o a las releases.
+> Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Alta prioridad**
-1. **Probar en el S24 Ultra y la Tab S9** y corregir lo que aparezca. Lo más crítico: vibración del riel, fluidez a 120 Hz, gestos de dos dedos, reproductor con música real, shortcuts con apps reales.
-2. **Medir el arranque en el S24 Ultra** con el baseline profile (`:baselineprofile`) y fijar objetivos con números reales.
-3. **Nombre definitivo** de la app (hoy "Launcher").
-4. **Reordenar favoritos arrastrando** directamente en la home (hoy se ordenan desde la hoja de Kvaesitso).
-5. **Notificaciones en la lista:** deslizar para descartar y tocar la vista previa para abrir esa notificación.
+**Siguiente: fases 9 → 15 (§10)**, en este orden: correcciones rápidas → fork total → pantalla principal configurable → riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
 
-**Media**
-6. **Widgets propios en la home:** batería de Galaxy Buds/Watch (Bluetooth), temporizador/cronómetro, nota rápida.
-7. **Widgets de terceros incrustados** en la home minimalista (p. ej. Samsung Weather), además del panel de widgets.
-8. **◷ contextual:** sugerencias según la hora del día y el lugar, no solo las más usadas.
-9. **Gestos extra:** desde los bordes, pellizcar, animación al usar los dos dedos.
-10. **Tablet:** widgets o agenda ampliada en la columna izquierda, S Pen hover, reloj dual/mundial.
-11. **Animación de cierre:** la app vuelve a la fila de la que salió (`GestureNavContract`).
+**Fuera de las fases (seguir haciendo en paralelo)**
+- Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
+- Medir el arranque en el S24 Ultra con `:baselineprofile` y fijar objetivos con números.
+- Nombre definitivo de la app.
+- Notificaciones en la lista: deslizar para descartar, tocar la vista previa para abrir la notificación.
+- Widgets propios: batería de Galaxy Buds/Watch, temporizador/cronómetro, nota rápida; widgets de terceros incrustados en la home.
+- Animación de cierre: la app vuelve a la fila de la que salió.
+- Tablet: S Pen hover; widgets o agenda en la columna izquierda.
+- Accesibilidad: etiquetas de TalkBack en el riel, el botón de acción y las entradas especiales.
 
-**Baja / mantenimiento**
-12. **Sincronizar con upstream** (Kvaesitso) por tag, mensual.
-13. **Regla en `main`** que exija el check `build` para poder usar auto-merge.
-14. Relojes: flip, fuente/peso configurables.
-15. Accesibilidad: etiquetas de TalkBack en el riel y en las entradas especiales.
-16. Avisos de permisos de la búsqueda con el estilo minimalista.
+## 10. Plan de funciones v0.3 → v1.0
 
+Decisiones tomadas (16-11-2026):
+- **Fork total**: el código se renombra a `dev.kbzon.launcher`, se deja de traer cambios de Kvaesitso y se borra lo que no se use. Se conserva el aviso de copyright de Kvaesitso (lo exige la GPL-3.0).
+- **Solo existe la home minimalista** (deja de ser una opción).
+- **Botón de acción**: abajo, en la esquina del lado del riel (al alcance del pulgar).
+- **Carpetas**: se abren como popup.
+- **Relojes**: el cambio de estilo funciona; se agregan más tipos.
+
+### Fase 9 — Correcciones y ajustes rápidos (v0.2.1)
+1. **El reloj abre la app de reloj completa**, no solo las alarmas. Nuevo ajuste "El reloj abre" (como clima y fecha): por defecto la app de reloj del sistema (Samsung Reloj); se puede elegir otra.
+2. **Clima en la misma línea que la alarma**, siempre que haya datos. Si no hay proveedor o ubicación, mostrar un acceso "Configurar clima" en vez de nada (hoy simplemente no aparece).
+3. **Solo home minimalista**: quitar el interruptor; los homes de Kvaesitso (reloj + widgets) dejan de ser alcanzables. La búsqueda minimalista queda siempre activa.
+4. **Recomendaciones por uso desactivables**: ajuste "Sugerir apps según el uso". Apagado → desaparece ◷ del riel y no se muestran apps frecuentes en ningún lado (distinto de *Incógnito*, que además deja de registrar).
+5. **Doble toque en el riel → apagar pantalla / bloquear**. Se distingue de tocar una letra: dos toques sin movimiento en < 300 ms. Usa el servicio de accesibilidad del launcher (`GLOBAL_ACTION_LOCK_SCREEN`); si no está activado, la primera vez se explica y se lleva al ajuste.
+6. **Ola del riel más marcada**: la letra bajo el dedo se desplaza más hacia adentro (≈ 56 dp en vez de 36) y crece más; ajuste "Intensidad de la ola" (suave / normal / marcada).
+7. **El riel funciona desde ambos bordes**: aunque las letras se vean solo a la derecha, deslizar en el borde izquierdo también recorre el alfabeto (zona táctil invisible de ~24 dp). Mientras se usa el borde contrario, aparece junto al dedo una burbuja con la letra actual y las letras visibles hacen la ola en su lado.
+
+### Fase 10 — Fork total (v0.3.0)
+1. **Renombrar paquetes** `de.mm20.launcher2.*` → `dev.kbzon.launcher.*` en los ~90 módulos (código, `namespace`, manifiestos, ProGuard). El `applicationId` y la firma no cambian: actualiza encima y conserva datos (base de datos, ajustes y backups usan los mismos nombres de archivo).
+2. **Quitar el remoto `upstream`** y las reglas de sincronización (§1.2–1.3 pasan a historia). El fork pasa a ser un proyecto propio.
+3. **Plugins de Kvaesitso**: decidir si se mantiene la compatibilidad (sus acciones y permisos se llaman `de.mm20.launcher2.*`). Recomendación: mantener los nombres del protocolo de plugins para no romper los plugins de clima, o eliminar el soporte de plugins si no los usas.
+4. **Quitar todo rastro visible**: enlaces de ayuda a `kvaesitso.mm20.de`, textos, nombres de archivos, `readme.md` propio.
+5. **Ko-fi** en Acerca de (y en el README).
+6. **Borrar lo que no se usa**: homes y widgets de Kvaesitso que ya no se alcanzan, build types `nightly`/`fdroid`, traducciones distintas de es/en.
+
+### Fase 11 — Pantalla principal configurable (v0.4)
+1. **Mantener pulsado un espacio vacío → popup de ajustes rápidos**: gestos, botón de acción, lado y posición del riel, estilo de reloj, estilo de íconos, tema; botón "Editar diseño" y botón "Ajustes". (Hoy ese gesto va al scaffold de Kvaesitso; se intercepta en la home.)
+2. **Gestos configurables en la home, todos en un solo lugar**: deslizar ↑ ↓ ← →, doble toque, dos dedos ↑ ↓, pellizcar; "bajar dividido" pasa a ser una opción de deslizar ↓. Acciones: buscar, notificaciones, ajustes rápidos, bloquear, recientes, apagado, abrir app/atajo, panel de widgets, linterna, nada. Por defecto: ↓ = buscar (tu ejemplo), ↑ = panel de widgets.
+3. **Botón de acción** (abajo, lado del riel): toque, doble toque, mantener y deslizar ↑ ↓ ← →, cada uno con su acción. Al arrastrar muestra hacia dónde va y vibra al cruzar el umbral. Por defecto: toque = buscar.
+4. **Modo "Editar diseño"**: arrastrar verticalmente el bloque superior (reloj + vistazo) y el riel (posición y alto). Se guarda como fracción de la pantalla, por orientación (teléfono y Tab).
+
+### Fase 12 — Riel, lista y carpetas (v0.5)
+1. **Orden de la lista por letra**: alfabético, más usadas primero, recientes primero, recién instaladas primero.
+2. **Carpetas (popup)**: crear desde el menú de una app ("Nueva carpeta" / "Añadir a carpeta"); se muestran en favoritos con un ícono mosaico; al tocar, popup con cuadrícula de apps, renombrar y reordenar. Se construyen sobre las **etiquetas fijables de Kvaesitso** (ya existen y se guardan en la base de datos).
+3. **Reordenar favoritos arrastrando** directamente en la home.
+
+### Fase 13 — Personalización visual (v0.6)
+1. **Estilo unificado** (`DESIGN.md`): paleta y roles de color, escala tipográfica, espaciados, radios, sombras (ninguna) y curvas de animación. Se aplica a la home, búsqueda, menús, hojas y ajustes, para que todo se vea como una sola app.
+2. **Temas**: temas predeterminados (p. ej. *Grafito*, *Medianoche OLED*, *Papel*, *Bosque*, *Arena*) y editor para crear y editar. Un tema agrupa colores, forma, tipografía, transparencias y estilo de íconos. Se apoya en el editor de temas de Kvaesitso, simplificado.
+3. **Fuente y tamaño**: fuentes incluidas con licencia libre (Inter, Manrope, Space Grotesk, IBM Plex Sans, la del sistema) y tamaño ajustable para la lista, el reloj y el vistazo.
+4. **Íconos como Niagara**, además de lo que ya trae Kvaesitso (packs de íconos, temáticos): *Original*, *Monocromo* (capa monocroma de Android 13+, teñida con el acento), *Contorno* (glifo monocromo dentro de un contorno fino, sin relleno) y *Sin íconos*. Si una app no trae capa monocroma, se genera una a partir del ícono o se usa su inicial.
+5. **Más relojes**: portar los de Kvaesitso (binario, segmentos, órbita, digital 2), y nuevos: flip, mundial/dual (útil en la Tab), matriz de puntos, vertical y anillo de agenda. Fuente del reloj configurable.
+
+### Fase 14 — Búsqueda minimalista 2.0 (v0.7)
+1. Todos los tipos de resultado como filas de lista (igual que la home), sin tarjetas, con encabezados de sección discretos.
+2. Avisos de permisos compactos (una sola línea por categoría).
+3. Acciones rápidas en contactos (llamar, mensaje), calculadora y conversor en línea.
+4. Atajos de búsqueda propios (p. ej. `yt` → YouTube, `m` → Maps), además de los prefijos de categoría.
+5. Opción de barra de búsqueda abajo (alcance del pulgar) y navegación con teclado físico (flechas + Enter).
+
+### Fase 15 — Limpieza de ajustes (futuro)
+Eliminar los ajustes heredados de Kvaesitso que no aplican a esta app (reloj y widgets de la home de Kvaesitso, dock, estilos de barra, etc.) y reorganizar en: Inicio · Riel y lista · Gestos y botón de acción · Búsqueda · Apariencia · Privacidad · Backup · Acerca de.
+
+### Recomendaciones adicionales
+- **Primer arranque guiado**: elegir como launcher predeterminado y pedir cada permiso (notificaciones, calendario, contactos, accesibilidad para bloquear) explicando para qué sirve.
+- **Pruebas de capturas** (Roborazzi o Paparazzi) de la home y la búsqueda, para que los cambios visuales no rompan nada sin darnos cuenta; pruebas unitarias del detector de gestos y del orden de la lista.
+- **Presupuesto de rendimiento**: cada fase se mide con el recorrido de Macrobenchmark; ninguna función nueva puede empeorar el arranque ni el scroll del riel.
+- **Intensidad de vibración** configurable (riel, botón de acción, gestos).
+- **Mantener pulsado el reloj** → temporizador rápido o la próxima alarma.
+- **Ajustes por dispositivo** (teléfono / Tab) para posición del riel y diseño, ya que tienen proporciones muy distintas.
+
+### Preguntas abiertas
+- URL de tu Ko-fi.
+- Plugins de Kvaesitso: ¿mantener compatibilidad o quitarlos? (Fase 10.3)
+- Gestos por defecto de la home y del botón de acción: ¿están bien los propuestos?
+- Temas predeterminados y fuentes: ¿algún estilo o fuente que quieras sí o sí?
