@@ -33,6 +33,14 @@ fun MainSettingsScreen() {
     ) {
         item {
             PreferenceCategory {
+                Preference( // [fork]
+                    icon = R.drawable.home_24px,
+                    title = stringResource(id = R.string.fork_preference_screen_minimal_home),
+                    summary = stringResource(id = R.string.fork_preference_screen_minimal_home_summary),
+                    onClick = {
+                        backStack.add(de.mm20.launcher2.ui.settings.home.MinimalHomeSettingsRoute)
+                    }
+                )
                 Preference(
                     icon = R.drawable.palette_24px,
                     title = stringResource(id = R.string.preference_screen_appearance),

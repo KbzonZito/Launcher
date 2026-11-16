@@ -15,4 +15,12 @@
     <string name="fork_preference_incognito_summary">Don\'t record app launches: frequently used apps and search ranking stop learning</string>
     <string name="fork_preference_secure_screens">Protect search from screenshots</string>
     <string name="fork_preference_secure_screens_summary">Block screenshots and screen recording while search results or hidden apps are on screen</string>
+    <string name="fork_preference_screen_minimal_home">Minimal home</string>
+    <string name="fork_preference_screen_minimal_home_summary">Favorites list and alphabet rail</string>
+    <string name="fork_preference_minimal_home">Use minimal home</string>
+    <string name="fork_preference_minimal_home_summary">Clock, glance line, favorites and an alphabet rail instead of the clock and widgets screen</string>
+    <string name="fork_preference_minimal_home_icons">Show app icons</string>
+    <string name="fork_preference_minimal_home_rail_left">Alphabet on the left</string>
+    <string name="fork_preference_minimal_home_rail_left_summary">For using the phone with your left hand</string>
+    <string name="fork_minimal_home_empty_favorites">Pick a letter on the right to see your apps. Long-press an app → pin it to favorites.</string>
 </resources>

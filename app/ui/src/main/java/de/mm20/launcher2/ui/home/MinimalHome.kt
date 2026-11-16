@@ -1,0 +1,362 @@
+package de.mm20.launcher2.ui.home
+
+import android.content.ContentUris
+import android.content.Context
+import android.content.Intent
+import android.provider.AlarmClock
+import android.provider.CalendarContract
+import android.text.format.DateFormat
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.viewmodel.compose.viewModel
+import de.mm20.launcher2.search.CalendarEvent
+import de.mm20.launcher2.search.SavableSearchable
+import de.mm20.launcher2.ui.R
+import de.mm20.launcher2.ui.component.ShapedLauncherIcon
+import de.mm20.launcher2.ui.launcher.sheets.LocalBottomSheetManager
+import de.mm20.launcher2.ui.locals.LocalMeasurementSystem
+import de.mm20.launcher2.ui.locals.LocalPreferDarkContentOverWallpaper
+import de.mm20.launcher2.ui.utils.formatTemperature
+import kotlinx.coroutines.delay
+import java.util.Date
+import java.util.Locale
+
+/**
+ * [fork] Home minimalista: reloj, línea de un vistazo, favoritos y riel del alfabeto.
+ */
+@Composable
+fun MinimalHome(
+    insets: PaddingValues,
+    listState: LazyListState,
+    modifier: Modifier = Modifier,
+) {
+    val vm: MinimalHomeVM = viewModel()
+    val context = LocalContext.current
+
+    val darkContent = LocalPreferDarkContentOverWallpaper.current
+    val contentColor = if (darkContent) Color(0xE6000000) else Color.White
+    val shadow = if (darkContent) null else Shadow(Color(0x66000000), blurRadius = 8f)
+    val accent = MaterialTheme.colorScheme.primaryFixedDim
+
+    val appsByLetter by vm.appsByLetter.collectAsState()
+    val favorites by vm.favorites.collectAsState()
+    val selectedLetter by vm.selectedLetter.collectAsState()
+    val showIcons by vm.showIcons.collectAsState()
+    val railOnLeft by vm.railOnLeft.collectAsState()
+
+    BackHandler(enabled = selectedLetter != null) { vm.selectLetter(null) }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { vm.selectLetter(null) }
+    LaunchedEffect(selectedLetter) { listState.scrollToItem(0) }
+
+    val onLaunch: (SavableSearchable) -> Unit = { item ->
+        if (vm.launch(context, item)) vm.selectLetter(null)
+    }
+
+    CompositionLocalProvider(LocalContentColor provides contentColor) {
+        Box(modifier = modifier.fillMaxSize().padding(insets)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        start = if (railOnLeft) 56.dp else 28.dp,
+                        end = if (railOnLeft) 28.dp else 56.dp,
+                    ),
+            ) {
+                Spacer(Modifier.height(40.dp))
+                HomeClock(shadow = shadow)
+                GlanceLine(vm = vm, shadow = shadow)
+                Spacer(Modifier.weight(1f))
+
+                AnimatedContent(
+                    targetState = selectedLetter,
+                    transitionSpec = {
+                        (fadeIn(spring(stiffness = 900f)) + slideInVertically(spring(dampingRatio = 0.85f, stiffness = 700f)) { it / 8 })
+                            .togetherWith(fadeOut(spring(stiffness = 1500f)) + slideOutVertically { -it / 12 })
+                    },
+                    contentAlignment = Alignment.BottomStart,
+                    label = "homeList",
+                ) { letter ->
+                    if (letter == null && favorites.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.fork_minimal_home_empty_favorites),
+                            style = TextStyle(fontSize = 15.sp, shadow = shadow),
+                            color = contentColor.copy(alpha = 0.7f),
+                            modifier = Modifier.padding(bottom = 8.dp),
+                        )
+                    } else if (letter == null) {
+                        HomeList(
+                            items = favorites,
+                            vm = vm,
+                            showIcons = showIcons,
+                            shadow = shadow,
+                            listState = listState,
+                            onLaunch = onLaunch,
+                        )
+                    } else {
+                        Column {
+                            Text(
+                                text = letter.toString(),
+                                color = accent,
+                                style = TextStyle(fontSize = 44.sp, fontWeight = FontWeight.Light, shadow = shadow),
+                                modifier = Modifier.padding(bottom = 4.dp).combinedClickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null,
+                                    onClick = { vm.selectLetter(null) },
+                                ),
+                            )
+                            HomeList(
+                                items = appsByLetter[letter].orEmpty(),
+                                vm = vm,
+                                showIcons = showIcons,
+                                shadow = shadow,
+                                listState = listState,
+                                onLaunch = onLaunch,
+                            )
+                        }
+                    }
+                }
+                Spacer(Modifier.height(32.dp))
+            }
+
+            AlphabetRail(
+                letters = appsByLetter.keys.toList(),
+                selected = selectedLetter,
+                onLetter = { vm.selectLetter(it) },
+                onDragStateChange = {},
+                color = contentColor,
+                accent = accent,
+                railOnLeft = railOnLeft,
+                modifier = Modifier
+                    .align(if (railOnLeft) Alignment.CenterStart else Alignment.CenterEnd)
+                    .padding(horizontal = 8.dp),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun HomeList(
+    items: List<SavableSearchable>,
+    vm: MinimalHomeVM,
+    showIcons: Boolean,
+    shadow: Shadow?,
+    listState: LazyListState,
+    onLaunch: (SavableSearchable) -> Unit,
+) {
+    val sheetManager = LocalBottomSheetManager.current
+    val iconSizePx = with(LocalDensity.current) { 30.dp.roundToPx() }
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxWidth().heightIn(max = 460.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        items(items, key = { it.key }) { item ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateItem()
+                    .combinedClickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { onLaunch(item) },
+                        onLongClick = { sheetManager.showCustomizeSearchableModal(item) },
+                    )
+                    .padding(vertical = 9.dp),
+            ) {
+                if (showIcons) {
+                    val icon by remember(item.key) { vm.icon(item, iconSizePx) }.collectAsState(null)
+                    ShapedLauncherIcon(size = 30.dp, icon = { icon })
+                    Spacer(Modifier.width(16.dp))
+                }
+                Text(
+                    text = item.displayLabel,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Normal, shadow = shadow),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HomeClock(shadow: Shadow?) {
+    val context = LocalContext.current
+    val now by produceState(System.currentTimeMillis()) {
+        while (true) {
+            value = System.currentTimeMillis()
+            delay(60_000 - value % 60_000)
+        }
+    }
+    val is24h = DateFormat.is24HourFormat(context)
+    val time = DateFormat.format(if (is24h) "HH:mm" else "h:mm", now).toString()
+    val datePattern = DateFormat.getBestDateTimePattern(Locale.getDefault(), "EEEEdMMMM")
+    val date = DateFormat.format(datePattern, now).toString().replaceFirstChar { it.uppercase() }
+
+    Text(
+        text = time,
+        style = TextStyle(fontSize = 76.sp, fontWeight = FontWeight.Thin, letterSpacing = (-2).sp, shadow = shadow),
+        modifier = Modifier.combinedClickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = { context.tryStart(Intent(AlarmClock.ACTION_SHOW_ALARMS)) },
+        ),
+    )
+    Text(
+        text = date,
+        style = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.Medium, shadow = shadow),
+        modifier = Modifier.combinedClickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = { context.openCalendarAt(now) },
+        ),
+    )
+}
+
+/** Próximo evento · clima · próxima alarma, cada uno abre su app. */
+@Composable
+private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?) {
+    val context = LocalContext.current
+    val event by vm.nextEvent.collectAsState()
+    val forecast by vm.weather.collectAsState()
+    val alarm by remember { vm.nextAlarm(context) }.collectAsState(null)
+    val measurementSystem = LocalMeasurementSystem.current
+    val style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, shadow = shadow)
+    val dim = LocalContentColor.current.copy(alpha = 0.85f)
+
+    Column(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        event?.let { ev ->
+            GlanceItem(
+                icon = R.drawable.event_24px,
+                text = ev.glanceText(context),
+                style = style,
+                color = dim,
+                onClick = { vm.launch(context, ev) },
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            forecast?.let { f ->
+                GlanceItem(
+                    icon = null,
+                    text = "${formatTemperature(context, f.temperature.toFloat(), measurementSystem)} ${f.condition}",
+                    style = style,
+                    color = dim,
+                    onClick = { context.openWeatherApp() },
+                )
+            }
+            alarm?.takeIf { it - System.currentTimeMillis() < 24 * 60 * 60 * 1000L }?.let { t ->
+                GlanceItem(
+                    icon = R.drawable.alarm_24px,
+                    text = DateFormat.getTimeFormat(context).format(Date(t)),
+                    style = style,
+                    color = dim,
+                    onClick = { context.tryStart(Intent(AlarmClock.ACTION_SHOW_ALARMS)) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GlanceItem(icon: Int?, text: String, style: TextStyle, color: Color, onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.combinedClickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = onClick,
+        ),
+    ) {
+        if (icon != null) {
+            Icon(painterResource(icon), contentDescription = null, tint = color, modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(6.dp))
+        }
+        Text(text, style = style, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+private fun CalendarEvent.glanceText(context: Context): String {
+    val start = startTime
+    val time = if (start != null) DateFormat.getTimeFormat(context).format(Date(start)) else ""
+    return listOf(time, labelOverride ?: label).filter { it.isNotBlank() }.joinToString("  ")
+}
+
+private fun Context.tryStart(intent: Intent) {
+    try {
+        startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    } catch (_: Exception) {
+    }
+}
+
+private fun Context.openCalendarAt(time: Long) {
+    val uri = CalendarContract.CONTENT_URI.buildUpon().appendPath("time").let {
+        ContentUris.appendId(it, time)
+    }.build()
+    tryStart(Intent(Intent.ACTION_VIEW, uri))
+}
+
+/** Abre la app de clima instalada (Samsung, Breezy, Google), en ese orden. Configurable en la fase 6. */
+private fun Context.openWeatherApp() {
+    val candidates = listOf("com.sec.android.daemonapp", "org.breezyweather", "com.google.android.apps.weather")
+    for (pkg in candidates) {
+        val intent = packageManager.getLaunchIntentForPackage(pkg) ?: continue
+        tryStart(intent)
+        return
+    }
+}

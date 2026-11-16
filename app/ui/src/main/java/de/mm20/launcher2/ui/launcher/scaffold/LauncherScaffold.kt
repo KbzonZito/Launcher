@@ -1676,7 +1676,8 @@ private fun Modifier.searchBarAnimation(
 ): Modifier {
     val offsetFactor = if (config.searchBarPosition == SearchBarPosition.Top) -1f else 1f
 
-    val component = state.currentComponent
+    // [fork] En reposo, la home también puede ajustar la barra (la home minimalista la esconde).
+    val component = state.currentComponent ?: config.homeComponent
     val anim = state.currentAnimation
 
     val progress = if (anim == ScaffoldAnimation.Rubberband) {
