@@ -157,6 +157,9 @@ Hoy Kvaesitso tiene 7: swipe ↑↓←→, doble tap, long press y botón home. 
 - Feedback visual del gesto mientras arrastras (no solo el resultado).
 
 ### 5.4 Búsqueda
+
+> **Estado (fase 4):** se mantiene el motor y la UI de resultados de Kvaesitso. Agregado: prefijos `a` apps · `c` contactos · `e` eventos · `f` archivos · `s` atajos · `t` herramientas (los chips de filtro siguen al prefijo y se restauran al borrarlo); al entrar por `ASSIST` (botón lateral) el teclado se abre siempre; guía en Ajustes → Inicio minimalista → Búsqueda. Medido en emulador (release, proceso vivo): la búsqueda por `ASSIST` abre en ~30 ms. El restyle minimalista de los resultados queda para la fase 8.
+
 - Reutilizar `services/search` (es lo mejor de Kvaesitso: apps, contactos, calendario, archivos, calculadora, conversor de unidades, shortcuts, ajustes).
 - UI nueva: campo arriba, resultados agrupados, el primero se lanza con Enter, ranking por frecencia + hora del día.
 - **Botón lateral**: el launcher ya declara `android.intent.action.ASSIST`, así que se puede elegir como "asistente digital" en *Ajustes → Funciones avanzadas → Botón lateral → Mantener pulsado*. Alternativa con Good Lock (RegiStar) apuntando a una actividad dedicada `SearchActivity` (abre directo el teclado, sin pasar por la home, arranque en < 150 ms).
@@ -190,19 +193,21 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 
 ## 7. Hoja de ruta
 
-| Fase | Entregable | Resultado instalable |
+| Fase | Entregable | Estado |
 |---|---|---|
-| **0** | Entorno + remoto `upstream` + `.gitignore` de secretos + keystore + `applicationId` + `versionCode` automático + script de deploy | Kvaesitso con tu firma y tu nombre, actualizable para siempre |
-| **1** | Poda de módulos + auditoría de red + modo offline + medición base | APK más chico, menos red |
-| **1b** | Apps ocultas con biometría, espacio privado, búsqueda incógnita, `FLAG_SECURE` | Privacidad lista desde temprano |
-| **2** | `:app:home`: lista de favoritos + riel del alfabeto básico + glance line | Ya usable como daily driver |
-| **3** | Riel avanzado (abanico, lanzar en un gesto, shortcuts, háptica) | El "wow" frente a Niagara |
-| **4** | Búsqueda nueva + `SearchActivity` + botón lateral | |
-| **5** | Motor de gestos ampliado + gestos por app | |
-| **6** | Relojes nuevos + widgets de calendario/clima + integración con apps | |
-| **7** | Layout de tablet | Tab S9 |
-| **8** | Baseline profiles, benchmarks, pulido de animaciones | |
-| continuo | `upstream-sync` mensual por tag | |
+| **0** | Entorno, remoto `upstream`, `.gitignore` de secretos, firma con la clave de Bookloft, `applicationId` `dev.kbzon.launcher`, `versionCode` automático, `scripts/deploy.sh`, CI | ✅ PR #1 |
+| **1** | Poda de módulos (Nextcloud, ownCloud, WebDAV, Wikipedia), solo es/en, auditoría de red (`PRIVACY.md`) | ✅ PR #2 |
+| **1b** | Modo offline, divisas apagadas por defecto, coordenadas a ~1 km · apps ocultas con biometría, incógnito, `FLAG_SECURE` | ✅ PR #3, #4 |
+| **2** | Home minimalista: reloj, línea de un vistazo, favoritos, riel con ola + háptica | ✅ PR #5 |
+| **3** | Riel ★ ◷ 🔒, notificaciones en la lista, shortcuts al deslizar, menú propio | ✅ PR #6 |
+| **4** | Prefijos de búsqueda, botón lateral con teclado inmediato, guía de configuración, fix de crash de shortcuts | ✅ PR #7 (restyle visual de resultados → fase 8) |
+| **5** | Motor de gestos ampliado + gestos por app | ⏳ |
+| **6** | Relojes nuevos + widgets de calendario/clima + app de clima configurable | ⏳ |
+| **7** | Layout de tablet | ⏳ |
+| **8** | Baseline profiles, benchmarks, pulido de animaciones, medir arranque en el S24U | ⏳ |
+| continuo | `upstream-sync` mensual por tag | ⏳ |
+
+Pendientes sueltos: probar en S24 Ultra y Tab S9 · espacio privado propio · borrar estadísticas de uso · backups cifrados · mosaicos de mapa en modo offline · regla de `main` que exija `build` (para auto-merge).
 
 ---
 

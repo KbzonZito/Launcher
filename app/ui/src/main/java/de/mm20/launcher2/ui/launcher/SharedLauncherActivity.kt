@@ -252,7 +252,7 @@ abstract class SharedLauncherActivity(
                                 if (mode == LauncherActivityMode.Assistant) {
                                     val searchComponent = SearchComponent(
                                         reverse = reverseSearchResults,
-                                        openKeyboard = searchBarAutofocus,
+                                        openKeyboard = true, // [fork] botón lateral → escribir de inmediato
                                     )
                                     val dismissComponent =
                                         DismissComponent(this@SharedLauncherActivity)
