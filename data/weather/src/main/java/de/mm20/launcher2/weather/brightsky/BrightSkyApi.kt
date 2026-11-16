@@ -59,8 +59,8 @@ internal class BrightSkyApi {
                 parameter("units", "si")
                 parameter("date", date)
                 parameter("last_date", lastDate)
-                parameter("lat", lat)
-                parameter("lon", lon)
+                parameter("lat", String.format(java.util.Locale.ROOT, "%.2f", lat)) // [fork] ~1 km
+                parameter("lon", String.format(java.util.Locale.ROOT, "%.2f", lon)) // [fork] ~1 km
             }
         }.body()
     }

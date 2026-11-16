@@ -107,6 +107,7 @@ class LauncherApplication : Application(), CoroutineScope, ImageLoaderFactory {
         return ImageLoader.Builder(applicationContext)
             .components {
                 add(SvgDecoder.Factory())
+                add(de.mm20.launcher2.fork.OfflineImageInterceptor(org.koin.java.KoinJavaComponent.get(de.mm20.launcher2.preferences.privacy.PrivacySettings::class.java))) // [fork]
             }
             .crossfade(true)
             .crossfade(200)

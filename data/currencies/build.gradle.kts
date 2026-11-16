@@ -50,6 +50,8 @@ dependencies {
     implementation(libs.bundles.ktor)
 
     implementation(project(":core:ktx"))
+    implementation(project(":core:preferences")) // [fork]
+    implementation(libs.koin.android) // [fork]
     implementation(project(":core:i18n"))
     implementation(project(":data:database"))
     implementation(project(":core:crashreporter"))

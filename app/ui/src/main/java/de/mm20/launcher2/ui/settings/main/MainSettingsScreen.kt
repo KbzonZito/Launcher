@@ -18,6 +18,7 @@ import de.mm20.launcher2.ui.settings.icons.IconsSettingsRoute
 import de.mm20.launcher2.ui.settings.integrations.IntegrationsSettingsRoute
 import de.mm20.launcher2.ui.settings.locale.LocaleSettingsRoute
 import de.mm20.launcher2.ui.settings.plugins.PluginsSettingsRoute
+import de.mm20.launcher2.ui.settings.privacy.PrivacySettingsRoute
 import de.mm20.launcher2.ui.settings.search.SearchSettingsRoute
 import kotlinx.serialization.Serializable
 
@@ -70,6 +71,14 @@ fun MainSettingsScreen() {
                     summary = stringResource(id = R.string.preference_screen_gestures_summary),
                     onClick = {
                         backStack.add(GesturesSettingsRoute)
+                    }
+                )
+                Preference( // [fork]
+                    icon = R.drawable.cloud_off_24px,
+                    title = stringResource(id = R.string.fork_preference_screen_privacy),
+                    summary = stringResource(id = R.string.fork_preference_screen_privacy_summary),
+                    onClick = {
+                        backStack.add(PrivacySettingsRoute)
                     }
                 )
                 Preference(
