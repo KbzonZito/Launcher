@@ -142,7 +142,6 @@ fun TypographySettingsScreen(themeId: UUID) {
                 },
             )
         },
-        helpUrl = "https://kvaesitso.mm20.de/docs/user-guide/customization/color-schemes",
     ) {
         if (theme == null || previewTypography == null) return@PreferenceScreen
 

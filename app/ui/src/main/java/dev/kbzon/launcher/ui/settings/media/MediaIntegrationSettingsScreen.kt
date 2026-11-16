@@ -62,7 +62,6 @@ fun MediaIntegrationSettingsScreen() {
 
     PreferenceScreen(
         stringResource(R.string.preference_media_integration),
-        helpUrl = "https://kvaesitso.mm20.de/docs/user-guide/integrations/mediacontrol",
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         if (loading) {

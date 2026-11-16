@@ -108,6 +108,16 @@ fun AboutSettingsScreen() {
                     }
                 )
                 Preference(
+                    icon = R.drawable.favorite_24px,
+                    title = stringResource(R.string.fork_about_kofi),
+                    summary = "ko-fi.com/kbzonzito",
+                    onClick = {
+                        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+                            data = "https://ko-fi.com/kbzonzito".toUri()
+                        })
+                    }
+                )
+                Preference(
                     icon = R.drawable.github,
                     title = stringResource(R.string.fork_about_based_on),
                     summary = "github.com/MM2-0/Kvaesitso · GPL-3.0",

@@ -540,7 +540,7 @@ fun CustomizeWebSearch(viewModel: EditSearchActionSheetVM) {
                                             .build()
                                             .launchUrl(
                                                 context,
-                                                Uri.parse("https://kvaesitso.mm20.de/docs/user-guide/search/quickactions#web-search")
+                                                Uri.parse("https://github.com/KbzonZito/Launcher#readme")
                                             )
                                     },
                                 color = MaterialTheme.colorScheme.secondary,

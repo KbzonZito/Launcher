@@ -134,7 +134,6 @@ fun ColorSchemeSettingsScreen(themeId: UUID) {
                 }
             )
         },
-        helpUrl = "https://kvaesitso.mm20.de/docs/user-guide/customization/color-schemes",
     ) {
         if (theme == null || previewColorScheme == null) return@PreferenceScreen
         val selectedColorScheme =

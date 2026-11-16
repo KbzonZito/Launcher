@@ -101,4 +101,5 @@
     <string name="fork_preference_rail_both_edges">Alphabet from both edges</string>
     <string name="fork_preference_rail_both_edges_summary">Slide along the opposite edge too; a bubble shows the letter</string>
     <string name="fork_preference_category_rail">Alphabet</string>
+    <string name="fork_about_kofi">Support on Ko-fi</string>
 </resources>

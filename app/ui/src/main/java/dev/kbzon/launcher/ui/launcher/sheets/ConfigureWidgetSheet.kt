@@ -1001,7 +1001,7 @@ fun ColumnScope.ConfigureCalendarWidget(
                     )
                     .build().launchUrl(
                         context,
-                        Uri.parse("https://kvaesitso.mm20.de/docs/user-guide/widgets/calendar-widget#my-calendars-dont-show-up")
+                        Uri.parse("https://github.com/KbzonZito/Launcher#readme")
                     )
             }) {
             Icon(

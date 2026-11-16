@@ -130,7 +130,7 @@ fun SearchActionsSettingsScreen() {
                             )
                             .build().launchUrl(
                                 context,
-                                Uri.parse("https://kvaesitso.mm20.de/docs/user-guide/search/quickactions")
+                                Uri.parse("https://github.com/KbzonZito/Launcher#readme")
                             )
                     }) {
                         Icon(

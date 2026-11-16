@@ -43,7 +43,6 @@ fun UnitConverterHelpSettingsScreen() {
     PreferenceScreen(
         title = stringResource(R.string.preference_search_unitconverter),
         verticalArrangement = Arrangement.spacedBy(2.dp),
-        helpUrl = "https://kvaesitso.mm20.de/docs/user-guide/search/unit-converter"
     ) {
         for (i in availableConverters.indices) {
             stickyHeader {

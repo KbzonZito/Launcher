@@ -81,7 +81,7 @@ fun DebugSettingsScreen() {
                             val df = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
                             val path = File(
                                 context.externalCacheDir,
-                                "kvaesitso-dump-${df.format(Date(System.currentTimeMillis()))}.hprof"
+                                "launcher-dump-${df.format(Date(System.currentTimeMillis()))}.hprof"
                             ).absolutePath
                             delay(100)
                             withContext(Dispatchers.Default) {

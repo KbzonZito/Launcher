@@ -206,7 +206,7 @@ interface Location : SavableSearchable {
     }
 
     fun toAndroidLocation(): AndroidLocation =
-        AndroidLocation("KvaesitsoLocationProvider").apply {
+        AndroidLocation("LauncherLocationProvider").apply {
             this.latitude = this@Location.latitude
             this.longitude = this@Location.longitude
         }
@@ -221,7 +221,7 @@ interface Location : SavableSearchable {
     fun distanceTo(
         latitude: Double,
         longitude: Double,
-        locationProvider: String = "KvaesitsoLocationProvider"
+        locationProvider: String = "LauncherLocationProvider"
     ): Float =
         this.distanceTo(AndroidLocation(locationProvider).apply {
             this.latitude = latitude

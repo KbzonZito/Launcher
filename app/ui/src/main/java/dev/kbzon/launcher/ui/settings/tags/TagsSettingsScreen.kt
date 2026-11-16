@@ -43,7 +43,6 @@ fun TagsSettingsScreen() {
 
     PreferenceScreen(
         title = stringResource(R.string.preference_screen_tags),
-        helpUrl = "https://kvaesitso.mm20.de/docs/user-guide/concepts/tags"
     ) {
         item {
             PreferenceCategory {
