@@ -72,6 +72,9 @@ class FavoritesService(
         )
     }
 
+    /** [fork] Olvida qué apps se usan más (no afecta favoritos fijados ni ocultos). */
+    fun resetUsageStats() = searchableRepository.resetUsageStats()
+
     fun reportLaunch(searchable: SavableSearchable) {
         // [fork] Modo incógnito: no se registra la apertura.
         scope.launch {

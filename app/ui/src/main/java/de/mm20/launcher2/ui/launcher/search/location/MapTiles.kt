@@ -58,6 +58,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import coil.ImageLoader
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import coil.compose.AsyncImage
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
@@ -402,6 +404,16 @@ const val ZOOM_MIN = 0
 private object MapTileLoader : KoinComponent {
     private val context: Context by inject()
 
+    // [fork] Modo offline: los mosaicos solo salen de la caché, nunca de la red.
+    private val privacySettings: de.mm20.launcher2.preferences.privacy.PrivacySettings by inject()
+    private val offline by lazy {
+        privacySettings.offlineMode.stateIn(
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Default),
+            kotlinx.coroutines.flow.SharingStarted.Eagerly,
+            kotlinx.coroutines.runBlocking { privacySettings.offlineMode.first() },
+        )
+    }
+
     private val userAgent = "${context.packageName}/${
         context.packageManager.getPackageInfo(
             context.packageName,
@@ -423,6 +435,7 @@ private object MapTileLoader : KoinComponent {
             "$tileServerUrl/$zoom/$x/$y.png"
         }
         return ImageRequest.Builder(context)
+            .networkCachePolicy(if (offline.value) CachePolicy.DISABLED else CachePolicy.ENABLED) // [fork]
             .data(url)
             .addHeader(
                 "User-Agent",

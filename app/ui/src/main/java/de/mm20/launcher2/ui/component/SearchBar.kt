@@ -15,6 +15,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -165,6 +169,12 @@ fun SearchBar(
                                 color = contentColor
                             )
                         }
+                        // [fork] TextFieldValue propio: si el texto cambia desde fuera (p. ej. al escribir con
+                        // un teclado físico en la home), el cursor va al final y no al principio.
+                        var fieldValue by remember { mutableStateOf(TextFieldValue(value, TextRange(value.length))) }
+                        if (fieldValue.text != value) {
+                            fieldValue = TextFieldValue(value, TextRange(value.length))
+                        }
                         BasicTextField(
                             modifier = Modifier
                                 .onFocusChanged {
@@ -179,8 +189,11 @@ fun SearchBar(
                                 color = contentColor
                             ),
                             singleLine = true,
-                            value = value,
-                            onValueChange = onValueChange,
+                            value = fieldValue,
+                            onValueChange = {
+                                fieldValue = it
+                                if (it.text != value) onValueChange(it.text)
+                            },
                             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Go,

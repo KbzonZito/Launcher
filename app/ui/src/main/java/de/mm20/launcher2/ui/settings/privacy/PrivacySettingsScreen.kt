@@ -4,6 +4,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import android.widget.Toast
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.fragment.app.FragmentActivity
@@ -55,6 +61,30 @@ fun PrivacySettingsScreen() {
                     value = incognito,
                     onValueChanged = viewModel::setIncognito,
                 )
+                var confirmReset by remember { mutableStateOf(false) }
+                Preference(
+                    title = stringResource(R.string.fork_preference_reset_usage),
+                    summary = stringResource(R.string.fork_preference_reset_usage_summary),
+                    icon = R.drawable.delete_24px,
+                    onClick = { confirmReset = true },
+                )
+                if (confirmReset) {
+                    AlertDialog(
+                        onDismissRequest = { confirmReset = false },
+                        title = { Text(stringResource(R.string.fork_preference_reset_usage)) },
+                        text = { Text(stringResource(R.string.fork_reset_usage_confirm)) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                viewModel.resetUsageStats()
+                                confirmReset = false
+                                Toast.makeText(activity, R.string.fork_reset_usage_done, Toast.LENGTH_SHORT).show()
+                            }) { Text(stringResource(R.string.fork_reset_usage_action)) }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { confirmReset = false }) { Text(stringResource(android.R.string.cancel)) }
+                        },
+                    )
+                }
                 SwitchPreference(
                     title = stringResource(R.string.fork_preference_secure_screens),
                     summary = stringResource(R.string.fork_preference_secure_screens_summary),

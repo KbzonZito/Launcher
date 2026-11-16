@@ -5,7 +5,23 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.foundation.focusable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isAltPressed
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.utf16CodePoint
+import androidx.lifecycle.viewmodel.compose.viewModel
+import de.mm20.launcher2.ui.launcher.search.SearchVM
+import kotlinx.coroutines.launch
 import androidx.compose.ui.draw.alpha
 import de.mm20.launcher2.ui.home.MinimalHome
 import de.mm20.launcher2.ui.launcher.scaffold.LauncherScaffoldState
@@ -33,6 +49,31 @@ internal object MinimalHomeComponent : ScaffoldComponent() {
         insets: PaddingValues,
         state: LauncherScaffoldState,
     ) {
-        MinimalHome(insets = insets, listState = listState, modifier = modifier)
+        // Teclado físico (Tab S9 con funda teclado): escribir en la home abre la búsqueda con ese texto.
+        val searchVM: SearchVM = viewModel()
+        val scope = rememberCoroutineScope()
+        val focusRequester = remember { FocusRequester() }
+        LaunchedEffect(state.currentComponent) {
+            if (state.currentComponent == null) runCatching { focusRequester.requestFocus() }
+        }
+        MinimalHome(
+            insets = insets,
+            listState = listState,
+            modifier = modifier
+                .focusRequester(focusRequester)
+                .focusable()
+                .onKeyEvent { event ->
+                    if (event.type != KeyEventType.KeyDown) return@onKeyEvent false
+                    if (event.isCtrlPressed || event.isAltPressed || event.isMetaPressed) return@onKeyEvent false
+                    val codePoint = event.utf16CodePoint
+                    if (codePoint <= 0 || Character.isISOControl(codePoint) || Character.isWhitespace(codePoint)) {
+                        return@onKeyEvent false
+                    }
+                    searchVM.search(String(Character.toChars(codePoint)))
+                    scope.launch { state.onSearchBarTap() }
+                    state.isSearchBarFocused = true
+                    true
+                },
+        )
     }
 }

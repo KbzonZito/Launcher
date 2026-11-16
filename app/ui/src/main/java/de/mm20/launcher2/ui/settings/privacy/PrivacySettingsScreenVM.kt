@@ -8,6 +8,9 @@ import org.koin.core.component.inject
 // [fork]
 class PrivacySettingsScreenVM : ViewModel(), KoinComponent {
     private val privacySettings: PrivacySettings by inject()
+    private val favoritesService: de.mm20.launcher2.services.favorites.FavoritesService by inject()
+
+    fun resetUsageStats() = favoritesService.resetUsageStats()
 
     val offlineMode = privacySettings.offlineMode
 

@@ -66,4 +66,9 @@
     <string name="fork_preference_linked_app_auto">Automático</string>
     <string name="fork_about_source">Código fuente</string>
     <string name="fork_about_based_on">Basado en Kvaesitso</string>
+    <string name="fork_preference_reset_usage">Borrar estadísticas de uso</string>
+    <string name="fork_preference_reset_usage_summary">Olvidar qué apps abres más. Los favoritos fijados y las apps ocultas se mantienen.</string>
+    <string name="fork_reset_usage_confirm">Las apps frecuentes y el orden de la búsqueda empezarán a aprender desde cero. No se puede deshacer.</string>
+    <string name="fork_reset_usage_action">Borrar</string>
+    <string name="fork_reset_usage_done">Estadísticas de uso borradas</string>
 </resources>

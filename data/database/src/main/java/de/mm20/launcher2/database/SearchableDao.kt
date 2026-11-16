@@ -180,6 +180,10 @@ interface SearchableDao {
         }
     }
 
+    // [fork] Borrar estadísticas de uso (Ajustes → Privacidad).
+    @Query("UPDATE Searchable SET launchCount = 0, `weight` = 0.0")
+    fun resetUsageStats()
+
     @Query("UPDATE Searchable SET launchCount = launchCount + 1 WHERE `key` = :key")
     fun incrementLaunchCount(key: String)
 

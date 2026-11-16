@@ -67,4 +67,9 @@
     <string name="fork_preference_linked_app_auto">Automatic</string>
     <string name="fork_about_source">Source code</string>
     <string name="fork_about_based_on">Based on Kvaesitso</string>
+    <string name="fork_preference_reset_usage">Clear usage statistics</string>
+    <string name="fork_preference_reset_usage_summary">Forget which apps you open most. Pinned favorites and hidden apps stay.</string>
+    <string name="fork_reset_usage_confirm">Frequent apps and search ranking will start learning from scratch. This can\'t be undone.</string>
+    <string name="fork_reset_usage_action">Clear</string>
+    <string name="fork_reset_usage_done">Usage statistics cleared</string>
 </resources>
