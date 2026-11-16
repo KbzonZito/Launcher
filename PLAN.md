@@ -89,10 +89,15 @@ En este Mac no hay JDK, Android SDK ni `adb`.
 
 ---
 
-## 4. Poda (fase 1, ~1 sesión)
+## 4. Poda (fase 1) — ✅ hecha
 
-Borrar (cada uno en su commit): `libs/nextcloud`, `libs/owncloud`, `libs/webdav`, `services/accounts` (si solo sirve a Nextcloud/ownCloud), `data/wikipedia`, flavor `fdroid`, `fastlane/`, `docs/`, `crowdin.yml`, workflows de nightly/fdroid y traducciones salvo `es` y `en`.
-Revisar después: `data/websites`, `data/currencies`, `plugins/sdk` (el SDK de plugins puede servir para el clima → lo dejamos de momento).
+- Eliminados: `libs/nextcloud`, `libs/owncloud`, `libs/webdav`, `services/accounts`, `data/wikipedia`, `docs/`, `fastlane/`, `crowdin.yml`.
+  Wikipedia se reemplaza por un repositorio vacío en `de.mm20.launcher2.fork.forkModule`, así `services/search` no se toca.
+- Idiomas: `localeFilters = en, es` en el APK. Las traducciones **se quedan en el repo** (borrarlas generaría conflictos en cada sync de Weblate de upstream).
+- Se mantienen los build types/flavors `nightly` y `fdroid`: están declarados en 6 módulos de upstream y quitarlos solo añadiría conflictos. No se usan.
+- Auditoría de red en [PRIVACY.md](PRIVACY.md). Clima Met.no ahora recibe coordenadas a ~1 km.
+- Resultado: APK release de 13 MB → 11 MB. Pendiente medir el arranque en frío en el S24U (requiere el dispositivo conectado).
+- Revisar más adelante: `data/websites`, `data/currencies` (por ahora se desactivan por defecto en la fase 1b).
 
 ## 4b. Privacidad dentro de la app (principio de diseño, no una fase)
 
