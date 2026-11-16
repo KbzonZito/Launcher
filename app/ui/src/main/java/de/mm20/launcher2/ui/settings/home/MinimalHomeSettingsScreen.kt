@@ -15,6 +15,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.mm20.launcher2.preferences.home.MinimalClockStyle
+import de.mm20.launcher2.preferences.home.WaveIntensity
 import de.mm20.launcher2.ui.common.SearchablePicker
 import de.mm20.launcher2.ui.component.DismissableBottomSheet
 import de.mm20.launcher2.ui.component.preferences.ListPreference
@@ -42,11 +43,10 @@ data object MinimalHomeSettingsRoute : NavKey
 @Composable
 fun MinimalHomeSettingsScreen() {
     val settings: MinimalHomeSettings = koinInject()
-    val enabled by settings.enabled.collectAsStateWithLifecycle(true)
+    val enabled = true // [fork] la home minimalista ya no es opcional
     val showIcons by settings.showIcons.collectAsStateWithLifecycle(true)
     val railOnLeft by settings.railOnLeft.collectAsStateWithLifecycle(false)
     val notificationPreviews by settings.notificationPreviews.collectAsStateWithLifecycle(true)
-    val searchStyle by settings.searchStyle.collectAsStateWithLifecycle(true)
     val splitSwipeDown by settings.splitSwipeDown.collectAsStateWithLifecycle(true)
     val twoFingerUp by settings.twoFingerUp.collectAsStateWithLifecycle(null)
     val twoFingerDown by settings.twoFingerDown.collectAsStateWithLifecycle(null)
@@ -61,13 +61,18 @@ fun MinimalHomeSettingsScreen() {
     val clockStyle by settings.clockStyle.collectAsStateWithLifecycle(MinimalClockStyle.Thin)
     val agenda by settings.agenda.collectAsStateWithLifecycle(true)
     val mediaPlayer by settings.mediaPlayer.collectAsStateWithLifecycle(true)
+    val clockKey by settings.clockAppKey.collectAsStateWithLifecycle(null)
+    val usageSuggestions by settings.usageSuggestions.collectAsStateWithLifecycle(true)
+    val railDoubleTap by settings.railDoubleTapLock.collectAsStateWithLifecycle(true)
+    val wave by settings.waveIntensity.collectAsStateWithLifecycle(WaveIntensity.Normal)
+    val bothEdges by settings.railBothEdges.collectAsStateWithLifecycle(true)
     val weatherKey by settings.weatherAppKey.collectAsStateWithLifecycle(null)
     val calendarKey by settings.calendarAppKey.collectAsStateWithLifecycle(null)
-    val linkedKeys = listOfNotNull(weatherKey, calendarKey)
+    val linkedKeys = listOfNotNull(weatherKey, calendarKey, clockKey)
     val linkedApps by remember(linkedKeys) {
         if (linkedKeys.isEmpty()) flowOf(emptyList()) else searchableRepository.getByKeys(linkedKeys)
     }.collectAsStateWithLifecycle(emptyList())
-    var pickingFor by remember { mutableStateOf<String?>(null) } // "weather" | "calendar"
+    var pickingFor by remember { mutableStateOf<String?>(null) } // "weather" | "calendar" | "clock"
     val clockLabels = mapOf(
         MinimalClockStyle.Thin to R.string.fork_clock_thin,
         MinimalClockStyle.Bold to R.string.fork_clock_bold,
@@ -87,13 +92,6 @@ fun MinimalHomeSettingsScreen() {
     PreferenceScreen(title = stringResource(R.string.fork_preference_screen_minimal_home)) {
         item {
             PreferenceCategory {
-                SwitchPreference(
-                    title = stringResource(R.string.fork_preference_minimal_home),
-                    summary = stringResource(R.string.fork_preference_minimal_home_summary),
-                    icon = R.drawable.home_24px,
-                    value = enabled,
-                    onValueChanged = settings::setEnabled,
-                )
                 SwitchPreference(
                     title = stringResource(R.string.fork_preference_minimal_home_icons),
                     icon = R.drawable.apps_24px,
@@ -146,6 +144,13 @@ fun MinimalHomeSettingsScreen() {
                     enabled = enabled,
                 )
                 Preference(
+                    title = stringResource(R.string.fork_preference_clock_app),
+                    summary = linkedApps.firstOrNull { it.key == clockKey }?.let { it.labelOverride ?: it.label }
+                        ?: stringResource(R.string.fork_preference_clock_app_auto),
+                    icon = R.drawable.alarm_24px,
+                    onClick = { pickingFor = "clock" },
+                )
+                Preference(
                     title = stringResource(R.string.fork_preference_weather_app),
                     summary = linkedApps.firstOrNull { it.key == weatherKey }?.let { it.labelOverride ?: it.label }
                         ?: stringResource(R.string.fork_preference_linked_app_auto),
@@ -160,6 +165,42 @@ fun MinimalHomeSettingsScreen() {
                     icon = R.drawable.calendar_today_24px,
                     onClick = { pickingFor = "calendar" },
                     enabled = enabled,
+                )
+            }
+        }
+        item {
+            PreferenceCategory(title = stringResource(R.string.fork_preference_category_rail)) {
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_usage_suggestions),
+                    summary = stringResource(R.string.fork_preference_usage_suggestions_summary),
+                    icon = R.drawable.schedule_24px,
+                    value = usageSuggestions,
+                    onValueChanged = settings::setUsageSuggestions,
+                )
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_rail_double_tap),
+                    summary = stringResource(R.string.fork_preference_rail_double_tap_summary),
+                    icon = R.drawable.lock_24px,
+                    value = railDoubleTap,
+                    onValueChanged = settings::setRailDoubleTapLock,
+                )
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_rail_both_edges),
+                    summary = stringResource(R.string.fork_preference_rail_both_edges_summary),
+                    icon = R.drawable.swipe_left_alt_24px,
+                    value = bothEdges,
+                    onValueChanged = settings::setRailBothEdges,
+                )
+                ListPreference(
+                    title = stringResource(R.string.fork_preference_wave),
+                    icon = R.drawable.gesture_24px,
+                    items = listOf(
+                        ListPreferenceItem(stringResource(R.string.fork_wave_soft), WaveIntensity.Soft),
+                        ListPreferenceItem(stringResource(R.string.fork_wave_normal), WaveIntensity.Normal),
+                        ListPreferenceItem(stringResource(R.string.fork_wave_strong), WaveIntensity.Strong),
+                    ),
+                    value = wave,
+                    onValueChanged = settings::setWaveIntensity,
                 )
             }
         }
@@ -200,14 +241,6 @@ fun MinimalHomeSettingsScreen() {
         }
         item {
             PreferenceCategory(title = stringResource(R.string.fork_search_help_title)) {
-                SwitchPreference(
-                    title = stringResource(R.string.fork_preference_minimal_search),
-                    summary = stringResource(R.string.fork_preference_minimal_search_summary),
-                    icon = R.drawable.search_24px,
-                    value = searchStyle,
-                    onValueChanged = settings::setSearchStyle,
-                    enabled = enabled,
-                )
                 Preference(
                     title = stringResource(R.string.fork_search_prefixes_title),
                     summary = stringResource(R.string.fork_search_prefixes_summary),
@@ -224,24 +257,39 @@ fun MinimalHomeSettingsScreen() {
 
     DismissableBottomSheet(expanded = pickingFor != null, onDismissRequest = { pickingFor = null }) {
         val forWeather = pickingFor == "weather"
+        val forClock = pickingFor == "clock"
         Column {
             Text(
-                stringResource(if (forWeather) R.string.fork_preference_weather_app else R.string.fork_preference_calendar_app),
+                stringResource(
+                    when {
+                        forClock -> R.string.fork_preference_clock_app
+                        forWeather -> R.string.fork_preference_weather_app
+                        else -> R.string.fork_preference_calendar_app
+                    }
+                ),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
             )
             TextButton(
                 onClick = {
-                    if (forWeather) settings.setWeatherAppKey(null) else settings.setCalendarAppKey(null)
+                    when {
+                        forClock -> settings.setClockAppKey(null)
+                        forWeather -> settings.setWeatherAppKey(null)
+                        else -> settings.setCalendarAppKey(null)
+                    }
                     pickingFor = null
                 },
                 modifier = Modifier.padding(horizontal = 12.dp),
             ) { Text(stringResource(R.string.fork_preference_linked_app_auto)) }
             SearchablePicker(
-                value = linkedApps.firstOrNull { it.key == (if (forWeather) weatherKey else calendarKey) },
+                value = linkedApps.firstOrNull { it.key == (if (forClock) clockKey else if (forWeather) weatherKey else calendarKey) },
                 onValueChanged = { app ->
                     app?.let { searchableRepository.insert(it) }
-                    if (forWeather) settings.setWeatherAppKey(app?.key) else settings.setCalendarAppKey(app?.key)
+                    when {
+                        forClock -> settings.setClockAppKey(app?.key)
+                        forWeather -> settings.setWeatherAppKey(app?.key)
+                        else -> settings.setCalendarAppKey(app?.key)
+                    }
                     pickingFor = null
                 },
                 modifier = Modifier.fillMaxSize(),

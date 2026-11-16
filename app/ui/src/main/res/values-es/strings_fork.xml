@@ -85,4 +85,19 @@
     <string name="fork_backup_wrong_password">Contraseña incorrecta</string>
     <string name="fork_preference_media_player">Reproductor</string>
     <string name="fork_preference_media_player_summary">Mostrar lo que suena con reproducir/pausa y saltar, debajo del vistazo. Necesita acceso a notificaciones.</string>
+    <string name="fork_glance_setup_weather">Configurar clima</string>
+    <string name="fork_lock_needs_accessibility">Para apagar la pantalla, activa el servicio de accesibilidad del launcher</string>
+    <string name="fork_preference_clock_app">El reloj abre</string>
+    <string name="fork_preference_clock_app_auto">App de reloj</string>
+    <string name="fork_preference_usage_suggestions">Sugerir apps según el uso</string>
+    <string name="fork_preference_usage_suggestions_summary">Apps frecuentes (◷ en el alfabeto). Apagado: desaparecen de todos lados</string>
+    <string name="fork_preference_rail_double_tap">Doble toque en el alfabeto para bloquear</string>
+    <string name="fork_preference_rail_double_tap_summary">Apaga la pantalla. Necesita el servicio de accesibilidad</string>
+    <string name="fork_preference_wave">Intensidad de la ola</string>
+    <string name="fork_wave_soft">Suave</string>
+    <string name="fork_wave_normal">Normal</string>
+    <string name="fork_wave_strong">Marcada</string>
+    <string name="fork_preference_rail_both_edges">Alfabeto desde ambos bordes</string>
+    <string name="fork_preference_rail_both_edges_summary">Desliza también por el borde contrario; una burbuja muestra la letra</string>
+    <string name="fork_preference_category_rail">Alfabeto</string>
 </resources>

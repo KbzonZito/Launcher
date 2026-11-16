@@ -83,6 +83,38 @@ class MinimalHomeSettings internal constructor(
 
     fun setMediaPlayer(enabled: Boolean) = dataStore.update { it.copy(minimalHomeMediaPlayer = enabled) }
 
+    /** App que abre el reloj (clave de búsqueda); null = la app de reloj del sistema. */
+    val clockAppKey: Flow<String?>
+        get() = dataStore.data.map { it.minimalHomeClockAppKey }.distinctUntilChanged()
+
+    fun setClockAppKey(key: String?) = dataStore.update { it.copy(minimalHomeClockAppKey = key) }
+
+    /** Sugerir apps según el uso (◷ en el riel y apps frecuentes). */
+    val usageSuggestions: Flow<Boolean>
+        get() = dataStore.data.map { it.minimalHomeUsageSuggestions }.distinctUntilChanged()
+
+    fun setUsageSuggestions(enabled: Boolean) = dataStore.update {
+        // También apaga las "frecuentes" de los favoritos de Kvaesitso, para que no aparezcan en ningún lado.
+        it.copy(minimalHomeUsageSuggestions = enabled, favoritesFrequentlyUsed = enabled)
+    }
+
+    /** Doble toque en el riel apaga la pantalla. */
+    val railDoubleTapLock: Flow<Boolean>
+        get() = dataStore.data.map { it.minimalHomeRailDoubleTapLock }.distinctUntilChanged()
+
+    fun setRailDoubleTapLock(enabled: Boolean) = dataStore.update { it.copy(minimalHomeRailDoubleTapLock = enabled) }
+
+    val waveIntensity: Flow<WaveIntensity>
+        get() = dataStore.data.map { it.minimalHomeWaveIntensity }.distinctUntilChanged()
+
+    fun setWaveIntensity(value: WaveIntensity) = dataStore.update { it.copy(minimalHomeWaveIntensity = value) }
+
+    /** El riel también responde desde el borde contrario. */
+    val railBothEdges: Flow<Boolean>
+        get() = dataStore.data.map { it.minimalHomeRailBothEdges }.distinctUntilChanged()
+
+    fun setRailBothEdges(enabled: Boolean) = dataStore.update { it.copy(minimalHomeRailBothEdges = enabled) }
+
     val appSwipeLeft: Flow<Map<String, String>>
         get() = dataStore.data.map { it.minimalHomeAppSwipeLeft }.distinctUntilChanged()
 
