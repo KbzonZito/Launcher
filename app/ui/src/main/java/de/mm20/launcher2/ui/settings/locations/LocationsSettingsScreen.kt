@@ -23,7 +23,6 @@ import androidx.navigation3.runtime.NavKey
 import de.mm20.launcher2.crashreporter.CrashReporter
 import de.mm20.launcher2.ktx.isAtLeastApiLevel
 import de.mm20.launcher2.ktx.sendWithBackgroundPermission
-import de.mm20.launcher2.plugin.PluginState
 import de.mm20.launcher2.preferences.MeasurementSystem
 import de.mm20.launcher2.preferences.search.LocationSearchSettings
 import de.mm20.launcher2.ui.R
@@ -56,10 +55,6 @@ fun LocationsSettingsScreen() {
     val themeMap by viewModel.themeMap.collectAsState()
     val customTileServerUrl by viewModel.customTileServerUrl.collectAsState()
 
-    val plugins by viewModel.availablePlugins.collectAsStateWithLifecycle(
-        initialValue = emptyList(),
-        minActiveState = Lifecycle.State.RESUMED
-    )
     val enabledPlugins by viewModel.enabledPlugins.collectAsStateWithLifecycle(initialValue = null)
 
     val anyLocationProviderEnabled = osmLocations ?: false || enabledPlugins.isNullOrEmpty().not()
@@ -79,37 +74,6 @@ fun LocationsSettingsScreen() {
                         backStack.add(OsmSettingsRoute)
                     }
                 )
-                for (plugin in plugins) {
-                    val state = plugin.state
-                    GuardedPreference(
-                        locked = state is PluginState.SetupRequired,
-                        onUnlock = {
-                            try {
-                                (state as PluginState.SetupRequired).setupActivity.sendWithBackgroundPermission(
-                                    context
-                                )
-                            } catch (e: PendingIntent.CanceledException) {
-                                CrashReporter.logException(e)
-                            }
-                        },
-                        description = (state as? PluginState.SetupRequired)?.message
-                            ?: stringResource(id = R.string.plugin_state_setup_required),
-                        icon = R.drawable.error_24px,
-                        unlockLabel = stringResource(id = R.string.plugin_action_setup),
-                    ) {
-                        SwitchPreference(
-                            title = plugin.plugin.label,
-                            enabled = enabledPlugins != null && state is PluginState.Ready,
-                            summary = (state as? PluginState.Ready)?.text
-                                ?: (state as? PluginState.SetupRequired)?.message
-                                ?: plugin.plugin.description,
-                            value = enabledPlugins?.contains(plugin.plugin.authority) == true && state is PluginState.Ready,
-                            onValueChanged = {
-                                viewModel.setPluginEnabled(plugin.plugin.authority, it)
-                            },
-                        )
-                    }
-                }
             }
         }
         item {

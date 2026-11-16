@@ -149,7 +149,6 @@ dependencies {
     implementation(project(":data:currencies"))
     implementation(project(":data:customattrs"))
     implementation(project(":data:searchable"))
-    implementation(project(":data:plugins"))
     implementation(project(":data:themes"))
     implementation(project(":data:i18n"))
     implementation(project(":data:files"))
@@ -174,7 +173,6 @@ dependencies {
     implementation(project(":services:widgets"))
     implementation(project(":services:favorites"))
     implementation(project(":data:locations"))
-    implementation(project(":services:plugins"))
     implementation(project(":core:devicepose"))
     implementation(project(":services:feed"))
 

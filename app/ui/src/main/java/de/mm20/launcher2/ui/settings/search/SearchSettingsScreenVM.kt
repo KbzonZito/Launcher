@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import de.mm20.launcher2.applications.AppRepository
 import de.mm20.launcher2.permissions.PermissionGroup
 import de.mm20.launcher2.permissions.PermissionsManager
-import de.mm20.launcher2.plugins.PluginService
 import de.mm20.launcher2.preferences.search.CalculatorSearchSettings
 import de.mm20.launcher2.preferences.search.CalendarSearchSettings
 import de.mm20.launcher2.preferences.search.ContactSearchSettings
@@ -37,7 +36,6 @@ class SearchSettingsScreenVM : ViewModel(), KoinComponent {
 
     private val appRepository: AppRepository by inject()
 
-    private val pluginService: PluginService by inject()
     private val permissionsManager: PermissionsManager by inject()
 
     val favorites = searchUiSettings.favorites
@@ -160,8 +158,6 @@ class SearchSettingsScreenVM : ViewModel(), KoinComponent {
         searchFilterSettings.setDefaultFilter(searchFilters)
     }
 
-    val plugins = pluginService.getPluginsWithState(enabled = true)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val isTasksAppInstalled = appRepository.findOne("org.tasks", Process.myUserHandle())
         .map { it != null }

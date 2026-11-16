@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.mm20.launcher2.permissions.PermissionGroup
 import de.mm20.launcher2.permissions.PermissionsManager
-import de.mm20.launcher2.plugin.PluginType
-import de.mm20.launcher2.plugins.PluginService
 import de.mm20.launcher2.preferences.search.FileSearchSettings
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -18,17 +16,12 @@ import org.koin.core.component.inject
 class FileSearchSettingsScreenVM : ViewModel(), KoinComponent {
     private val fileSearchSettings: FileSearchSettings by inject()
     private val permissionsManager: PermissionsManager by inject()
-    private val pluginService: PluginService by inject()
 
     val hasFilePermission = permissionsManager.hasPermission(PermissionGroup.ExternalStorage)
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
     val loading = mutableStateOf(true)
 
-    val availablePlugins = pluginService.getPluginsWithState(
-        type = PluginType.FileSearch,
-        enabled = true,
-    )
 
     val enabledPlugins = fileSearchSettings.enabledPlugins
 

@@ -23,7 +23,6 @@ import androidx.navigation3.runtime.NavKey
 import de.mm20.launcher2.crashreporter.CrashReporter
 import de.mm20.launcher2.ktx.sendWithBackgroundPermission
 import de.mm20.launcher2.ktx.tryStartActivity
-import de.mm20.launcher2.plugin.PluginState
 import de.mm20.launcher2.ui.BuildConfig
 import de.mm20.launcher2.ui.R
 import de.mm20.launcher2.ui.common.WeatherLocationSearchDialog
@@ -55,10 +54,6 @@ fun WeatherIntegrationSettingsScreen() {
         derivedStateOf { availableProviders.find { it.id == weatherProvider } }
     }
 
-    val pluginState by viewModel.weatherProviderPluginState.collectAsStateWithLifecycle(
-        null,
-        minActiveState = Lifecycle.State.RESUMED
-    )
 
     PreferenceScreen(
         title = stringResource(R.string.preference_screen_weatherwidget),
@@ -66,26 +61,6 @@ fun WeatherIntegrationSettingsScreen() {
     ) {
         item {
             PreferenceCategory {
-                val state = pluginState?.state
-                if (state is PluginState.SetupRequired) {
-                    Banner(
-                        modifier = Modifier.padding(16.dp),
-                        text = state.message
-                            ?: stringResource(R.string.plugin_state_setup_required),
-                        icon = R.drawable.error_24px,
-                        primaryAction = {
-                            TextButton(onClick = {
-                                try {
-                                    state.setupActivity.sendWithBackgroundPermission(context)
-                                } catch (e: PendingIntent.CanceledException) {
-                                    CrashReporter.logException(e)
-                                }
-                            }) {
-                                Text(stringResource(R.string.plugin_action_setup))
-                            }
-                        }
-                    )
-                }
                 ListPreference(
                     title = stringResource(R.string.preference_weather_provider),
                     items = availableProviders.map {
