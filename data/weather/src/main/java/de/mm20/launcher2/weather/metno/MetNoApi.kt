@@ -104,8 +104,9 @@ internal class MetNoApi {
         return httpClient.get {
             url {
                 path("weatherapi", "locationforecast", "2.0", "compact")
-                parameter("lat", String.format(Locale.ROOT, "%.4f", lat))
-                parameter("lon", String.format(Locale.ROOT, "%.4f", lon))
+                // [fork] 2 decimales (~1 km) en vez de 4 (~11 m): suficiente para el pronóstico, no revela la dirección.
+                parameter("lat", String.format(Locale.ROOT, "%.2f", lat))
+                parameter("lon", String.format(Locale.ROOT, "%.2f", lon))
             }
             header("User-Agent", userAgent)
             header("If-Modified-Since", httpDateFormat.format(Date(ifModifiedSince)))

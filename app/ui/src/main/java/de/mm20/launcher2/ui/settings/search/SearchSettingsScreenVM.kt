@@ -16,7 +16,6 @@ import de.mm20.launcher2.preferences.search.SearchFilterSettings
 import de.mm20.launcher2.preferences.search.ShortcutSearchSettings
 import de.mm20.launcher2.preferences.search.UnitConverterSettings
 import de.mm20.launcher2.preferences.search.WebsiteSearchSettings
-import de.mm20.launcher2.preferences.search.WikipediaSearchSettings
 import de.mm20.launcher2.preferences.ui.SearchUiSettings
 import de.mm20.launcher2.search.SearchFilters
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,7 +29,6 @@ class SearchSettingsScreenVM : ViewModel(), KoinComponent {
     private val contactSearchSettings: ContactSearchSettings by inject()
     private val calendarSearchSettings: CalendarSearchSettings by inject()
     private val shortcutSearchSettings: ShortcutSearchSettings by inject()
-    private val wikipediaSearchSettings: WikipediaSearchSettings by inject()
     private val websiteSearchSettings: WebsiteSearchSettings by inject()
     private val unitConverterSettings: UnitConverterSettings by inject()
     private val calculatorSearchSettings: CalculatorSearchSettings by inject()
@@ -106,13 +104,6 @@ class SearchSettingsScreenVM : ViewModel(), KoinComponent {
 
     fun setUnitConverter(unitConverter: Boolean) {
         unitConverterSettings.setEnabled(unitConverter)
-    }
-
-    val wikipedia = wikipediaSearchSettings.enabled
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
-    fun setWikipedia(wikipedia: Boolean) {
-        wikipediaSearchSettings.setEnabled(wikipedia)
     }
 
     val websites = websiteSearchSettings.enabled

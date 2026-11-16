@@ -9,6 +9,8 @@ plugins {
 android {
     androidResources {
         generateLocaleConfig = true
+        // [fork] Solo español e inglés en el APK; las traducciones siguen en el repo para no generar conflictos con upstream.
+        localeFilters += listOf("en", "es")
     }
 
     packaging {
@@ -132,7 +134,6 @@ dependencies {
 
     implementation(libs.koin.android)
 
-    implementation(project(":services:accounts"))
     implementation(project(":data:applications"))
     implementation(project(":data:appshortcuts"))
     implementation(project(":services:backup"))
@@ -153,9 +154,7 @@ dependencies {
     implementation(project(":services:icons"))
     implementation(project(":core:ktx"))
     implementation(project(":services:music"))
-    implementation(project(":libs:nextcloud"))
     implementation(project(":data:notifications"))
-    implementation(project(":libs:owncloud"))
     implementation(project(":core:permissions"))
     implementation(project(":core:profiles"))
     implementation(project(":core:preferences"))
@@ -166,7 +165,6 @@ dependencies {
     implementation(project(":data:weather"))
     implementation(project(":data:websites"))
     implementation(project(":data:widgets"))
-    implementation(project(":data:wikipedia"))
     implementation(project(":data:database"))
     implementation(project(":data:search-actions"))
     implementation(project(":services:global-actions"))

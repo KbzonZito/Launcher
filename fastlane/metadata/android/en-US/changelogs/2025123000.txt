@@ -1,2 +1,0 @@
-- Crash fix
-- Fix tags not showing in app widget

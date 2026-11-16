@@ -17,7 +17,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
-import de.mm20.launcher2.accounts.AccountType
 import de.mm20.launcher2.crashreporter.CrashReporter
 import de.mm20.launcher2.ktx.isAtLeastApiLevel
 import de.mm20.launcher2.ktx.sendWithBackgroundPermission
@@ -80,54 +79,6 @@ fun FileSearchSettingsScreen() {
                             viewModel.setLocalFiles(it)
                         },
                         enabled = hasFilePermission == true
-                    )
-                }
-
-                val nextcloud by viewModel.nextcloud.collectAsState()
-                val nextcloudAccount by viewModel.nextcloudAccount
-                GuardedPreference(
-                    locked = nextcloudAccount == null,
-                    onUnlock = {
-                        viewModel.login(context as AppCompatActivity, AccountType.Nextcloud)
-                    },
-                    icon = R.drawable.account_box_24px,
-                    description = stringResource(R.string.no_account_nextcloud),
-                    unlockLabel = stringResource(R.string.connect_account),
-                ) {
-                    SwitchPreference(
-                        title = stringResource(R.string.preference_search_nextcloud),
-                        summary = nextcloudAccount?.let {
-                            stringResource(R.string.preference_search_cloud_summary, it.userName)
-                        } ?: stringResource(R.string.preference_summary_not_logged_in),
-                        value = nextcloud == true && nextcloudAccount != null,
-                        onValueChanged = {
-                            viewModel.setNextcloud(it)
-                        },
-                        enabled = nextcloudAccount != null
-                    )
-                }
-
-                val owncloud by viewModel.owncloud.collectAsState()
-                val owncloudAccount by viewModel.owncloudAccount
-                GuardedPreference(
-                    locked = owncloudAccount == null,
-                    onUnlock = {
-                        viewModel.login(context as AppCompatActivity, AccountType.Owncloud)
-                    },
-                    icon = R.drawable.account_box_24px,
-                    description = stringResource(R.string.no_account_owncloud),
-                    unlockLabel = stringResource(R.string.connect_account),
-                ) {
-                    SwitchPreference(
-                        title = stringResource(R.string.preference_search_owncloud),
-                        summary = owncloudAccount?.let {
-                            stringResource(R.string.preference_search_cloud_summary, it.userName)
-                        } ?: stringResource(R.string.preference_summary_not_logged_in),
-                        value = owncloud == true && owncloudAccount != null,
-                        onValueChanged = {
-                            viewModel.setOwncloud(it)
-                        },
-                        enabled = owncloudAccount != null
                     )
                 }
 
