@@ -227,11 +227,43 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **8** | Baseline profile generado (34 k reglas + perfil de arranque), módulo `:baselineprofile` con generador y Macrobenchmark | ✅ PR #11, restyle de la búsqueda en PR #14 · pendiente: medir en el S24U, pulido de animaciones |
 | continuo | `upstream-sync` mensual por tag | ⏳ |
 
-Pendientes sueltos: **nombre definitivo de la app** (hoy "Launcher"; ícono propio ya hecho) · probar en S24 Ultra y Tab S9 · espacio privado propio · widgets propios · regla de `main` que exija `build` (para auto-merge). Hechos fuera de fase: mini reproductor en la home (PR #17); backups cifrados con contraseña (PR #16); apertura con animación desde la fila tocada, apps del Espacio privado de Android dentro del candado, batería en el vistazo cuando carga o baja del 20 % (PR #15); teclado físico en la home abre la búsqueda, borrar estadísticas de uso, mosaicos de mapa en modo offline (PR #13).
+Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), apertura animada + Espacio privado en el candado + batería en el vistazo (PR #15), búsqueda minimalista (PR #14), teclado físico + borrar estadísticas + mapas offline (PR #13), identidad propia (PR #12). Pendientes: ver §9.
 
 ---
 
-## 8. Próximos pasos concretos
-1. Decidir el nombre/`applicationId` (propuesta: `dev.kbzon.launcher`; nombre visible a elegir).
-2. Instalar Android Studio/JDK 21 + SDK 37 y conectar los dos Galaxy por ADB inalámbrico.
-3. Ejecutar la fase 0 (yo hago los cambios de Gradle, `.gitignore`, el script de deploy y la estructura de módulos; la firma reutiliza tu clave existente vía `setup-signing.sh`, sin que las contraseñas pasen por mí).
+## 8. Releases
+
+| Versión | Contenido principal |
+|---|---|
+| v0.1.0 | Fases 0–8: home minimalista con riel, privacidad, gestos, relojes, tablet, baseline profile |
+| v0.1.1 | Identidad propia: nombre "Launcher", ícono, enlaces |
+| v0.2.0 | Búsqueda minimalista, teclado físico, borrar estadísticas, mapas offline, apertura animada, Espacio privado en el candado, batería en el vistazo, backups cifrados, mini reproductor |
+
+Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
+
+## 9. Próximas mejoras (backlog priorizado)
+
+> Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta o a las releases.
+
+**Alta prioridad**
+1. **Probar en el S24 Ultra y la Tab S9** y corregir lo que aparezca. Lo más crítico: vibración del riel, fluidez a 120 Hz, gestos de dos dedos, reproductor con música real, shortcuts con apps reales.
+2. **Medir el arranque en el S24 Ultra** con el baseline profile (`:baselineprofile`) y fijar objetivos con números reales.
+3. **Nombre definitivo** de la app (hoy "Launcher").
+4. **Reordenar favoritos arrastrando** directamente en la home (hoy se ordenan desde la hoja de Kvaesitso).
+5. **Notificaciones en la lista:** deslizar para descartar y tocar la vista previa para abrir esa notificación.
+
+**Media**
+6. **Widgets propios en la home:** batería de Galaxy Buds/Watch (Bluetooth), temporizador/cronómetro, nota rápida.
+7. **Widgets de terceros incrustados** en la home minimalista (p. ej. Samsung Weather), además del panel de widgets.
+8. **◷ contextual:** sugerencias según la hora del día y el lugar, no solo las más usadas.
+9. **Gestos extra:** desde los bordes, pellizcar, animación al usar los dos dedos.
+10. **Tablet:** widgets o agenda ampliada en la columna izquierda, S Pen hover, reloj dual/mundial.
+11. **Animación de cierre:** la app vuelve a la fila de la que salió (`GestureNavContract`).
+
+**Baja / mantenimiento**
+12. **Sincronizar con upstream** (Kvaesitso) por tag, mensual.
+13. **Regla en `main`** que exija el check `build` para poder usar auto-merge.
+14. Relojes: flip, fuente/peso configurables.
+15. Accesibilidad: etiquetas de TalkBack en el riel y en las entradas especiales.
+16. Avisos de permisos de la búsqueda con el estilo minimalista.
+
