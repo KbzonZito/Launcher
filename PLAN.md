@@ -194,6 +194,14 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 
 ## 6. Rendimiento y animaciones (transversal, con números)
 
+> **Estado (fase 8):** módulo `:baselineprofile` (Macrobenchmark 1.5.0). El generador recorre la home (riel, lista de una letra, búsqueda por `ASSIST`) y deja `app/app/src/defaultRelease/generated/baselineProfiles/` (≈34.600 reglas + perfil de arranque); `profileinstaller` lo aplica al instalar. Emulador (Android 16, arranque en frío de la home): 146 ms de mediana con y sin perfil, es decir, no concluyente; el beneficio real se mide en el teléfono. Para medir en el S24U (con otra app como home por defecto mientras corre):
+>
+> ```
+> ./gradlew :app:app:generateDefaultReleaseBaselineProfile
+> ./gradlew :baselineprofile:connectedDefaultBenchmarkReleaseAndroidTest
+> ```
+
+
 - **Baseline profiles + módulo `:benchmark`** (Macrobenchmark): arranque en frío, abrir búsqueda, scroll del riel. Se mide en el S24U en cada PR grande.
 - R8 en modo completo, `isShrinkResources`, nada de reflexión nueva.
 - Compose: clases de estado estables/inmutables, `derivedStateOf`, listas con `key`, animaciones en la fase de dibujo (`graphicsLayer`, sin recomponer).
@@ -216,7 +224,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **5** | Bajar dividido (notificaciones / ajustes rápidos), dos dedos ↑↓ configurables, deslizar una app a la izquierda abre otra | ✅ PR #8 |
 | **6** | 6 estilos de reloj (fino, negrita, apilado, en palabras, analógico, progreso del día), agenda de hasta 3 eventos, apps de clima y fecha configurables | ✅ PR #9 |
 | **7** | Layout adaptativo: dos columnas en pantallas anchas en horizontal, una columna grande en la Tab en vertical, reloj escalado | ✅ PR #10 |
-| **8** | Baseline profiles, benchmarks, pulido de animaciones, medir arranque en el S24U | ⏳ |
+| **8** | Baseline profile generado (34 k reglas + perfil de arranque), módulo `:baselineprofile` con generador y Macrobenchmark | ✅ PR #11 · pendiente: medir en el S24U, restyle de la búsqueda, pulido de animaciones |
 | continuo | `upstream-sync` mensual por tag | ⏳ |
 
 Pendientes sueltos: probar en S24 Ultra y Tab S9 · espacio privado propio · borrar estadísticas de uso · backups cifrados · mosaicos de mapa en modo offline · regla de `main` que exija `build` (para auto-merge).

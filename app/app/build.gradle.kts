@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.androidx.baselineprofile) // [fork]
 }
 
 android {
@@ -133,6 +134,8 @@ dependencies {
     implementation(libs.coil.svg)
 
     implementation(libs.koin.android)
+    implementation(libs.androidx.profileinstaller) // [fork] instala el baseline profile
+    baselineProfile(project(":baselineprofile")) // [fork]
 
     implementation(project(":data:applications"))
     implementation(project(":data:appshortcuts"))

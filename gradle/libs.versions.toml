@@ -10,6 +10,8 @@ targetSdk = "37"
 pluginSdk = "2.3.0"
 
 android-gradle-plugin = "9.4.1"
+androidx-benchmark = "1.5.0" # [fork]
+androidx-uiautomator = "2.4.0" # [fork]
 ksp-gradle-plugin = "2.3.4"
 
 kotlin = "2.4.21"
@@ -121,6 +123,9 @@ koin-androidxcompose = { group = "io.insert-koin", name = "koin-androidx-compose
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "androidx-benchmark" } # [fork]
+androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "androidx-uiautomator" } # [fork]
+androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version = "1.4.1" } # [fork]
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 osmopeninghours = { group = "de.westnordost", name = "osm-opening-hours", version.ref = "osmOpeningHours" }
@@ -136,6 +141,8 @@ tests = ["junit"]
 [plugins]
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
+android-test = { id = "com.android.test", version.ref = "android-gradle-plugin" } # [fork]
+androidx-baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidx-benchmark" } # [fork]
 androidx-room3 = { id = "androidx.room3", version.ref = "androidx-room3" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp-gradle-plugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
