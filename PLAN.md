@@ -227,7 +227,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **8** | Baseline profile generado (34 k reglas + perfil de arranque), módulo `:baselineprofile` con generador y Macrobenchmark | ✅ PR #11, restyle de la búsqueda en PR #14 · pendiente: medir en el S24U, pulido de animaciones |
 | continuo | `upstream-sync` mensual por tag | ⏳ |
 
-Pendientes sueltos: **nombre definitivo de la app** (hoy "Launcher"; ícono propio ya hecho) · probar en S24 Ultra y Tab S9 · espacio privado propio · backups cifrados · widgets propios · regla de `main` que exija `build` (para auto-merge). Hechos fuera de fase: teclado físico en la home abre la búsqueda, borrar estadísticas de uso, mosaicos de mapa en modo offline (PR #13).
+Pendientes sueltos: **nombre definitivo de la app** (hoy "Launcher"; ícono propio ya hecho) · probar en S24 Ultra y Tab S9 · espacio privado propio · backups cifrados · widgets propios · regla de `main` que exija `build` (para auto-merge). Hechos fuera de fase: apertura con animación desde la fila tocada, apps del Espacio privado de Android dentro del candado, batería en el vistazo cuando carga o baja del 20 % (PR #15); teclado físico en la home abre la búsqueda, borrar estadísticas de uso, mosaicos de mapa en modo offline (PR #13).
 
 ---
 

@@ -49,6 +49,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -135,8 +136,8 @@ fun MinimalHome(
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { vm.selectLetter(null) }
     LaunchedEffect(selectedLetter) { listState.scrollToItem(0) }
 
-    val onLaunch: (SavableSearchable) -> Unit = { item ->
-        if (vm.launch(context, item)) vm.selectLetter(null)
+    val onLaunch: (SavableSearchable, IntRect?) -> Unit = { item, bounds ->
+        if (vm.launch(context, item, bounds)) vm.selectLetter(null)
     }
 
     CompositionLocalProvider(LocalContentColor provides contentColor) {
@@ -313,7 +314,7 @@ private fun HomeList(
     shadow: Shadow?,
     accent: Color,
     listState: LazyListState,
-    onLaunch: (SavableSearchable) -> Unit,
+    onLaunch: (SavableSearchable, IntRect?) -> Unit,
 ) {
     val swipeLeftTargets by vm.swipeLeftTargets.collectAsState()
     LazyColumn(
@@ -349,6 +350,7 @@ private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?) {
     val weatherApp by vm.weatherApp.collectAsState()
     val forecast by vm.weather.collectAsState()
     val alarm by remember { vm.nextAlarm(context) }.collectAsState(null)
+    val battery by remember { vm.battery(context) }.collectAsState(null)
     val measurementSystem = LocalMeasurementSystem.current
     val style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, shadow = shadow)
     val dim = LocalContentColor.current.copy(alpha = 0.85f)
@@ -372,6 +374,16 @@ private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?) {
                     style = style,
                     color = dim,
                     onClick = { weatherApp?.let { vm.launch(context, it) } ?: context.openWeatherApp() },
+                )
+            }
+            // Batería: solo cuando importa (cargando o por debajo del 20 %).
+            battery?.takeIf { it.charging || it.percent <= 20 }?.let { b ->
+                GlanceItem(
+                    icon = if (b.charging) R.drawable.battery_charging_50_20px else R.drawable.battery_1_bar_24px,
+                    text = "${b.percent}%",
+                    style = style,
+                    color = if (!b.charging && b.percent <= 20) MaterialTheme.colorScheme.error else dim,
+                    onClick = { context.tryStart(Intent(Intent.ACTION_POWER_USAGE_SUMMARY)) },
                 )
             }
             alarm?.takeIf { it - System.currentTimeMillis() < 24 * 60 * 60 * 1000L }?.let { t ->

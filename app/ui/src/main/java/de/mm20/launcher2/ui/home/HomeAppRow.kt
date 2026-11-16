@@ -53,6 +53,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.mm20.launcher2.notifications.Notification
@@ -83,7 +86,7 @@ fun HomeAppRow(
     isHiddenItem: Boolean,
     shadow: Shadow?,
     accent: Color,
-    onLaunch: (SavableSearchable) -> Unit,
+    onLaunch: (SavableSearchable, IntRect?) -> Unit,
     swipeLeftTarget: SavableSearchable? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -98,6 +101,8 @@ fun HomeAppRow(
     var expanded by remember(item.key) { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
     var pickSwipeLeft by remember { mutableStateOf(false) }
+    // Límites de la fila en la ventana: la app se abre expandiéndose desde aquí.
+    var rowBounds by remember { mutableStateOf<IntRect?>(null) }
     val dragOffset = remember { Animatable(0f) }
     val canExpand = item is Application
 
@@ -107,6 +112,10 @@ fun HomeAppRow(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .onGloballyPositioned { coords ->
+                        val r = coords.boundsInWindow()
+                        rowBounds = IntRect(r.left.roundToInt(), r.top.roundToInt(), r.right.roundToInt(), r.bottom.roundToInt())
+                    }
                     .offset { IntOffset(dragOffset.value.roundToInt(), 0) }
                     .pointerInput(item.key, canExpand, swipeLeftTarget?.key) {
                         // derecha: shortcuts (solo apps) · izquierda: app asignada (si hay)
@@ -119,7 +128,7 @@ fun HomeAppRow(
                             onDragEnd = {
                                 when (crossed) {
                                     1 -> expanded = !expanded
-                                    -1 -> swipeLeftTarget?.let(onLaunch)
+                                    -1 -> swipeLeftTarget?.let { onLaunch(it, rowBounds) }
                                 }
                                 scope.launch { dragOffset.animateTo(0f, spring(dampingRatio = 0.6f, stiffness = 500f)) }
                             },
@@ -143,7 +152,7 @@ fun HomeAppRow(
                     .combinedClickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        onClick = { onLaunch(item) },
+                        onClick = { onLaunch(item, rowBounds) },
                         onLongClick = {
                             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                             menuOpen = true
@@ -255,7 +264,7 @@ fun HomeAppRow(
                                 .combinedClickable(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
-                                    onClick = { onLaunch(shortcut) },
+                                    onClick = { onLaunch(shortcut, rowBounds) },
                                 )
                                 .padding(vertical = 7.dp),
                         ) {
