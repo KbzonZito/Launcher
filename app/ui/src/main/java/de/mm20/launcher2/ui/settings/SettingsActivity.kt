@@ -242,7 +242,10 @@ class SettingsActivity : BaseActivity() {
                 SearchActionsSettingsScreen()
             }
             entry<HiddenItemsSettingsRoute> {
-                HiddenItemsSettingsScreen()
+                val hiddenItemsBackStack = LocalBackStack.current // [fork]
+                de.mm20.launcher2.ui.privacy.RequireHiddenItemsUnlock(onDenied = { hiddenItemsBackStack.removeLastOrNull() }) {
+                    HiddenItemsSettingsScreen()
+                }
             }
             entry<TagsSettingsRoute> {
                 TagsSettingsScreen()

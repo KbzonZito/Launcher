@@ -153,6 +153,11 @@ class SearchVM : ViewModel(), KoinComponent {
     }
 
     fun setFilters(filters: SearchFilters) {
+        // [fork] Mostrar apps ocultas requiere desbloquear (biometría si está activada).
+        if (filters.hiddenItems && !this.filters.value.hiddenItems && !de.mm20.launcher2.ui.privacy.HiddenItemsLock.unlocked.value) {
+            de.mm20.launcher2.ui.privacy.HiddenItemsLock.requestUnlock { setFilters(filters) }
+            return
+        }
         this.filters.value = filters
         search(searchQuery.value, forceRestart = true)
     }

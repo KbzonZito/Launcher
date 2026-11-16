@@ -103,6 +103,12 @@ data class LauncherSettingsData internal constructor(
 
     // [fork] Modo offline: corta toda la red de la app (búsqueda online, clima, divisas, imágenes remotas).
     val privacyOfflineMode: Boolean = false,
+    // [fork] Pedir huella/rostro/PIN para ver las apps ocultas.
+    val privacyProtectHiddenItems: Boolean = false,
+    // [fork] No registrar aperturas (no alimenta favoritos automáticos ni el ranking).
+    val privacyIncognito: Boolean = false,
+    // [fork] FLAG_SECURE en la búsqueda y en las apps ocultas (sin capturas ni miniatura en recientes).
+    val privacySecureScreens: Boolean = true,
 
     val badgesNotifications: Boolean = true,
     val badgesSuspendedApps: Boolean = true,

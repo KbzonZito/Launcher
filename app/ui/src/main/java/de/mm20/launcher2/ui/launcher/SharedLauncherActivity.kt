@@ -88,6 +88,7 @@ abstract class SharedLauncherActivity(
 ) : BaseActivity() {
 
     private val viewModel: LauncherScaffoldVM by viewModels()
+    private val searchVM: de.mm20.launcher2.ui.launcher.search.SearchVM by viewModels() // [fork]
 
     internal val enterHomeTransitionManager = EnterHomeTransitionManager()
 
@@ -116,6 +117,8 @@ abstract class SharedLauncherActivity(
         viewModel.setSystemInDarkMode(resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES)
 
         val bottomSheetManager = LauncherBottomSheetManager(this)
+        // [fork] Candado de apps ocultas, FLAG_SECURE y bloqueo al salir.
+        de.mm20.launcher2.ui.privacy.LauncherPrivacyGuard(this, searchVM, bottomSheetManager).attach()
 
         setContent {
             val snackbarHostState = remember { SnackbarHostState() }
