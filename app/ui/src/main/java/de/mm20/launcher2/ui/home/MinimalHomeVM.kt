@@ -11,6 +11,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.mm20.launcher2.appshortcuts.AppShortcutRepository
 import de.mm20.launcher2.calendar.CalendarRepository
+import de.mm20.launcher2.globalactions.GlobalActionsService
+import de.mm20.launcher2.preferences.GestureAction
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import de.mm20.launcher2.notifications.Notification
 import de.mm20.launcher2.notifications.NotificationRepository
 import de.mm20.launcher2.search.AppShortcut
@@ -61,10 +65,57 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     private val homeSettings: MinimalHomeSettings by inject()
     private val notificationRepository: NotificationRepository by inject()
     private val appShortcutRepository: AppShortcutRepository by inject()
+    private val globalActions: GlobalActionsService by inject()
 
     val showIcons = homeSettings.showIcons.stateIn(viewModelScope, SharingStarted.Eagerly, true)
     val railOnLeft = homeSettings.railOnLeft.stateIn(viewModelScope, SharingStarted.Eagerly, false)
     val notificationPreviews = homeSettings.notificationPreviews.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+    val splitSwipeDown = homeSettings.splitSwipeDown.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+    val twoFingerUp = homeSettings.twoFingerUp.stateIn(viewModelScope, SharingStarted.Eagerly, GestureAction.NoAction)
+    val twoFingerDown = homeSettings.twoFingerDown.stateIn(viewModelScope, SharingStarted.Eagerly, GestureAction.NoAction)
+
+    /** Destino al deslizar cada app a la izquierda (clave de app → destino resuelto). */
+    val swipeLeftTargets: StateFlow<Map<String, SavableSearchable>> = homeSettings.appSwipeLeft
+        .flatMapLatest { map ->
+            if (map.isEmpty()) flowOf(emptyMap())
+            else searchableRepository.getByKeys(map.values.distinct()).map { targets ->
+                val byKey = targets.associateBy { it.key }
+                map.mapNotNull { (app, target) -> byKey[target]?.let { app to it } }.toMap()
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
+
+    fun setSwipeLeftTarget(app: SavableSearchable, target: SavableSearchable?) {
+        // Guardarlo en la base de búsqueda para poder resolverlo luego por su clave.
+        target?.let { searchableRepository.insert(it) }
+        homeSettings.setAppSwipeLeft(app.key, target?.key)
+    }
+
+    fun openNotifications() = globalActions.openNotificationDrawer()
+    fun openQuickSettings() = globalActions.openQuickSettings()
+
+    /** Ejecuta una acción de gesto desde la home (sin pasar por el scaffold). */
+    fun runGestureAction(context: Context, action: GestureAction) {
+        when (action) {
+            is GestureAction.Notifications -> globalActions.openNotificationDrawer()
+            is GestureAction.QuickSettings -> globalActions.openQuickSettings()
+            is GestureAction.ScreenLock -> globalActions.lockScreen()
+            is GestureAction.PowerMenu -> globalActions.openPowerDialog()
+            is GestureAction.Recents -> globalActions.openRecents()
+            is GestureAction.Search -> context.startActivity(
+                Intent(Intent.ACTION_ASSIST)
+                    .setClassName(context, "de.mm20.launcher2.ui.assistant.AssistantActivity")
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+            is GestureAction.Launch -> {
+                val key = action.key ?: return
+                viewModelScope.launch {
+                    searchableRepository.getByKeys(listOf(key)).first().firstOrNull()?.let { launch(context, it) }
+                }
+            }
+            else -> Unit
+        }
+    }
 
     private val allApps = searchService.getAllApps()
     private val hiddenAppKeys = searchableRepository.getKeys(

@@ -148,7 +148,10 @@ Minimalismo tipográfico: fondo = tu wallpaper, sin tarjetas, sin sombras. Una s
 - Letras especiales: `★` favoritos, `◷` recientes/sugeridas por hora del día, `#` números, `🔒` privadas (con biometría).
 - Riel a la izquierda o derecha (para uso con una mano y para la Tab).
 
-### 5.3 Gestos (motor nuevo `:feature:gestures`)
+### 5.3 Gestos
+
+> **Estado (fase 5):** los gestos nuevos viven en la home minimalista (`ui/home/HomeGestures.kt`), resueltos antes que el scaffold, para no reescribir el motor de Kvaesitso. Hechos: bajar dividido (izquierda = notificaciones, derecha = ajustes rápidos), dos dedos arriba/abajo con el selector de acciones existente, deslizar una app a la izquierda abre la app asignada desde su menú (su ícono aparece en el borde mientras arrastras), a la derecha sus atajos. Los gestos del scaffold (arriba, izquierda, derecha, doble toque, mantener pulsado) siguen configurándose en Ajustes → Gestos. Pendiente: gestos desde los bordes, pellizcar, feedback visual del gesto de dos dedos.
+
 Hoy Kvaesitso tiene 7: swipe ↑↓←→, doble tap, long press y botón home. Agregamos:
 - Swipe ↓ en mitad izquierda = notificaciones, mitad derecha = ajustes rápidos (estilo One UI).
 - Gestos con dos dedos (↑↓, pellizcar), swipes desde los bordes, doble tap para bloquear (vía accesibilidad, ya existe `ScreenOffComponent`).
@@ -201,7 +204,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **2** | Home minimalista: reloj, línea de un vistazo, favoritos, riel con ola + háptica | ✅ PR #5 |
 | **3** | Riel ★ ◷ 🔒, notificaciones en la lista, shortcuts al deslizar, menú propio | ✅ PR #6 |
 | **4** | Prefijos de búsqueda, botón lateral con teclado inmediato, guía de configuración, fix de crash de shortcuts | ✅ PR #7 (restyle visual de resultados → fase 8) |
-| **5** | Motor de gestos ampliado + gestos por app | ⏳ |
+| **5** | Bajar dividido (notificaciones / ajustes rápidos), dos dedos ↑↓ configurables, deslizar una app a la izquierda abre otra | ✅ PR #8 |
 | **6** | Relojes nuevos + widgets de calendario/clima + app de clima configurable | ⏳ |
 | **7** | Layout de tablet | ⏳ |
 | **8** | Baseline profiles, benchmarks, pulido de animaciones, medir arranque en el S24U | ⏳ |

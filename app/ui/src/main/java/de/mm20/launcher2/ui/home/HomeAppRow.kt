@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -27,6 +29,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -39,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -55,6 +59,8 @@ import de.mm20.launcher2.notifications.Notification
 import de.mm20.launcher2.search.Application
 import de.mm20.launcher2.search.SavableSearchable
 import de.mm20.launcher2.ui.R
+import de.mm20.launcher2.ui.common.SearchablePicker
+import de.mm20.launcher2.ui.component.DismissableBottomSheet
 import de.mm20.launcher2.ui.component.ShapedLauncherIcon
 import de.mm20.launcher2.ui.launcher.sheets.LocalBottomSheetManager
 import kotlinx.coroutines.launch
@@ -78,6 +84,7 @@ fun HomeAppRow(
     shadow: Shadow?,
     accent: Color,
     onLaunch: (SavableSearchable) -> Unit,
+    swipeLeftTarget: SavableSearchable? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -90,6 +97,7 @@ fun HomeAppRow(
 
     var expanded by remember(item.key) { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
+    var pickSwipeLeft by remember { mutableStateOf(false) }
     val dragOffset = remember { Animatable(0f) }
     val canExpand = item is Application
 
@@ -100,24 +108,35 @@ fun HomeAppRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .offset { IntOffset(dragOffset.value.roundToInt(), 0) }
-                    .pointerInput(item.key, canExpand) {
-                        if (!canExpand) return@pointerInput
-                        var crossed = false
+                    .pointerInput(item.key, canExpand, swipeLeftTarget?.key) {
+                        // derecha: shortcuts (solo apps) · izquierda: app asignada (si hay)
+                        val maxRight = if (canExpand) thresholdPx * 1.4f else 0f
+                        val maxLeft = if (swipeLeftTarget != null) thresholdPx * 1.4f else thresholdPx * 0.25f
+                        if (maxRight == 0f && swipeLeftTarget == null) return@pointerInput
+                        var crossed = 0 // 1 = derecha, -1 = izquierda
                         detectHorizontalDragGestures(
-                            onDragStart = { crossed = false },
+                            onDragStart = { crossed = 0 },
                             onDragEnd = {
-                                if (crossed) expanded = !expanded
+                                when (crossed) {
+                                    1 -> expanded = !expanded
+                                    -1 -> swipeLeftTarget?.let(onLaunch)
+                                }
                                 scope.launch { dragOffset.animateTo(0f, spring(dampingRatio = 0.6f, stiffness = 500f)) }
                             },
                             onDragCancel = { scope.launch { dragOffset.animateTo(0f) } },
                         ) { change, dx ->
                             change.consume()
                             // resistencia elástica: se mueve menos cuanto más se arrastra
-                            val next = (dragOffset.value + dx * 0.5f).coerceIn(0f, thresholdPx * 1.4f)
+                            val next = (dragOffset.value + dx * 0.5f).coerceIn(-maxLeft, maxRight)
                             scope.launch { dragOffset.snapTo(next) }
-                            if (!crossed && next >= thresholdPx) {
-                                crossed = true
-                                view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                            val now = when {
+                                next >= thresholdPx && canExpand -> 1
+                                next <= -thresholdPx && swipeLeftTarget != null -> -1
+                                else -> 0
+                            }
+                            if (now != crossed) {
+                                crossed = now
+                                if (now != 0) view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
                             }
                         }
                     }
@@ -161,6 +180,24 @@ fun HomeAppRow(
                 }
             }
 
+            // Ícono de la app asignada, aparece en el borde al deslizar a la izquierda.
+            if (swipeLeftTarget != null) {
+                val targetIconPx = with(density) { 26.dp.roundToPx() }
+                val targetIcon by remember(swipeLeftTarget.key) { vm.icon(swipeLeftTarget, targetIconPx) }.collectAsState(null)
+                Box(
+                    Modifier
+                        .align(Alignment.CenterEnd)
+                        .graphicsLayer {
+                            val p = (-dragOffset.value / thresholdPx).coerceIn(0f, 1f)
+                            alpha = p
+                            scaleX = 0.6f + 0.4f * p
+                            scaleY = 0.6f + 0.4f * p
+                        }
+                ) {
+                    ShapedLauncherIcon(size = 26.dp, icon = { targetIcon })
+                }
+            }
+
             HomeItemMenu(
                 expanded = menuOpen,
                 onDismiss = { menuOpen = false },
@@ -169,7 +206,28 @@ fun HomeAppRow(
                 isHiddenItem = isHiddenItem,
                 onShowShortcuts = if (canExpand) ({ expanded = true }) else null,
                 onCustomize = { sheetManager.showCustomizeSearchableModal(item) },
+                swipeLeftTarget = swipeLeftTarget,
+                onPickSwipeLeft = { pickSwipeLeft = true },
             )
+
+            DismissableBottomSheet(expanded = pickSwipeLeft, onDismissRequest = { pickSwipeLeft = false }) {
+                Column {
+                    Text(
+                        stringResource(R.string.fork_swipe_left_picker_title, item.displayLabel),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                    )
+                    SearchablePicker(
+                        value = swipeLeftTarget,
+                        onValueChanged = {
+                            vm.setSwipeLeftTarget(item, it)
+                            pickSwipeLeft = false
+                        },
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 24.dp),
+                    )
+                }
+            }
         }
 
         if (item is Application) {
@@ -227,6 +285,8 @@ private fun HomeItemMenu(
     isHiddenItem: Boolean,
     onShowShortcuts: (() -> Unit)?,
     onCustomize: () -> Unit,
+    swipeLeftTarget: SavableSearchable?,
+    onPickSwipeLeft: () -> Unit,
 ) {
     val context = LocalContext.current
     val pinned by remember(item.key) { vm.isPinned(item) }.collectAsState(false)
@@ -240,6 +300,8 @@ private fun HomeItemMenu(
         if (pinned) entry(R.drawable.star_24px_filled, R.string.fork_menu_unpin) { vm.unpin(item) }
         else entry(R.drawable.star_24px, R.string.fork_menu_pin) { vm.pin(item) }
         if (onShowShortcuts != null) entry(R.drawable.apps_24px, R.string.fork_menu_shortcuts, onShowShortcuts)
+        entry(R.drawable.swipe_left_alt_24px, if (swipeLeftTarget == null) R.string.fork_menu_swipe_left else R.string.fork_menu_swipe_left_change, onPickSwipeLeft)
+        if (swipeLeftTarget != null) entry(R.drawable.close_24px, R.string.fork_menu_swipe_left_clear) { vm.setSwipeLeftTarget(item, null) }
         entry(R.drawable.edit_24px, R.string.fork_menu_customize, onCustomize)
         if (isHiddenItem) entry(R.drawable.visibility_24px, R.string.fork_menu_unhide) { vm.unhide(item) }
         else entry(R.drawable.visibility_off_24px, R.string.fork_menu_hide) { vm.hide(item) }

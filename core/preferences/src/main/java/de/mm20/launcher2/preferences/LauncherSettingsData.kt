@@ -115,6 +115,12 @@ data class LauncherSettingsData internal constructor(
     val minimalHomeShowIcons: Boolean = true,
     val minimalHomeRailOnLeft: Boolean = false,
     val minimalHomeNotificationPreviews: Boolean = true,
+    // [fork] Gestos de la home minimalista.
+    val minimalHomeSplitSwipeDown: Boolean = true,
+    val minimalHomeTwoFingerUp: GestureAction = GestureAction.NoAction,
+    val minimalHomeTwoFingerDown: GestureAction = GestureAction.QuickSettings,
+    /** clave de app → clave de lo que se abre al deslizarla a la izquierda */
+    val minimalHomeAppSwipeLeft: Map<String, String> = emptyMap(),
 
     val badgesNotifications: Boolean = true,
     val badgesSuspendedApps: Boolean = true,

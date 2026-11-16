@@ -41,4 +41,14 @@
     <string name="fork_search_prefixes_summary">Escribe una letra y un espacio para buscar en una sola categoría: a apps · c contactos · e eventos · f archivos · s atajos · t herramientas. Enter abre el primer resultado.</string>
     <string name="fork_search_side_button_title">Buscar con el botón lateral</string>
     <string name="fork_search_side_button_summary">Ajustes → Aplicaciones → Aplicaciones predeterminadas → Asistente digital → elige este launcher. Luego Ajustes → Funciones avanzadas → Botón lateral → Mantener pulsado → Asistente digital. Con Good Lock (RegiStar) también puedes asignar cualquier botón al atajo \"Buscar\".</string>
+    <string name="fork_menu_swipe_left">Deslizar a la izquierda abre…</string>
+    <string name="fork_menu_swipe_left_change">Cambiar app al deslizar</string>
+    <string name="fork_menu_swipe_left_clear">Quitar app al deslizar</string>
+    <string name="fork_swipe_left_picker_title">Deslizar %1$s a la izquierda abre</string>
+    <string name="fork_preference_category_gestures">Gestos</string>
+    <string name="fork_preference_split_swipe_down">Bajar dividido</string>
+    <string name="fork_preference_split_swipe_down_summary">La mitad izquierda abre las notificaciones y la derecha los ajustes rápidos</string>
+    <string name="fork_preference_two_finger_up">Dos dedos hacia arriba</string>
+    <string name="fork_preference_two_finger_down">Dos dedos hacia abajo</string>
+    <string name="fork_preference_app_swipe_hint">Por app: deslizar a la derecha muestra sus atajos; deslizar a la izquierda abre la app que le asignes desde su menú.</string>
 </resources>

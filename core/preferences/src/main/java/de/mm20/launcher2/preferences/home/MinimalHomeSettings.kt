@@ -1,5 +1,6 @@
 package de.mm20.launcher2.preferences.home
 
+import de.mm20.launcher2.preferences.GestureAction
 import de.mm20.launcher2.preferences.LauncherDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -30,4 +31,30 @@ class MinimalHomeSettings internal constructor(
         get() = dataStore.data.map { it.minimalHomeNotificationPreviews }.distinctUntilChanged()
 
     fun setNotificationPreviews(show: Boolean) = dataStore.update { it.copy(minimalHomeNotificationPreviews = show) }
+
+    /** Bajar en la mitad izquierda = notificaciones, mitad derecha = ajustes rápidos. */
+    val splitSwipeDown: Flow<Boolean>
+        get() = dataStore.data.map { it.minimalHomeSplitSwipeDown }.distinctUntilChanged()
+
+    fun setSplitSwipeDown(enabled: Boolean) = dataStore.update { it.copy(minimalHomeSplitSwipeDown = enabled) }
+
+    val twoFingerUp: Flow<GestureAction>
+        get() = dataStore.data.map { it.minimalHomeTwoFingerUp }.distinctUntilChanged()
+
+    fun setTwoFingerUp(action: GestureAction) = dataStore.update { it.copy(minimalHomeTwoFingerUp = action) }
+
+    val twoFingerDown: Flow<GestureAction>
+        get() = dataStore.data.map { it.minimalHomeTwoFingerDown }.distinctUntilChanged()
+
+    fun setTwoFingerDown(action: GestureAction) = dataStore.update { it.copy(minimalHomeTwoFingerDown = action) }
+
+    val appSwipeLeft: Flow<Map<String, String>>
+        get() = dataStore.data.map { it.minimalHomeAppSwipeLeft }.distinctUntilChanged()
+
+    fun setAppSwipeLeft(appKey: String, targetKey: String?) = dataStore.update {
+        it.copy(
+            minimalHomeAppSwipeLeft = if (targetKey == null) it.minimalHomeAppSwipeLeft - appKey
+            else it.minimalHomeAppSwipeLeft + (appKey to targetKey)
+        )
+    }
 }

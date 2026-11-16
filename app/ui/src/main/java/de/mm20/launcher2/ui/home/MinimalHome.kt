@@ -54,6 +54,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
+import android.view.HapticFeedbackConstants
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -90,6 +92,7 @@ fun MinimalHome(
 ) {
     val vm: MinimalHomeVM = viewModel()
     val context = LocalContext.current
+    val view = LocalView.current
 
     val darkContent = LocalPreferDarkContentOverWallpaper.current
     val contentColor = if (darkContent) Color(0xE6000000) else Color.White
@@ -134,7 +137,22 @@ fun MinimalHome(
     }
 
     CompositionLocalProvider(LocalContentColor provides contentColor) {
-        Box(modifier = modifier.fillMaxSize().padding(insets)) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .homeGestures(
+                    splitSwipeDown = { vm.splitSwipeDown.value },
+                    onSwipeDown = { leftHalf ->
+                        view.performHapticFeedback(HapticFeedbackConstants.GESTURE_END)
+                        if (leftHalf) vm.openNotifications() else vm.openQuickSettings()
+                    },
+                    onTwoFinger = { up ->
+                        view.performHapticFeedback(HapticFeedbackConstants.GESTURE_END)
+                        vm.runGestureAction(context, if (up) vm.twoFingerUp.value else vm.twoFingerDown.value)
+                    },
+                )
+                .padding(insets)
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -249,6 +267,7 @@ private fun HomeList(
     listState: LazyListState,
     onLaunch: (SavableSearchable) -> Unit,
 ) {
+    val swipeLeftTargets by vm.swipeLeftTargets.collectAsState()
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxWidth().heightIn(max = 460.dp),
@@ -265,6 +284,7 @@ private fun HomeList(
                 shadow = shadow,
                 accent = accent,
                 onLaunch = onLaunch,
+                swipeLeftTarget = swipeLeftTargets[item.key],
                 modifier = Modifier.animateItem(),
             )
         }
