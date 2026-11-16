@@ -196,11 +196,11 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 
 ## 6. Rendimiento y animaciones (transversal, con números)
 
-> **Estado (fase 8):** módulo `:baselineprofile` (Macrobenchmark 1.5.0). El generador recorre la home (riel, lista de una letra, búsqueda por `ASSIST`) y deja `app/app/src/defaultRelease/generated/baselineProfiles/` (≈34.600 reglas + perfil de arranque); `profileinstaller` lo aplica al instalar. Emulador (Android 16, arranque en frío de la home): 146 ms de mediana con y sin perfil, es decir, no concluyente; el beneficio real se mide en el teléfono. Para medir en el S24U (con otra app como home por defecto mientras corre):
+> **Estado (fase 8):** módulo `:baselineprofile` (Macrobenchmark 1.5.0). El generador recorre la home (riel, lista de una letra, búsqueda por `ASSIST`) y deja `app/app/src/release/generated/baselineProfiles/` (≈34.600 reglas + perfil de arranque); `profileinstaller` lo aplica al instalar. Emulador (Android 16, arranque en frío de la home): 146 ms de mediana con y sin perfil, es decir, no concluyente; el beneficio real se mide en el teléfono. Para medir en el S24U (con otra app como home por defecto mientras corre):
 >
 > ```
-> ./gradlew :app:app:generateDefaultReleaseBaselineProfile
-> ./gradlew :baselineprofile:connectedDefaultBenchmarkReleaseAndroidTest
+> ./gradlew :app:app:generateReleaseBaselineProfile
+> ./gradlew :baselineprofile:connectedBenchmarkReleaseAndroidTest
 > ```
 
 
@@ -228,7 +228,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **7** | Layout adaptativo: dos columnas en pantallas anchas en horizontal, una columna grande en la Tab en vertical, reloj escalado | ✅ PR #10 |
 | **8** | Baseline profile generado (34 k reglas + perfil de arranque), módulo `:baselineprofile` con generador y Macrobenchmark | ✅ PR #11, restyle de la búsqueda en PR #14 · pendiente: medir en el S24U, pulido de animaciones |
 | **9** | Correcciones rápidas: reloj abre la app completa, clima junto a la alarma, solo home minimalista, sugerencias desactivables, doble toque en el riel = bloquear, ola más marcada, riel desde ambos bordes | ✅ PR #20 |
-| **10** | Fork total: renombrar a `dev.kbzon.launcher`, sin upstream, Ko-fi, borrar lo que no se usa | ⏳ v0.3.0 |
+| **10** | Fork total: código renombrado a `dev.kbzon.launcher`, sin upstream, plugins eliminados, Ko-fi, README propio, sin flavors ni traducciones extra | ✅ PR #21 |
 | **11** | Home configurable: popup al mantener pulsado, gestos unificados, botón de acción, editar diseño | ⏳ v0.4 |
 | **12** | Orden de lista por letra, carpetas (popup), reordenar favoritos | ⏳ v0.5 |
 | **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ⏳ v0.6 |
@@ -254,7 +254,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: fases 10 → 15 (§10)**, en este orden: fork total → pantalla principal configurable → riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: fases 11 → 15 (§10)**, en este orden: pantalla principal configurable → riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -286,6 +286,10 @@ Decisiones tomadas (16-11-2026):
 7. **El riel funciona desde ambos bordes**: aunque las letras se vean solo a la derecha, deslizar en el borde izquierdo también recorre el alfabeto (zona táctil invisible de ~24 dp). Mientras se usa el borde contrario, aparece junto al dedo una burbuja con la letra actual y las letras visibles hacen la ola en su lado.
 
 ### Fase 10 — Fork total (v0.3.0)
+> ✅ Hecha (PR #21). Notas:
+> - Se conservan a propósito cuatro nombres de componente viejos para no perder nada al actualizar: alias `de.mm20.launcher2.ui.launcher.LauncherActivity` (home predeterminada) y `…ui.assistant.AssistantActivity` (asistente), y los servicios `de.mm20.launcher2.notifications.NotificationService` y `…globalactions.LauncherAccessibilityService` (permisos concedidos). Probado instalando encima de la versión anterior: home, permisos, ajustes y favoritos se mantienen.
+> - Plugins: módulos, SDK y pantallas eliminados. Quedan restos inertes en la capa de datos (proveedores de plugins en calendario/contactos/archivos/lugares/clima) atados a un `NoPluginRepository` vacío; se borran en la Fase 15.
+> - Sin flavors: las tareas son `assembleRelease` / `assembleDebug` y el APK sale en `app/app/build/outputs/apk/release/`.
 1. **Renombrar paquetes** `de.mm20.launcher2.*` → `dev.kbzon.launcher.*` en los ~90 módulos (código, `namespace`, manifiestos, ProGuard). El `applicationId` y la firma no cambian: actualiza encima y conserva datos (base de datos, ajustes y backups usan los mismos nombres de archivo).
 2. **Quitar el remoto `upstream`** y las reglas de sincronización (§1.2–1.3 pasan a historia). El fork pasa a ser un proyecto propio.
 3. **Plugins de Kvaesitso**: decidir si se mantiene la compatibilidad (sus acciones y permisos se llaman `de.mm20.launcher2.*`). Recomendación: mantener los nombres del protocolo de plugins para no romper los plugins de clima, o eliminar el soporte de plugins si no los usas.
@@ -319,6 +323,7 @@ Decisiones tomadas (16-11-2026):
 5. Opción de barra de búsqueda abajo (alcance del pulgar) y navegación con teclado físico (flechas + Enter).
 
 ### Fase 15 — Limpieza de ajustes (futuro)
+Incluye borrar los restos de plugins de la capa de datos (`NoPluginRepository` y proveedores `Plugin*`).
 Eliminar los ajustes heredados de Kvaesitso que no aplican a esta app (reloj y widgets de la home de Kvaesitso, dock, estilos de barra, etc.) y reorganizar en: Inicio · Riel y lista · Gestos y botón de acción · Búsqueda · Apariencia · Privacidad · Backup · Acerca de.
 
 ### Recomendaciones adicionales
@@ -330,7 +335,5 @@ Eliminar los ajustes heredados de Kvaesitso que no aplican a esta app (reloj y w
 - **Ajustes por dispositivo** (teléfono / Tab) para posición del riel y diseño, ya que tienen proporciones muy distintas.
 
 ### Preguntas abiertas
-- URL de tu Ko-fi.
-- Plugins de Kvaesitso: ¿mantener compatibilidad o quitarlos? (Fase 10.3)
 - Gestos por defecto de la home y del botón de acción: ¿están bien los propuestos?
 - Temas predeterminados y fuentes: ¿algún estilo o fuente que quieras sí o sí?

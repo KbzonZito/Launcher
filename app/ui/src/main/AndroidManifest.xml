@@ -21,7 +21,14 @@
             android:stateNotNeeded="true"
             android:theme="@style/LauncherTheme"
             android:enableOnBackInvokedCallback="true"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <!-- [fork] Alias con el nombre de componente anterior al renombrado: Android guarda por este
+             nombre la home predeterminada y el acceso del cajón de apps. Así se conservan al actualizar. -->
+        <activity-alias
+            android:name="de.mm20.launcher2.ui.launcher.LauncherActivity"
+            android:exported="true"
+            android:targetActivity=".launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,8 +44,7 @@
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
-
-        </activity>
+        </activity-alias>
 
         <activity
             android:name=".assistant.AssistantActivity"
@@ -50,12 +56,18 @@
             android:stateNotNeeded="true"
             android:theme="@style/AssistantTheme"
             android:windowSoftInputMode="stateHidden|adjustResize"
-            android:enableOnBackInvokedCallback="true">
+            android:enableOnBackInvokedCallback="true" />
+
+        <!-- [fork] Alias con el nombre anterior para conservar la asignación del asistente / botón lateral. -->
+        <activity-alias
+            android:name="de.mm20.launcher2.ui.assistant.AssistantActivity"
+            android:exported="true"
+            android:targetActivity=".assistant.AssistantActivity">
             <intent-filter>
                 <action android:name="android.intent.action.ASSIST" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>
+        </activity-alias>
 
         <activity
             android:name=".settings.SettingsActivity"
@@ -72,7 +84,7 @@
             </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="de.mm20.launcher2.ui.launcher.LauncherActivity" />
+                android:value="dev.kbzon.launcher.ui.launcher.LauncherActivity" />
 
             <!-- [fork] sin enlaces a kvaesitso.mm20.de: no somos esa app -->
         </activity>
@@ -87,7 +99,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="application/vnd.de.mm20.launcher2.theme" />
+                <data android:mimeType="application/vnd.dev.kbzon.launcher.theme" />
             </intent-filter>
         </activity>
     </application>

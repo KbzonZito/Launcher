@@ -32,10 +32,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-        create("nightly") {
-            initWith(getByName("release"))
-            matchingFallbacks += "release"
-        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -67,7 +63,7 @@ android {
     lint {
         abortOnError = false
     }
-    namespace = "de.mm20.launcher2.ui"
+    namespace = "dev.kbzon.launcher.ui"
 }
 
 
@@ -143,7 +139,6 @@ dependencies {
     implementation(project(":core:permissions"))
     implementation(project(":data:websites"))
     implementation(project(":data:unitconverter"))
-    implementation(project(":services:plugins"))
     implementation(project(":services:backup"))
     implementation(project(":data:search-actions"))
     implementation(project(":services:global-actions"))

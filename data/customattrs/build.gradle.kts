@@ -37,7 +37,7 @@ android {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    namespace = "de.mm20.launcher2.data.customattrs"
+    namespace = "dev.kbzon.launcher.data.customattrs"
 }
 
 dependencies {

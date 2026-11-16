@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "de.mm20.launcher2.location"
+    namespace = "dev.kbzon.launcher.location"
     compileSdk {
         version = release(libs.versions.compileSdk.get().toInt()) {
             minorApiLevel = libs.versions.compileSdkMinor.get().toInt()

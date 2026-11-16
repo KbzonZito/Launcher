@@ -38,7 +38,7 @@ android {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    namespace = "de.mm20.launcher2.preferences"
+    namespace = "dev.kbzon.launcher.preferences"
 }
 
 dependencies {

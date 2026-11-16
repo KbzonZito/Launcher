@@ -10,8 +10,7 @@ plugins {
 android {
     androidResources {
         generateLocaleConfig = true
-        // [fork] Solo español e inglés en el APK; las traducciones siguen en el repo para no generar conflictos con upstream.
-        localeFilters += listOf("en", "es")
+        localeFilters += listOf("en", "es") // [fork] solo español e inglés
     }
 
     packaging {
@@ -49,7 +48,7 @@ android {
     }
 
     defaultConfig {
-        // [fork] applicationId propio: convive con Kvaesitso oficial. El namespace Kotlin sigue siendo de.mm20.launcher2.
+        // [fork] applicationId propio: convive con Kvaesitso oficial. El namespace Kotlin sigue siendo dev.kbzon.launcher.
         applicationId = "dev.kbzon.launcher"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
@@ -76,31 +75,6 @@ android {
             isDebuggable = true
             signingConfig = if (hasPersonalSigning) personalSigning else signingConfigs.getByName("debug")
         }
-        create("nightly") {
-            initWith(getByName("release"))
-            matchingFallbacks += "release"
-            applicationIdSuffix = ".nightly"
-            versionNameSuffix = "-${LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"))}-nightly"
-            signingConfig = if (hasPersonalSigning) personalSigning else null
-
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-
-        flavorDimensions += "variant"
-        productFlavors {
-            create("default") {
-                dimension = "variant"
-            }
-            create("fdroid") {
-                dimension = "variant"
-                versionNameSuffix = "-fdroid"
-            }
-        }
     }
 
     compileOptions {
@@ -116,7 +90,7 @@ android {
     lint {
         abortOnError = false
     }
-    namespace = "de.mm20.launcher2"
+    namespace = "dev.kbzon.launcher"
     buildFeatures {
         buildConfig = true
     }
@@ -134,6 +108,7 @@ dependencies {
     implementation(libs.coil.svg)
 
     implementation(libs.koin.android)
+    implementation(libs.androidx.work) // [fork] migración de tareas tras el renombrado
     implementation(libs.androidx.profileinstaller) // [fork] instala el baseline profile
     baselineProfile(project(":baselineprofile")) // [fork]
 
@@ -149,7 +124,6 @@ dependencies {
     implementation(project(":data:currencies"))
     implementation(project(":data:customattrs"))
     implementation(project(":data:searchable"))
-    implementation(project(":data:plugins"))
     implementation(project(":data:themes"))
     implementation(project(":data:i18n"))
     implementation(project(":data:files"))
@@ -174,7 +148,6 @@ dependencies {
     implementation(project(":services:widgets"))
     implementation(project(":services:favorites"))
     implementation(project(":data:locations"))
-    implementation(project(":services:plugins"))
     implementation(project(":core:devicepose"))
     implementation(project(":services:feed"))
 

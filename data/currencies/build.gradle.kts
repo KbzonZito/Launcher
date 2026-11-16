@@ -37,7 +37,7 @@ android {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    namespace = "de.mm20.launcher2.currencies"
+    namespace = "dev.kbzon.launcher.currencies"
 }
 
 dependencies {

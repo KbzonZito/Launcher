@@ -44,7 +44,7 @@ android {
         buildConfig = true
     }
 
-    namespace = "de.mm20.launcher2.feed"
+    namespace = "dev.kbzon.launcher.feed"
 }
 
 dependencies {

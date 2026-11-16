@@ -1,9 +1,12 @@
 package de.mm20.launcher2.globalactions
 
+// [fork] Nombre de clase conservado a propósito: Android guarda por este nombre el permiso
+// concedido (acceso a notificaciones / accesibilidad). Cambiarlo obligaría a concederlo de nuevo.
+
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
-import de.mm20.launcher2.permissions.PermissionsManager
+import dev.kbzon.launcher.permissions.PermissionsManager
 import org.koin.android.ext.android.inject
 import java.lang.ref.WeakReference
 

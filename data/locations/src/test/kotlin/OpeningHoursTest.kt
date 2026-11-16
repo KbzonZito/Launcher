@@ -1,6 +1,6 @@
-import de.mm20.launcher2.locations.providers.openstreetmaps.parseOpeningSchedule
-import de.mm20.launcher2.search.location.OpeningHours
-import de.mm20.launcher2.search.location.OpeningSchedule
+import dev.kbzon.launcher.locations.providers.openstreetmaps.parseOpeningSchedule
+import dev.kbzon.launcher.search.location.OpeningHours
+import dev.kbzon.launcher.search.location.OpeningSchedule
 import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test

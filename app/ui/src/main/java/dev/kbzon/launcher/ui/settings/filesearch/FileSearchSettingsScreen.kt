@@ -1,0 +1,83 @@
+package dev.kbzon.launcher.ui.settings.filesearch
+
+import android.app.PendingIntent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavKey
+import dev.kbzon.launcher.crashreporter.CrashReporter
+import dev.kbzon.launcher.ktx.isAtLeastApiLevel
+import dev.kbzon.launcher.ktx.sendWithBackgroundPermission
+import dev.kbzon.launcher.ui.R
+import dev.kbzon.launcher.ui.component.preferences.GuardedPreference
+import dev.kbzon.launcher.ui.component.preferences.PreferenceCategory
+import dev.kbzon.launcher.ui.component.preferences.PreferenceScreen
+import dev.kbzon.launcher.ui.component.preferences.SwitchPreference
+import kotlinx.serialization.Serializable
+
+@Serializable
+data object FileSearchSettingsRoute: NavKey
+
+@Composable
+fun FileSearchSettingsScreen() {
+    val viewModel: FileSearchSettingsScreenVM = viewModel()
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(null) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.onResume()
+        }
+    }
+
+    val enabledPlugins by viewModel.enabledPlugins.collectAsStateWithLifecycle(null)
+
+    val loading by viewModel.loading
+    PreferenceScreen(title = stringResource(R.string.preference_search_files)) {
+        if (loading == true) {
+            item {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            return@PreferenceScreen
+        }
+        item {
+            PreferenceCategory {
+                val localFiles by viewModel.localFiles.collectAsState()
+                val hasFilePermission by viewModel.hasFilePermission.collectAsState()
+                GuardedPreference(
+                    locked = hasFilePermission == false,
+                    onUnlock = {
+                        viewModel.requestFilePermission(context as AppCompatActivity)
+                    },
+                    description = stringResource(
+                        if (isAtLeastApiLevel(29)) R.string.missing_permission_file_search_settings_android10 else R.string.missing_permission_file_search_settings
+                    ),
+                ) {
+                    SwitchPreference(
+                        title = stringResource(R.string.preference_search_localfiles),
+                        summary = stringResource(R.string.preference_search_localfiles_summary),
+                        value = localFiles == true && hasFilePermission == true,
+                        onValueChanged = {
+                            viewModel.setLocalFiles(it)
+                        },
+                        enabled = hasFilePermission == true
+                    )
+                }
+
+            }
+        }
+    }
+}

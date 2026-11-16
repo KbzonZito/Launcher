@@ -1,7 +1,7 @@
--keepclassmembers class de.mm20.launcher2.preferences.LegacySettings {
+-keepclassmembers class dev.kbzon.launcher.preferences.LegacySettings {
     <fields>;
 }
 
--keepclassmembers class de.mm20.launcher2.preferences.LegacySettings$* {
+-keepclassmembers class dev.kbzon.launcher.preferences.LegacySettings$* {
     <fields>;
 }

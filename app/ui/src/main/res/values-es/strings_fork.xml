@@ -100,4 +100,5 @@
     <string name="fork_preference_rail_both_edges">Alfabeto desde ambos bordes</string>
     <string name="fork_preference_rail_both_edges_summary">Desliza también por el borde contrario; una burbuja muestra la letra</string>
     <string name="fork_preference_category_rail">Alfabeto</string>
+    <string name="fork_about_kofi">Apoyar en Ko-fi</string>
 </resources>

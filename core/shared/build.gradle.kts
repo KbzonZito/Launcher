@@ -29,10 +29,6 @@ android {
                     "proguard-rules.pro"
             )
         }
-        create("nightly") {
-            initWith(getByName("release"))
-            matchingFallbacks += "release"
-        }
     }
 
     compileOptions {
@@ -45,7 +41,7 @@ android {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    namespace = "de.mm20.launcher2.shared"
+    namespace = "dev.kbzon.launcher.shared"
 
     publishing {
         singleVariant("release") {
@@ -73,7 +69,7 @@ val javadocJar by tasks.registering(Jar::class) {
 publishing {
     publications {
         register<MavenPublication>("release") {
-            groupId = "de.mm20.launcher2"
+            groupId = "dev.kbzon.launcher"
             artifactId = "shared"
             version = libs.versions.pluginSdk.get()
 

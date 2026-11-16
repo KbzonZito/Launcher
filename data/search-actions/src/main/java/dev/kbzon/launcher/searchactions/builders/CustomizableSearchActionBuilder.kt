@@ -1,0 +1,3 @@
+package dev.kbzon.launcher.searchactions.builders
+
+sealed interface CustomizableSearchActionBuilder: SearchActionBuilder

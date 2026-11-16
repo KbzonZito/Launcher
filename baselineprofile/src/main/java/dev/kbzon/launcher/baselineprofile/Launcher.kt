@@ -8,8 +8,8 @@ import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.Until
 
 const val PACKAGE = "dev.kbzon.launcher"
-private const val HOME = "de.mm20.launcher2.ui.launcher.LauncherActivity"
-private const val ASSISTANT = "de.mm20.launcher2.ui.assistant.AssistantActivity"
+private const val HOME = "dev.kbzon.launcher.ui.launcher.LauncherActivity"
+private const val ASSISTANT = "dev.kbzon.launcher.ui.assistant.AssistantActivity"
 
 fun MacrobenchmarkScope.startHome() {
     startActivityAndWait(

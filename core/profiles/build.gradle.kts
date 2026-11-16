@@ -26,10 +26,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-        create("nightly") {
-            initWith(getByName("release"))
-            matchingFallbacks += "release"
-        }
     }
 
     compileOptions {
@@ -42,7 +38,7 @@ android {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    namespace = "de.mm20.launcher2.profiles"
+    namespace = "dev.kbzon.launcher.profiles"
 }
 
 dependencies {

@@ -1,0 +1,86 @@
+package dev.kbzon.launcher.ui.settings.calendarsearch
+
+import android.app.PendingIntent
+import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.NavKey
+import dev.kbzon.launcher.crashreporter.CrashReporter
+import dev.kbzon.launcher.ktx.sendWithBackgroundPermission
+import dev.kbzon.launcher.ui.R
+import dev.kbzon.launcher.ui.component.preferences.GuardedPreference
+import dev.kbzon.launcher.ui.component.preferences.PreferenceCategory
+import dev.kbzon.launcher.ui.component.preferences.PreferenceScreen
+import dev.kbzon.launcher.ui.component.preferences.PreferenceWithSwitch
+import dev.kbzon.launcher.ui.locals.LocalBackStack
+import kotlinx.serialization.Serializable
+
+@Serializable
+data object CalendarSearchSettingsRoute: NavKey
+
+@Composable
+fun CalendarSearchSettingsScreen() {
+    val viewModel: CalendarSearchSettingsScreenVM = viewModel()
+    val context = LocalContext.current
+    val backStack = LocalBackStack.current
+
+    val hasCalendarPermission by viewModel.hasCalendarPermission.collectAsState(null)
+    val hasTasksPermission by viewModel.hasTasksPermission.collectAsState(null)
+    val isTasksAppInstalled by viewModel.isTasksAppInstalled.collectAsStateWithLifecycle(false)
+    val enabledProviders by viewModel.enabledProviders.collectAsState(emptySet())
+
+    PreferenceScreen(title = stringResource(R.string.preference_search_calendar)) {
+        item {
+            PreferenceCategory {
+                GuardedPreference(
+                    locked = hasCalendarPermission == false,
+                    onUnlock = {
+                        viewModel.requestCalendarPermission(context as AppCompatActivity)
+                    },
+                    description = stringResource(R.string.missing_permission_calendar_search_settings),
+                ) {
+                    PreferenceWithSwitch(
+                        title = stringResource(R.string.preference_search_calendar),
+                        summary = stringResource(R.string.preference_search_local_calendar_summary),
+                        switchValue = enabledProviders.contains("local") && hasCalendarPermission == true,
+                        onSwitchChanged = {
+                            viewModel.setProviderEnabled("local", it)
+                        },
+                        enabled = hasCalendarPermission == true,
+                        onClick = {
+                            backStack.add(CalendarProviderSettingsRoute(providerId = "local"))
+                        }
+                    )
+                }
+                if (isTasksAppInstalled) {
+                    GuardedPreference(
+                        locked = hasTasksPermission == false,
+                        onUnlock = {
+                            viewModel.requestTasksPermission(context as AppCompatActivity)
+                        },
+                        description = stringResource(R.string.missing_permission_tasks_search_settings),
+                    ) {
+                        PreferenceWithSwitch(
+                            title = stringResource(R.string.preference_search_tasks),
+                            summary = stringResource(R.string.preference_search_tasks_summary),
+                            switchValue = enabledProviders.contains("tasks.org") && hasTasksPermission == true,
+                            onSwitchChanged = {
+                                viewModel.setProviderEnabled("tasks.org", it)
+                            },
+                            enabled = hasTasksPermission == true,
+                            onClick = {
+                                backStack.add(CalendarProviderSettingsRoute(providerId = "tasks.org"))
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
