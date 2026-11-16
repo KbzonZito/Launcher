@@ -31,6 +31,7 @@ import org.koin.dsl.module
 val preferencesModule = module {
     single { LauncherDataStore(androidContext()) }
     factory { de.mm20.launcher2.preferences.privacy.PrivacySettings(get()) } // [fork]
+    factory { de.mm20.launcher2.preferences.home.MinimalHomeSettings(get()) } // [fork]
     factory<Backupable>(named<LauncherDataStore>()) { get<LauncherDataStore>() }
     factory { MediaSettings(get()) }
     factory { ContactSearchSettings(get()) }

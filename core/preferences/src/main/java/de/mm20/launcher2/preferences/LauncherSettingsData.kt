@@ -110,6 +110,11 @@ data class LauncherSettingsData internal constructor(
     // [fork] FLAG_SECURE en la búsqueda y en las apps ocultas (sin capturas ni miniatura en recientes).
     val privacySecureScreens: Boolean = true,
 
+    // [fork] Home minimalista: lista de favoritos + riel del alfabeto.
+    val minimalHomeEnabled: Boolean = true,
+    val minimalHomeShowIcons: Boolean = true,
+    val minimalHomeRailOnLeft: Boolean = false,
+
     val badgesNotifications: Boolean = true,
     val badgesSuspendedApps: Boolean = true,
     val badgesCloudFiles: Boolean = true,

@@ -14,4 +14,12 @@
     <string name="fork_preference_incognito_summary">No registrar las aperturas: las apps frecuentes y el orden de la búsqueda dejan de aprender</string>
     <string name="fork_preference_secure_screens">Proteger la búsqueda de capturas</string>
     <string name="fork_preference_secure_screens_summary">Bloquea capturas y grabación de pantalla mientras se ven resultados de búsqueda o apps ocultas</string>
+    <string name="fork_preference_screen_minimal_home">Inicio minimalista</string>
+    <string name="fork_preference_screen_minimal_home_summary">Lista de favoritos y riel del alfabeto</string>
+    <string name="fork_preference_minimal_home">Usar inicio minimalista</string>
+    <string name="fork_preference_minimal_home_summary">Reloj, línea de un vistazo, favoritos y riel del alfabeto en lugar de la pantalla de reloj y widgets</string>
+    <string name="fork_preference_minimal_home_icons">Mostrar íconos de apps</string>
+    <string name="fork_preference_minimal_home_rail_left">Alfabeto a la izquierda</string>
+    <string name="fork_preference_minimal_home_rail_left_summary">Para usar el teléfono con la mano izquierda</string>
+    <string name="fork_minimal_home_empty_favorites">Elige una letra a la derecha para ver tus apps. Mantén pulsada una app → fíjala en favoritos.</string>
 </resources>

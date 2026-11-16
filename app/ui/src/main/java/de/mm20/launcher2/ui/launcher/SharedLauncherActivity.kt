@@ -154,6 +154,7 @@ abstract class SharedLauncherActivity(
                         val searchBarColor by viewModel.searchBarColor.collectAsState()
                         val searchBarAutofocus by viewModel.autoFocusSearch.collectAsState(false)
                         val widgetsOnHomeScreen by viewModel.widgetsOnHomeScreen.collectAsState()
+                        val minimalHome by org.koin.compose.koinInject<de.mm20.launcher2.preferences.home.MinimalHomeSettings>().enabled.collectAsState(null) // [fork]
                         val wallpaperBlur by viewModel.wallpaperBlur.collectAsState()
                         val wallpaperBlurRadius by viewModel.wallpaperBlurRadius.collectAsState()
 
@@ -161,7 +162,7 @@ abstract class SharedLauncherActivity(
 
                         val backgroundColor = MaterialTheme.colorScheme.surfaceContainer
 
-                        if (gestures == null || widgetsOnHomeScreen == null) return@ProvideCompositionLocals
+                        if (gestures == null || widgetsOnHomeScreen == null || minimalHome == null) return@ProvideCompositionLocals
 
                         LaunchedEffect(fixedRotation) {
                             requestedOrientation = if (fixedRotation) {
@@ -243,6 +244,7 @@ abstract class SharedLauncherActivity(
                                 hideStatus,
                                 hideNav,
                                 widgetsOnHomeScreen,
+                                minimalHome, // [fork]
                                 searchBarAutofocus,
                                 wallpaperBlur,
                                 wallpaperBlurRadius,
@@ -355,7 +357,9 @@ abstract class SharedLauncherActivity(
                                     val gestures = gestures!!
 
                                     val config = ScaffoldConfiguration(
-                                        homeComponent = if (widgetsOnHomeScreen == true) {
+                                        homeComponent = if (minimalHome == true) {
+                                            de.mm20.launcher2.ui.launcher.scaffold.components.MinimalHomeComponent // [fork]
+                                        } else if (widgetsOnHomeScreen == true) {
                                             ClockAndWidgetsHomeComponent
                                         } else {
                                             ClockHomeComponent
