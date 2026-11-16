@@ -1,5 +1,8 @@
 package de.mm20.launcher2.ui.privacy
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,4 +40,7 @@ object HiddenItemsLock {
     fun lock() {
         _unlocked.value = false
     }
+
+    /** true mientras alguna pantalla del launcher muestra apps ocultas (activa FLAG_SECURE). */
+    var hiddenContentVisible by mutableStateOf(false)
 }

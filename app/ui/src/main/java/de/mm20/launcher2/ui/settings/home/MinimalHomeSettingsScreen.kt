@@ -23,6 +23,7 @@ fun MinimalHomeSettingsScreen() {
     val enabled by settings.enabled.collectAsStateWithLifecycle(true)
     val showIcons by settings.showIcons.collectAsStateWithLifecycle(true)
     val railOnLeft by settings.railOnLeft.collectAsStateWithLifecycle(false)
+    val notificationPreviews by settings.notificationPreviews.collectAsStateWithLifecycle(true)
 
     PreferenceScreen(title = stringResource(R.string.fork_preference_screen_minimal_home)) {
         item {
@@ -39,6 +40,14 @@ fun MinimalHomeSettingsScreen() {
                     icon = R.drawable.apps_24px,
                     value = showIcons,
                     onValueChanged = settings::setShowIcons,
+                    enabled = enabled,
+                )
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_minimal_home_notification_previews),
+                    summary = stringResource(R.string.fork_preference_minimal_home_notification_previews_summary),
+                    icon = R.drawable.notifications_24px,
+                    value = notificationPreviews,
+                    onValueChanged = settings::setNotificationPreviews,
                     enabled = enabled,
                 )
                 SwitchPreference(

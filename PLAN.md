@@ -121,7 +121,7 @@ En este Mac no hay JDK, Android SDK ni `adb`.
 ## 5. Diseño — la home nueva
 
 > **Estado (fase 2, ✅ MVP):** vive en `app/ui/.../ui/home/` (paquete nuevo dentro de `app/ui`, no un módulo aparte: necesita el tema, los íconos y el scaffold de `app/ui`, y los archivos nuevos no generan conflictos con upstream). Se integra como `MinimalHomeComponent` del scaffold, así los gestos y la búsqueda siguen funcionando. Ajustes → Inicio minimalista (activada por defecto, íconos sí/no, riel a la izquierda).
-> Hecho: reloj y fecha (abren reloj/calendario), línea de un vistazo (próximo evento, clima, alarma), favoritos, riel con ola + háptica, soltar despliega las apps de la letra. Pendiente para la fase 3: shortcuts inline, notificaciones en la lista, menú propio al mantener pulsado (hoy abre la hoja de Kvaesitso), letras especiales ★ ◷ 🔒.
+> Hecho: reloj y fecha (abren reloj/calendario), línea de un vistazo (próximo evento, clima, alarma), favoritos, riel con ola + háptica, soltar despliega las apps de la letra. **Fase 3 ✅:** entradas especiales del riel (★ favoritos, ◷ frecuentes, 🔒 ocultas, que pide autenticación al soltar), punto y vista previa de la última notificación por app, deslizar una app a la derecha despliega sus shortcuts, menú propio al mantener pulsado (fijar, atajos, personalizar, ocultar/mostrar, info, desinstalar).
 
 ### 5.1 Concepto visual
 Minimalismo tipográfico: fondo = tu wallpaper, sin tarjetas, sin sombras. Una sola tipografía variable (p. ej. *Inter* o *Manrope*, empaquetada; no Google Fonts en runtime), jerarquía solo por tamaño/peso. Colores dinámicos de Material You con acento único. Íconos opcionales (lista solo con texto como en Niagara, o íconos monocromos).

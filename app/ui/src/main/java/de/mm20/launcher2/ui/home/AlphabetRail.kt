@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +32,9 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import de.mm20.launcher2.ui.R
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -54,6 +58,7 @@ fun AlphabetRail(
     letters: List<Char>,
     selected: Char?,
     onLetter: (Char) -> Unit,
+    onRelease: (Char) -> Unit,
     onDragStateChange: (dragging: Boolean) -> Unit,
     color: Color,
     accent: Color,
@@ -67,6 +72,7 @@ fun AlphabetRail(
     val density = LocalDensity.current
     val bulgePx = with(density) { bulge.toPx() }
     val currentOnLetter by rememberUpdatedState(onLetter)
+    val currentOnRelease by rememberUpdatedState(onRelease)
     val currentOnDrag by rememberUpdatedState(onDragStateChange)
 
     var heightPx by remember { mutableIntStateOf(0) }
@@ -121,6 +127,7 @@ fun AlphabetRail(
                     }
                     touchY = Float.NaN
                     currentOnDrag(false)
+                    if (lastIndex >= 0) currentOnRelease(letters[lastIndex])
                 }
             },
         contentAlignment = Alignment.Center,
@@ -128,29 +135,41 @@ fun AlphabetRail(
         Column(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
             letters.forEachIndexed { index, letter ->
                 val isSelected = letter == selected
+                val waveModifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .wrapContentHeight(Alignment.CenterVertically)
+                    .graphicsLayer {
+                        if (waveStrength == 0f || heightPx == 0) return@graphicsLayer
+                        val slot = heightPx.toFloat() / letters.size
+                        val center = slot * (index + 0.5f)
+                        val distance = abs(lastY - center) / (slot * 3.5f)
+                        val influence = max(0f, 1f - distance).let { it * it } * waveStrength
+                        val scale = 1f + 1.4f * influence
+                        scaleX = scale
+                        scaleY = scale
+                        translationX = (if (railOnLeft) 1f else -1f) * bulgePx * influence
+                        transformOrigin = TransformOrigin.Center
+                    }
+                if (letter == MinimalHomeVM.HIDDEN) {
+                    Box(waveModifier, contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(R.drawable.lock_20px),
+                            contentDescription = null,
+                            tint = if (isSelected) accent else color.copy(alpha = 0.72f),
+                            modifier = Modifier.size(12.dp),
+                        )
+                    }
+                    return@forEachIndexed
+                }
                 Text(
                     text = letter.toString(),
                     textAlign = TextAlign.Center,
                     color = if (isSelected) accent else color.copy(alpha = 0.72f),
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                    fontSize = 12.sp,
+                    fontSize = if (letter == MinimalHomeVM.RECENT || letter == MinimalHomeVM.STAR) 15.sp else 12.sp,
                     style = MaterialTheme.typography.labelSmall,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .wrapContentHeight(Alignment.CenterVertically)
-                        .graphicsLayer {
-                            if (waveStrength == 0f || heightPx == 0) return@graphicsLayer
-                            val slot = heightPx.toFloat() / letters.size
-                            val center = slot * (index + 0.5f)
-                            val distance = abs(lastY - center) / (slot * 3.5f)
-                            val influence = max(0f, 1f - distance).let { it * it } * waveStrength
-                            val scale = 1f + 1.4f * influence
-                            scaleX = scale
-                            scaleY = scale
-                            translationX = (if (railOnLeft) 1f else -1f) * bulgePx * influence
-                            transformOrigin = TransformOrigin.Center
-                        },
+                    modifier = waveModifier,
                 )
             }
         }

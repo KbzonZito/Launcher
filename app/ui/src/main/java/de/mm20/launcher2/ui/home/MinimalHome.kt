@@ -40,6 +40,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -63,6 +64,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
+import de.mm20.launcher2.notifications.Notification
+import de.mm20.launcher2.search.Application
 import de.mm20.launcher2.search.CalendarEvent
 import de.mm20.launcher2.search.SavableSearchable
 import de.mm20.launcher2.ui.R
@@ -70,6 +73,7 @@ import de.mm20.launcher2.ui.component.ShapedLauncherIcon
 import de.mm20.launcher2.ui.launcher.sheets.LocalBottomSheetManager
 import de.mm20.launcher2.ui.locals.LocalMeasurementSystem
 import de.mm20.launcher2.ui.locals.LocalPreferDarkContentOverWallpaper
+import de.mm20.launcher2.ui.privacy.HiddenItemsLock
 import de.mm20.launcher2.ui.utils.formatTemperature
 import kotlinx.coroutines.delay
 import java.util.Date
@@ -97,6 +101,29 @@ fun MinimalHome(
     val selectedLetter by vm.selectedLetter.collectAsState()
     val showIcons by vm.showIcons.collectAsState()
     val railOnLeft by vm.railOnLeft.collectAsState()
+    val frequentApps by vm.frequentApps.collectAsState()
+    val hiddenApps by vm.hiddenApps.collectAsState()
+    val notificationsByPackage by vm.notificationsByPackage.collectAsState()
+    val notificationPreviews by vm.notificationPreviews.collectAsState()
+    val hiddenUnlocked by HiddenItemsLock.unlocked.collectAsState()
+
+    val railEntries = remember(appsByLetter.keys, hiddenApps.isNotEmpty()) {
+        buildList {
+            add(MinimalHomeVM.STAR)
+            add(MinimalHomeVM.RECENT)
+            addAll(appsByLetter.keys)
+            if (hiddenApps.isNotEmpty()) add(MinimalHomeVM.HIDDEN)
+        }
+    }
+
+    // Las ocultas solo se ven desbloqueadas; si el candado se cierra, se vuelve a favoritos.
+    LaunchedEffect(hiddenUnlocked, selectedLetter) {
+        if (selectedLetter == MinimalHomeVM.HIDDEN && !hiddenUnlocked) vm.selectLetter(null)
+    }
+    DisposableEffect(selectedLetter) {
+        HiddenItemsLock.hiddenContentVisible = selectedLetter == MinimalHomeVM.HIDDEN
+        onDispose { HiddenItemsLock.hiddenContentVisible = false }
+    }
 
     BackHandler(enabled = selectedLetter != null) { vm.selectLetter(null) }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { vm.selectLetter(null) }
@@ -130,39 +157,49 @@ fun MinimalHome(
                     contentAlignment = Alignment.BottomStart,
                     label = "homeList",
                 ) { letter ->
-                    if (letter == null && favorites.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.fork_minimal_home_empty_favorites),
-                            style = TextStyle(fontSize = 15.sp, shadow = shadow),
-                            color = contentColor.copy(alpha = 0.7f),
-                            modifier = Modifier.padding(bottom = 8.dp),
-                        )
-                    } else if (letter == null) {
-                        HomeList(
-                            items = favorites,
-                            vm = vm,
-                            showIcons = showIcons,
-                            shadow = shadow,
-                            listState = listState,
-                            onLaunch = onLaunch,
-                        )
-                    } else {
-                        Column {
+                    val (header, items) = when (letter) {
+                        null -> null to favorites
+                        MinimalHomeVM.RECENT -> stringResource(R.string.fork_minimal_home_frequent) to frequentApps
+                        MinimalHomeVM.HIDDEN -> stringResource(R.string.fork_minimal_home_hidden) to hiddenApps
+                        else -> letter.toString() to appsByLetter[letter].orEmpty()
+                    }
+                    Column {
+                        if (header != null) {
                             Text(
-                                text = letter.toString(),
+                                text = header,
                                 color = accent,
-                                style = TextStyle(fontSize = 44.sp, fontWeight = FontWeight.Light, shadow = shadow),
+                                style = TextStyle(
+                                    fontSize = if (header.length == 1) 44.sp else 28.sp,
+                                    fontWeight = FontWeight.Light,
+                                    shadow = shadow,
+                                ),
                                 modifier = Modifier.padding(bottom = 4.dp).combinedClickable(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = null,
                                     onClick = { vm.selectLetter(null) },
                                 ),
                             )
+                        }
+                        if (items.isEmpty()) {
+                            Text(
+                                text = stringResource(
+                                    if (letter == null) R.string.fork_minimal_home_empty_favorites
+                                    else R.string.fork_minimal_home_empty_section
+                                ),
+                                style = TextStyle(fontSize = 15.sp, shadow = shadow),
+                                color = contentColor.copy(alpha = 0.7f),
+                                modifier = Modifier.padding(bottom = 8.dp),
+                            )
+                        } else {
                             HomeList(
-                                items = appsByLetter[letter].orEmpty(),
+                                items = items,
                                 vm = vm,
                                 showIcons = showIcons,
+                                notifications = notificationsByPackage,
+                                showPreview = notificationPreviews,
+                                isHiddenSection = letter == MinimalHomeVM.HIDDEN,
                                 shadow = shadow,
+                                accent = accent,
                                 listState = listState,
                                 onLaunch = onLaunch,
                             )
@@ -173,9 +210,20 @@ fun MinimalHome(
             }
 
             AlphabetRail(
-                letters = appsByLetter.keys.toList(),
-                selected = selectedLetter,
-                onLetter = { vm.selectLetter(it) },
+                letters = railEntries,
+                selected = selectedLetter ?: MinimalHomeVM.STAR,
+                onLetter = { entry ->
+                    when (entry) {
+                        MinimalHomeVM.STAR -> vm.selectLetter(null)
+                        MinimalHomeVM.HIDDEN -> Unit // se resuelve al soltar, para no pedir la huella al pasar
+                        else -> vm.selectLetter(entry)
+                    }
+                },
+                onRelease = { entry ->
+                    if (entry == MinimalHomeVM.HIDDEN) {
+                        HiddenItemsLock.requestUnlock { vm.selectLetter(MinimalHomeVM.HIDDEN) }
+                    }
+                },
                 onDragStateChange = {},
                 color = contentColor,
                 accent = accent,
@@ -188,49 +236,37 @@ fun MinimalHome(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HomeList(
     items: List<SavableSearchable>,
     vm: MinimalHomeVM,
     showIcons: Boolean,
+    notifications: Map<String, List<Notification>>,
+    showPreview: Boolean,
+    isHiddenSection: Boolean,
     shadow: Shadow?,
+    accent: Color,
     listState: LazyListState,
     onLaunch: (SavableSearchable) -> Unit,
 ) {
-    val sheetManager = LocalBottomSheetManager.current
-    val iconSizePx = with(LocalDensity.current) { 30.dp.roundToPx() }
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxWidth().heightIn(max = 460.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         items(items, key = { it.key }) { item ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .animateItem()
-                    .combinedClickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = { onLaunch(item) },
-                        onLongClick = { sheetManager.showCustomizeSearchableModal(item) },
-                    )
-                    .padding(vertical = 9.dp),
-            ) {
-                if (showIcons) {
-                    val icon by remember(item.key) { vm.icon(item, iconSizePx) }.collectAsState(null)
-                    ShapedLauncherIcon(size = 30.dp, icon = { icon })
-                    Spacer(Modifier.width(16.dp))
-                }
-                Text(
-                    text = item.displayLabel,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Normal, shadow = shadow),
-                )
-            }
+            HomeAppRow(
+                item = item,
+                vm = vm,
+                showIcons = showIcons,
+                notifications = (item as? Application)?.let { notifications[it.componentName.packageName] }.orEmpty(),
+                showPreview = showPreview,
+                isHiddenItem = isHiddenSection,
+                shadow = shadow,
+                accent = accent,
+                onLaunch = onLaunch,
+                modifier = Modifier.animateItem(),
+            )
         }
     }
 }

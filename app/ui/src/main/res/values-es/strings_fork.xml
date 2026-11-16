@@ -22,4 +22,18 @@
     <string name="fork_preference_minimal_home_rail_left">Alfabeto a la izquierda</string>
     <string name="fork_preference_minimal_home_rail_left_summary">Para usar el teléfono con la mano izquierda</string>
     <string name="fork_minimal_home_empty_favorites">Elige una letra a la derecha para ver tus apps. Mantén pulsada una app → fíjala en favoritos.</string>
+    <string name="fork_minimal_home_frequent">Frecuentes</string>
+    <string name="fork_minimal_home_hidden">Ocultas</string>
+    <string name="fork_minimal_home_empty_section">Todavía no hay nada aquí.</string>
+    <string name="fork_minimal_home_no_shortcuts">Sin atajos</string>
+    <string name="fork_menu_pin">Fijar en favoritos</string>
+    <string name="fork_menu_unpin">Quitar de favoritos</string>
+    <string name="fork_menu_shortcuts">Atajos</string>
+    <string name="fork_menu_customize">Renombrar, ícono, etiquetas…</string>
+    <string name="fork_menu_hide">Ocultar</string>
+    <string name="fork_menu_unhide">Mostrar</string>
+    <string name="fork_menu_app_info">Información de la app</string>
+    <string name="fork_menu_uninstall">Desinstalar</string>
+    <string name="fork_preference_minimal_home_notification_previews">Vista previa de notificaciones</string>
+    <string name="fork_preference_minimal_home_notification_previews_summary">Mostrar la última notificación debajo de cada app</string>
 </resources>

@@ -47,7 +47,8 @@ class LauncherPrivacyGuard(
                 val sensitiveOnScreen = snapshotFlow {
                     searchVM.searchQuery.value.isNotEmpty() ||
                             searchVM.filters.value.hiddenItems ||
-                            sheetManager.hiddenItemsSheetShown.value
+                            sheetManager.hiddenItemsSheetShown.value ||
+                            HiddenItemsLock.hiddenContentVisible
                 }
                 combine(sensitiveOnScreen, privacySettings.secureScreens) { sensitive, enabled ->
                     sensitive && enabled
