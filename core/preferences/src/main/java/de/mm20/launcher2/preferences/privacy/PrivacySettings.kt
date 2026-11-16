@@ -18,4 +18,28 @@ class PrivacySettings internal constructor(
     fun setOfflineMode(enabled: Boolean) {
         dataStore.update { it.copy(privacyOfflineMode = enabled) }
     }
+
+    /** Pedir autenticación antes de mostrar apps ocultas. */
+    val protectHiddenItems: Flow<Boolean>
+        get() = dataStore.data.map { it.privacyProtectHiddenItems }.distinctUntilChanged()
+
+    fun setProtectHiddenItems(enabled: Boolean) {
+        dataStore.update { it.copy(privacyProtectHiddenItems = enabled) }
+    }
+
+    /** No registrar aperturas de apps/resultados. */
+    val incognito: Flow<Boolean>
+        get() = dataStore.data.map { it.privacyIncognito }.distinctUntilChanged()
+
+    fun setIncognito(enabled: Boolean) {
+        dataStore.update { it.copy(privacyIncognito = enabled) }
+    }
+
+    /** FLAG_SECURE mientras se muestra la búsqueda o las apps ocultas. */
+    val secureScreens: Flow<Boolean>
+        get() = dataStore.data.map { it.privacySecureScreens }.distinctUntilChanged()
+
+    fun setSecureScreens(enabled: Boolean) {
+        dataStore.update { it.copy(privacySecureScreens = enabled) }
+    }
 }

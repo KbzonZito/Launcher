@@ -85,7 +85,7 @@ fun LauncherSearchBar(
                 ) {
                     IconToggleButton(
                         checked = sheetManager.hiddenItemsSheetShown.value,
-                        onCheckedChange = { if (it) sheetManager.showHiddenItemsSheet() },
+                        onCheckedChange = { if (it) de.mm20.launcher2.ui.privacy.HiddenItemsLock.requestUnlock { sheetManager.showHiddenItemsSheet() } }, // [fork]
                     ) {
                         Icon(
                             painter = painterResource(

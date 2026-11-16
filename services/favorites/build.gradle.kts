@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:preferences")) // [fork]
     implementation(libs.bundles.kotlin)
     implementation(libs.androidx.core)
     implementation(libs.koin.android)

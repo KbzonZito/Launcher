@@ -1,5 +1,9 @@
 package de.mm20.launcher2.services.favorites
 
+import kotlinx.coroutines.launch
+
+import kotlinx.coroutines.flow.first
+
 import de.mm20.launcher2.search.SavableSearchable
 import de.mm20.launcher2.searchable.PinnedLevel
 import de.mm20.launcher2.searchable.SavableSearchableRepository
@@ -8,7 +12,10 @@ import kotlinx.coroutines.flow.Flow
 
 class FavoritesService(
     private val searchableRepository: SavableSearchableRepository,
+    private val privacySettings: de.mm20.launcher2.preferences.privacy.PrivacySettings, // [fork]
 ) {
+    private val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO + kotlinx.coroutines.SupervisorJob()) // [fork]
+
     fun getFavorites(
         includeTypes: List<String>? = null,
         excludeTypes: List<String>? = null,
@@ -66,7 +73,10 @@ class FavoritesService(
     }
 
     fun reportLaunch(searchable: SavableSearchable) {
-        searchableRepository.touch(searchable)
+        // [fork] Modo incógnito: no se registra la apertura.
+        scope.launch {
+            if (!privacySettings.incognito.first()) searchableRepository.touch(searchable)
+        }
     }
 
     fun updateFavorites(

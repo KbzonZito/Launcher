@@ -2,8 +2,17 @@
 <!-- [fork] Strings added by this fork -->
 <resources>
     <string name="fork_preference_screen_privacy">Privacy</string>
-    <string name="fork_preference_screen_privacy_summary">Offline mode, network access</string>
+    <string name="fork_preference_screen_privacy_summary">Hidden apps lock, incognito, offline mode</string>
     <string name="fork_preference_offline_mode">Offline mode</string>
     <string name="fork_preference_offline_mode_summary">Block all network access: online search results, weather and exchange rate updates, and remote images</string>
     <string name="fork_preference_offline_mode_info">Breezy Weather and weather plugins keep working because they read data from apps on this device.</string>
+    <string name="fork_preference_category_on_device">On this device</string>
+    <string name="fork_preference_category_network">Network</string>
+    <string name="fork_preference_protect_hidden_items">Lock hidden apps</string>
+    <string name="fork_preference_protect_hidden_items_summary">Ask for fingerprint, face or device PIN before showing hidden apps</string>
+    <string name="fork_unlock_hidden_items_title">Show hidden apps</string>
+    <string name="fork_preference_incognito">Incognito</string>
+    <string name="fork_preference_incognito_summary">Don\'t record app launches: frequently used apps and search ranking stop learning</string>
+    <string name="fork_preference_secure_screens">Protect search from screenshots</string>
+    <string name="fork_preference_secure_screens_summary">Block screenshots and screen recording while search results or hidden apps are on screen</string>
 </resources>

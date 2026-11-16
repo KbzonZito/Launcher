@@ -12,4 +12,13 @@ class PrivacySettingsScreenVM : ViewModel(), KoinComponent {
     val offlineMode = privacySettings.offlineMode
 
     fun setOfflineMode(enabled: Boolean) = privacySettings.setOfflineMode(enabled)
+
+    val protectHiddenItems = privacySettings.protectHiddenItems
+    fun setProtectHiddenItems(enabled: Boolean) = privacySettings.setProtectHiddenItems(enabled)
+
+    val incognito = privacySettings.incognito
+    fun setIncognito(enabled: Boolean) = privacySettings.setIncognito(enabled)
+
+    val secureScreens = privacySettings.secureScreens
+    fun setSecureScreens(enabled: Boolean) = privacySettings.setSecureScreens(enabled)
 }

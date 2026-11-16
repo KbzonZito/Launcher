@@ -72,6 +72,7 @@ android {
 
 
 dependencies {
+    implementation(libs.androidx.biometric) // [fork]
     implementation(libs.bundles.kotlin)
 
     implementation(libs.androidx.compose.runtime)

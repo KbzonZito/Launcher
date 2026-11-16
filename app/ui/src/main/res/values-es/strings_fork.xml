@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="fork_preference_screen_privacy">Privacidad</string>
-    <string name="fork_preference_screen_privacy_summary">Modo offline, acceso a la red</string>
+    <string name="fork_preference_screen_privacy_summary">Candado de apps ocultas, incógnito, modo offline</string>
     <string name="fork_preference_offline_mode">Modo offline</string>
     <string name="fork_preference_offline_mode_summary">Bloquea todo acceso a la red: resultados online, actualización del clima y del tipo de cambio, e imágenes remotas</string>
     <string name="fork_preference_offline_mode_info">Breezy Weather y los plugins de clima siguen funcionando porque leen los datos de apps del dispositivo.</string>
+    <string name="fork_preference_category_on_device">En este dispositivo</string>
+    <string name="fork_preference_category_network">Red</string>
+    <string name="fork_preference_protect_hidden_items">Bloquear apps ocultas</string>
+    <string name="fork_preference_protect_hidden_items_summary">Pedir huella, rostro o PIN del dispositivo antes de mostrar las apps ocultas</string>
+    <string name="fork_unlock_hidden_items_title">Mostrar apps ocultas</string>
+    <string name="fork_preference_incognito">Incógnito</string>
+    <string name="fork_preference_incognito_summary">No registrar las aperturas: las apps frecuentes y el orden de la búsqueda dejan de aprender</string>
+    <string name="fork_preference_secure_screens">Proteger la búsqueda de capturas</string>
+    <string name="fork_preference_secure_screens_summary">Bloquea capturas y grabación de pantalla mientras se ven resultados de búsqueda o apps ocultas</string>
 </resources>
