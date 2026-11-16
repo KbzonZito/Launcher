@@ -9,6 +9,8 @@ plugins {
 android {
     androidResources {
         generateLocaleConfig = true
+        // [fork] Solo español e inglés en el APK; las traducciones siguen en el repo para no generar conflictos con upstream.
+        localeFilters += listOf("en", "es")
     }
 
     packaging {
