@@ -46,7 +46,6 @@ import de.mm20.launcher2.ui.settings.locations.LocationsSettingsRoute
 import de.mm20.launcher2.ui.settings.searchactions.SearchActionsSettingsRoute
 import de.mm20.launcher2.ui.settings.tags.TagsSettingsRoute
 import de.mm20.launcher2.ui.settings.unitconverter.UnitConverterSettingsRoute
-import de.mm20.launcher2.ui.settings.wikipedia.WikipediaSettingsRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -83,7 +82,6 @@ fun SearchSettingsScreen() {
     val contacts by viewModel.contacts.collectAsStateWithLifecycle(null)
     val calculator by viewModel.calculator.collectAsStateWithLifecycle(null)
     val unitConverter by viewModel.unitConverter.collectAsStateWithLifecycle(null)
-    val wikipedia by viewModel.wikipedia.collectAsStateWithLifecycle(null)
     val websites by viewModel.websites.collectAsStateWithLifecycle(null)
 
 
@@ -244,19 +242,6 @@ fun SearchSettingsScreen() {
                     },
                     onClick = {
                         backStack.add(UnitConverterSettingsRoute)
-                    }
-                )
-
-                PreferenceWithSwitch(
-                    title = stringResource(R.string.preference_search_wikipedia),
-                    summary = stringResource(R.string.preference_search_wikipedia_summary),
-                    icon = R.drawable.wikipedia,
-                    switchValue = wikipedia == true,
-                    onSwitchChanged = {
-                        viewModel.setWikipedia(it)
-                    },
-                    onClick = {
-                        backStack.add(WikipediaSettingsRoute)
                     }
                 )
 

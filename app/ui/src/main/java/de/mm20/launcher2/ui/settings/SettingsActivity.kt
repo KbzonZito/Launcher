@@ -150,8 +150,6 @@ import de.mm20.launcher2.ui.settings.unitconverter.UnitConverterSettingsRoute
 import de.mm20.launcher2.ui.settings.unitconverter.UnitConverterSettingsScreen
 import de.mm20.launcher2.ui.settings.weather.WeatherIntegrationSettingsRoute
 import de.mm20.launcher2.ui.settings.weather.WeatherIntegrationSettingsScreen
-import de.mm20.launcher2.ui.settings.wikipedia.WikipediaSettingsRoute
-import de.mm20.launcher2.ui.settings.wikipedia.WikipediaSettingsScreen
 import de.mm20.launcher2.ui.theme.LauncherTheme
 import de.mm20.launcher2.ui.theme.wallpaperColorsAsState
 
@@ -221,9 +219,6 @@ class SettingsActivity : BaseActivity() {
             }
             entry<UnitConverterHelpSettingsRoute> {
                 UnitConverterHelpSettingsScreen()
-            }
-            entry<WikipediaSettingsRoute> {
-                WikipediaSettingsScreen()
             }
             entry<LocationsSettingsRoute> {
                 LocationsSettingsScreen()

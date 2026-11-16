@@ -134,7 +134,6 @@ dependencies {
     implementation(project(":data:widgets"))
     implementation(project(":data:searchable"))
     implementation(project(":data:themes"))
-    implementation(project(":data:wikipedia"))
     implementation(project(":services:badges"))
     implementation(project(":core:crashreporter"))
     implementation(project(":data:notifications"))
