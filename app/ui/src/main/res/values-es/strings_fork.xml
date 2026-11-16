@@ -64,4 +64,6 @@
     <string name="fork_preference_weather_app">El clima abre</string>
     <string name="fork_preference_calendar_app">La fecha abre</string>
     <string name="fork_preference_linked_app_auto">Automático</string>
+    <string name="fork_about_source">Código fuente</string>
+    <string name="fork_about_based_on">Basado en Kvaesitso</string>
 </resources>

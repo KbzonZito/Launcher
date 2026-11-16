@@ -95,35 +95,25 @@ fun AboutSettingsScreen() {
             }
         }
         item {
+            // [fork] Enlaces propios + atribución al proyecto original (GPL-3.0).
             PreferenceCategory(title = stringResource(id = R.string.preference_category_links)) {
                 Preference(
                     icon = R.drawable.github,
-                    title = "GitHub",
-                    summary = "github.com/MM2-0/Kvaesitso",
+                    title = stringResource(R.string.fork_about_source),
+                    summary = "github.com/KbzonZito/Launcher",
+                    onClick = {
+                        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
+                            data = "https://github.com/KbzonZito/Launcher".toUri()
+                        })
+                    }
+                )
+                Preference(
+                    icon = R.drawable.github,
+                    title = stringResource(R.string.fork_about_based_on),
+                    summary = "github.com/MM2-0/Kvaesitso · GPL-3.0",
                     onClick = {
                         context.startActivity(Intent(Intent.ACTION_VIEW).apply {
                             data = "https://github.com/MM2-0/Kvaesitso".toUri()
-                        })
-                    }
-                )
-                Preference(
-                    icon = R.drawable.telegram,
-                    title = stringResource(id = R.string.preference_about_telegram),
-                    summary = "t.me/Kvaesitso",
-                    onClick = {
-                        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-                            data = "https://t.me/Kvaesitso".toUri()
-                        })
-                    }
-                )
-                Preference(
-                    icon = R.drawable.fdroid,
-                    title = stringResource(id = R.string.preference_about_fdroid),
-                    summary = "fdroid.mm20.de",
-                    onClick = {
-                        context.startActivity(Intent(Intent.ACTION_VIEW).apply {
-                            data =
-                                "https://fdroid.mm20.de".toUri()
                         })
                     }
                 )
