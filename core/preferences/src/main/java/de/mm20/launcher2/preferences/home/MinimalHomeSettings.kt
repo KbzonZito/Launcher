@@ -25,4 +25,9 @@ class MinimalHomeSettings internal constructor(
         get() = dataStore.data.map { it.minimalHomeRailOnLeft }.distinctUntilChanged()
 
     fun setRailOnLeft(left: Boolean) = dataStore.update { it.copy(minimalHomeRailOnLeft = left) }
+
+    val notificationPreviews: Flow<Boolean>
+        get() = dataStore.data.map { it.minimalHomeNotificationPreviews }.distinctUntilChanged()
+
+    fun setNotificationPreviews(show: Boolean) = dataStore.update { it.copy(minimalHomeNotificationPreviews = show) }
 }

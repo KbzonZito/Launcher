@@ -114,6 +114,7 @@ data class LauncherSettingsData internal constructor(
     val minimalHomeEnabled: Boolean = true,
     val minimalHomeShowIcons: Boolean = true,
     val minimalHomeRailOnLeft: Boolean = false,
+    val minimalHomeNotificationPreviews: Boolean = true,
 
     val badgesNotifications: Boolean = true,
     val badgesSuspendedApps: Boolean = true,

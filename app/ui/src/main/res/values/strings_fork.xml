@@ -23,4 +23,18 @@
     <string name="fork_preference_minimal_home_rail_left">Alphabet on the left</string>
     <string name="fork_preference_minimal_home_rail_left_summary">For using the phone with your left hand</string>
     <string name="fork_minimal_home_empty_favorites">Pick a letter on the right to see your apps. Long-press an app → pin it to favorites.</string>
+    <string name="fork_minimal_home_frequent">Frequent</string>
+    <string name="fork_minimal_home_hidden">Hidden</string>
+    <string name="fork_minimal_home_empty_section">Nothing here yet.</string>
+    <string name="fork_minimal_home_no_shortcuts">No shortcuts</string>
+    <string name="fork_menu_pin">Pin to favorites</string>
+    <string name="fork_menu_unpin">Remove from favorites</string>
+    <string name="fork_menu_shortcuts">Shortcuts</string>
+    <string name="fork_menu_customize">Rename, icon, tags…</string>
+    <string name="fork_menu_hide">Hide</string>
+    <string name="fork_menu_unhide">Unhide</string>
+    <string name="fork_menu_app_info">App info</string>
+    <string name="fork_menu_uninstall">Uninstall</string>
+    <string name="fork_preference_minimal_home_notification_previews">Notification previews</string>
+    <string name="fork_preference_minimal_home_notification_previews_summary">Show the latest notification under each app</string>
 </resources>
