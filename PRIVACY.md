@@ -23,15 +23,15 @@ Ajustes → Privacidad → **Modo offline**. Con él activo:
 - No se descarga el tipo de cambio.
 - Las imágenes remotas solo se muestran si ya estaban en caché.
 
-Excepción conocida: los mosaicos de mapa de un lugar guardado en favoritos usan su propio cargador de imágenes y no respetan el modo offline todavía.
+Los mosaicos de mapa también respetan el modo offline (solo caché).
 
 ## Protección en el dispositivo (fase 1b) ✅
 Ajustes → Privacidad → *En este dispositivo*:
 - **Bloquear apps ocultas**: pide huella, rostro o PIN del dispositivo antes de mostrarlas, ya sea desde el filtro de la búsqueda, el botón de ocultas o Ajustes → Apps ocultas. Desactivar la protección también pide autenticación. Se vuelve a bloquear cada vez que el launcher deja de verse (abrir una app, apagar la pantalla).
 - **Incógnito**: no registra aperturas; las apps frecuentes y el orden de la búsqueda dejan de aprender.
+- **Borrar estadísticas de uso**: pone a cero lo aprendido (favoritos fijados y ocultas se mantienen).
 - **Proteger la búsqueda de capturas** (activado por defecto): `FLAG_SECURE` mientras hay texto en la búsqueda, el filtro de ocultas activo o la hoja de ocultas abierta. La home normal sí se puede capturar.
 
 ## Pendiente
 - Espacio privado propio y, más adelante, integración con la Carpeta segura de Samsung / Private Space de Android.
-- Botón para borrar las estadísticas de uso ya registradas.
 - Backups cifrados con contraseña.

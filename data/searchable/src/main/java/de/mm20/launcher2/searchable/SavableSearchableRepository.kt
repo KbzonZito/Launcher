@@ -133,6 +133,9 @@ interface SavableSearchableRepository : Backupable {
      * - entries that are inconsistent (the key column is not equal to the key of the searchable)
      */
     suspend fun cleanupDatabase(): Int
+
+    /** [fork] Pone a cero aperturas y peso de todos los elementos (no toca favoritos fijados ni ocultos). */
+    fun resetUsageStats()
 }
 
 internal class SavableSearchableRepositoryImpl(
@@ -505,6 +508,10 @@ internal class SavableSearchableRepositoryImpl(
                 CrashReporter.logException(e)
             }
         }
+    }
+
+    override fun resetUsageStats() { // [fork]
+        scope.launch { database.searchableDao().resetUsageStats() }
     }
 
     override suspend fun cleanupDatabase(): Int {
