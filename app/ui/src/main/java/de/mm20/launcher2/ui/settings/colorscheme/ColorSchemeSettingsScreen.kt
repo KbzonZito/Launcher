@@ -398,7 +398,7 @@ fun ColorSchemeSettingsScreen(themeId: UUID) {
                             foregroundLayer = TintedIconLayer(
                                 ContextCompat.getDrawable(
                                     context,
-                                    R.drawable.ic_launcher_monochrome
+                                    R.drawable.fork_ic_launcher_monochrome
                                 )!!,
                                 scale = 1.5f,
                             ),

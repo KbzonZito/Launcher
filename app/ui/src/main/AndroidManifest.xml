@@ -45,7 +45,7 @@
             android:excludeFromRecents="true"
             android:exported="true"
             android:launchMode="singleTop"
-            android:taskAffinity="de.mm20.launcher2.assistant"
+            android:taskAffinity="${applicationId}.assistant"
             android:resumeWhilePausing="true"
             android:stateNotNeeded="true"
             android:theme="@style/AssistantTheme"
@@ -74,15 +74,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.mm20.launcher2.ui.launcher.LauncherActivity" />
 
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https"/>
-                <data android:path="/in-app"/>
-                <data android:path="/in-app.html"/>
-                <data android:host="kvaesitso.mm20.de"/>
-            </intent-filter>
+            <!-- [fork] sin enlaces a kvaesitso.mm20.de: no somos esa app -->
         </activity>
 
         <activity android:name=".launcher.sheets.BindAndConfigureAppWidgetActivity" />

@@ -43,11 +43,11 @@ fun CreateBackupSheet(
         )
         LaunchedEffect(null) {
             viewModel.reset()
-            val fileName = "${
+            val fileName = "launcher-${ // [fork]
                 ZonedDateTime.now().format(
                     DateTimeFormatter.ISO_INSTANT
                 ).replace(":", "_")
-            }.kvaesitso"
+            }.backup"
             backupLauncher.launch(fileName)
         }
 
