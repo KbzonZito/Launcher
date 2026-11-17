@@ -134,4 +134,13 @@
     <string name="fork_button_position_opposite">Opposite side</string>
     <string name="fork_button_position_center">Center</string>
     <string name="fork_edit_layout_hint_short">Drag the clock, the alphabet and the button</string>
+    <string name="fork_events_title">Upcoming</string>
+    <string name="fork_events_empty">No events today or tomorrow</string>
+    <string name="fork_events_all_day">All day</string>
+    <string name="fork_events_today">Today</string>
+    <string name="fork_events_tomorrow">Tomorrow</string>
+    <string name="fork_glance_more_events">+%1$d</string>
+    <string name="fork_glance_allow_location">Allow location for weather</string>
+    <string name="fork_preference_audio_media_apps">Music apps when audio connects</string>
+    <string name="fork_preference_audio_media_apps_summary">When Bluetooth headphones or a speaker connect, show your music apps under the clock</string>
 </resources>

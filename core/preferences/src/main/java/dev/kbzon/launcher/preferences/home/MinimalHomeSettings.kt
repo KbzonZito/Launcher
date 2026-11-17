@@ -120,6 +120,12 @@ class MinimalHomeSettings internal constructor(
 
     fun setActionButton(enabled: Boolean) = dataStore.update { it.copy(minimalHomeActionButton = enabled) }
 
+    /** Mostrar apps de música al conectar audio Bluetooth. */
+    val audioMediaApps: Flow<Boolean>
+        get() = dataStore.data.map { it.minimalHomeAudioMediaApps }.distinctUntilChanged()
+
+    fun setAudioMediaApps(enabled: Boolean) = dataStore.update { it.copy(minimalHomeAudioMediaApps = enabled) }
+
     val actionButtonPosition: Flow<ActionButtonPosition>
         get() = dataStore.data.map { it.minimalHomeActionButtonPosition }.distinctUntilChanged()
 

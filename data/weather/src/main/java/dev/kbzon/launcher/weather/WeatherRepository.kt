@@ -25,6 +25,7 @@ import org.koin.core.component.inject
 import java.time.Duration
 import java.util.*
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 interface WeatherRepository {
     fun getActiveProvider(): Flow<WeatherProviderInfo?>
@@ -261,7 +262,7 @@ class WeatherUpdateWorker(
 
     @OptIn(FlowPreview::class)
     private suspend fun getLastKnownLocation(): LatLon? = locationProvider.getLocation(skipCache = true)
-        .timeout(10.minutes)
+        .timeout(30.seconds) // [fork] antes 10 min: el clima quedaba esperando la ubicación
         .firstOrNull()
         .or { locationProvider.lastCachedLocation }
         ?.let { LatLon(it.latitude, it.longitude) }
