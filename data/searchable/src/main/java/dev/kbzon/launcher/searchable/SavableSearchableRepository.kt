@@ -116,6 +116,8 @@ interface SavableSearchableRepository : Backupable {
 
     fun getWeights(keys: List<String>): Flow<Map<String, Double>>
 
+    fun getLaunchCounts(keys: List<String>): Flow<Map<String, Int>>
+
     /**
      * Remove this item from the Searchable database
      */
@@ -402,6 +404,11 @@ internal class SavableSearchableRepositoryImpl(
     override fun getWeights(keys: List<String>): Flow<Map<String, Double>> {
         if (keys.size > 999) return flowOf(emptyMap())
         return database.searchableDao().getWeights(keys)
+    }
+
+    override fun getLaunchCounts(keys: List<String>): Flow<Map<String, Int>> {
+        if (keys.size > 999) return flowOf(emptyMap())
+        return database.searchableDao().getLaunchCounts(keys)
     }
 
     private suspend fun fromDatabaseEntity(entity: SavedSearchableEntity): SavedSearchable {

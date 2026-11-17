@@ -134,6 +134,7 @@ data class LauncherSettingsData internal constructor(
     val minimalHomeUsageSuggestions: Boolean = true,
     val minimalHomeRailDoubleTapLock: Boolean = true,
     val minimalHomeWaveIntensity: dev.kbzon.launcher.preferences.home.WaveIntensity = dev.kbzon.launcher.preferences.home.WaveIntensity.Normal,
+    val minimalHomeLetterSort: dev.kbzon.launcher.preferences.home.LetterSort = dev.kbzon.launcher.preferences.home.LetterSort.Alphabetical,
     val minimalHomeRailBothEdges: Boolean = true,
     // [fork] Fase 11
     val minimalHomeActionButton: Boolean = true,

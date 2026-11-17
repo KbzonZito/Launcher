@@ -105,6 +105,7 @@ import dev.kbzon.launcher.notifications.Notification
 import dev.kbzon.launcher.search.Application
 import dev.kbzon.launcher.search.CalendarEvent
 import dev.kbzon.launcher.search.SavableSearchable
+import dev.kbzon.launcher.search.Tag
 import dev.kbzon.launcher.ui.R
 import dev.kbzon.launcher.ui.component.ShapedLauncherIcon
 import dev.kbzon.launcher.ui.launcher.sheets.LocalBottomSheetManager
@@ -184,8 +185,10 @@ fun MinimalHome(
     var reorderMode by remember { mutableStateOf(false) }
     LaunchedEffect(selectedLetter) { if (selectedLetter != null) reorderMode = false }
 
+    var openFolder by remember { mutableStateOf<Tag?>(null) }
     val onLaunch: (SavableSearchable, IntRect?) -> Unit = { item, bounds ->
-        if (vm.launch(context, item, bounds)) vm.selectLetter(null)
+        if (item is Tag) openFolder = item
+        else if (vm.launch(context, item, bounds)) vm.selectLetter(null)
     }
 
     // [fork] Fase 11: acciones (pasan por el scaffold cuando hace falta animarlas), diseño y menú rápido.
@@ -218,12 +221,13 @@ fun MinimalHome(
             vm.selectLetter(null)
             quickMenuY = null
             eventsPopup = false
+            openFolder = null
             reorderMode = false
             if (editMode) { editMode = false; draftLayout = null }
         }
     }
-    BackHandler(enabled = editMode || quickMenuY != null || eventsPopup) {
-        if (eventsPopup) eventsPopup = false else if (quickMenuY != null) quickMenuY = null else { editMode = false; draftLayout = null }
+    BackHandler(enabled = editMode || quickMenuY != null || eventsPopup || openFolder != null) {
+        if (openFolder != null) openFolder = null else if (eventsPopup) eventsPopup = false else if (quickMenuY != null) quickMenuY = null else { editMode = false; draftLayout = null }
     }
     // B7: dónde va el botón según la posición elegida y el lado del alfabeto.
     val buttonAlign = when (buttonPosition) {
@@ -595,11 +599,19 @@ fun MinimalHome(
             }
 
             val eventsAhead by vm.eventsAhead.collectAsState()
+            HomeFolderPopup(
+                vm = vm,
+                folder = openFolder,
+                insets = insets,
+                onLaunch = { item -> openFolder = null; vm.launch(context, item) },
+                onDismiss = { openFolder = null },
+            )
             HomeEventsPopup(
                 visible = eventsPopup,
                 events = eventsAhead,
                 onEvent = { ev -> eventsPopup = false; vm.launch(context, ev) },
                 onDismiss = { eventsPopup = false },
+                insets = insets,
             )
 
             HomeQuickMenu(

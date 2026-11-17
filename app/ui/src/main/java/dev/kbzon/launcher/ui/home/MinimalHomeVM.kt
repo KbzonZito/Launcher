@@ -25,10 +25,16 @@ import dev.kbzon.launcher.permissions.PermissionGroup
 import dev.kbzon.launcher.permissions.PermissionsManager
 import dev.kbzon.launcher.preferences.home.MinimalClockStyle
 import dev.kbzon.launcher.preferences.home.MinimalHomeSettings
+import dev.kbzon.launcher.preferences.home.LetterSort
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import dev.kbzon.launcher.search.Application
 import dev.kbzon.launcher.search.CalendarEvent
 import dev.kbzon.launcher.search.SavableSearchable
 import dev.kbzon.launcher.search.SearchService
+import dev.kbzon.launcher.search.Tag
+import dev.kbzon.launcher.services.tags.TagsService
 import dev.kbzon.launcher.searchable.PinnedLevel
 import dev.kbzon.launcher.searchable.SavableSearchableRepository
 import dev.kbzon.launcher.searchable.VisibilityLevel
@@ -136,9 +142,38 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     /** Apps agrupadas por su letra índice, en orden. */
-    val appsByLetter: StateFlow<Map<Char, List<Application>>> = apps
+    val letterSort = homeSettings.letterSort.stateIn(viewModelScope, SharingStarted.Eagerly, LetterSort.Alphabetical)
+    fun setLetterSort(value: LetterSort) = homeSettings.setLetterSort(value)
+
+    /**
+     * Apps agrupadas por su letra índice, en orden. Dentro de cada letra se ordenan según
+     * [letterSort]; el orden alfabético de [apps] desempata (los sort de Kotlin son estables).
+     */
+    val appsByLetter: StateFlow<Map<Char, List<Application>>> = combine(apps, homeSettings.letterSort) { a, b -> a to b }
+        .flatMapLatest { (list, sort) ->
+            val keys = list.map { it.key }
+            when (sort) {
+                LetterSort.Alphabetical -> flowOf(list)
+                LetterSort.MostUsed -> searchableRepository.getLaunchCounts(keys)
+                    .map { counts -> list.sortedByDescending { counts[it.key] ?: 0 } }
+                LetterSort.Recent -> searchableRepository.getWeights(keys)
+                    .map { weights -> list.sortedByDescending { weights[it.key] ?: 0.0 } }
+                LetterSort.Newest -> flow {
+                    emit(list.sortedByDescending { installTime(it.componentName.packageName) })
+                }.flowOn(Dispatchers.IO)
+            }
+        }
         .map { list -> list.groupBy { indexLetter(it.displayLabel) }.toSortedMap(letterOrder) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
+
+    private val installTimes = java.util.concurrent.ConcurrentHashMap<String, Long>()
+    private fun installTime(pkg: String): Long = installTimes.getOrPut(pkg) {
+        try {
+            context.packageManager.getPackageInfo(pkg, 0).firstInstallTime
+        } catch (e: Exception) {
+            0L // p. ej. apps del perfil de trabajo que no están en el perfil personal
+        }
+    }
 
     /** Favoritos fijados por el usuario. */
     val favorites: StateFlow<List<SavableSearchable>> = favoritesService.getFavorites(
@@ -219,6 +254,75 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     }
     fun hide(item: SavableSearchable) = favoritesService.setVisibility(item, VisibilityLevel.Hidden)
     fun unhide(item: SavableSearchable) = favoritesService.setVisibility(item, VisibilityLevel.Default)
+
+    // ---- Fase 12: carpetas. Una carpeta es una etiqueta de Kvaesitso fijada en favoritos. ----
+    private val tagsService: TagsService by inject()
+
+    /** Carpetas que hay en favoritos, en el orden en que aparecen. */
+    val folders: StateFlow<List<Tag>> = favorites
+        .map { list -> list.filterIsInstance<Tag>() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+
+    /** Contenido de una carpeta, ordenado alfabéticamente (las etiquetas no guardan orden). */
+    fun folderItems(folder: Tag): Flow<List<SavableSearchable>> = tagsService.getTaggedItems(folder.tag)
+        .map { items ->
+            val collator = Collator.getInstance().apply { strength = Collator.PRIMARY }
+            items.sortedWith { a, b -> collator.compare(a.displayLabel, b.displayLabel) }
+        }
+
+    private suspend fun uniqueFolderName(name: String): String {
+        val existing = tagsService.getAllTags().first().toSet()
+        val base = name.trim().ifEmpty { "Carpeta" }
+        if (base !in existing) return base
+        var n = 2
+        while ("$base $n" in existing) n++
+        return "$base $n"
+    }
+
+    /**
+     * Crea una carpeta con [item] dentro. Si [item] era favorito, la carpeta ocupa su lugar;
+     * si no, se añade al final de los favoritos.
+     */
+    fun createFolder(name: String, item: SavableSearchable) = viewModelScope.launch {
+        val folder = Tag(uniqueFolderName(name))
+        tagsService.createTag(folder.tag, listOf(item))
+        val current = favorites.value
+        val index = current.indexOfFirst { it.key == item.key }
+        val updated = if (index >= 0) current.toMutableList().also { it[index] = folder } else current + folder
+        favoritesService.updateFavorites(manuallySorted = updated, automaticallySorted = emptyList())
+    }
+
+    /** Mete [item] en [folder]; si estaba en favoritos, sale de ahí (ya está en la carpeta). */
+    fun addToFolder(folder: Tag, item: SavableSearchable) = viewModelScope.launch {
+        val items = tagsService.getTaggedItems(folder.tag).first()
+        if (items.none { it.key == item.key }) {
+            tagsService.updateTag(folder.tag, items = items + item)
+        }
+        if (favorites.value.any { it.key == item.key }) unpin(item)
+    }
+
+    fun removeFromFolder(folder: Tag, item: SavableSearchable) = viewModelScope.launch {
+        val items = tagsService.getTaggedItems(folder.tag).first()
+        tagsService.updateTag(folder.tag, items = items.filterNot { it.key == item.key })
+    }
+
+    fun renameFolder(folder: Tag, newName: String) = viewModelScope.launch {
+        val name = newName.trim()
+        if (name.isEmpty() || name == folder.tag) return@launch
+        tagsService.updateTag(folder.tag, newName = uniqueFolderName(name))
+    }
+
+    /** Elimina la carpeta y devuelve sus apps a favoritos, en el lugar que ocupaba. */
+    fun deleteFolder(folder: Tag) = viewModelScope.launch {
+        val items = tagsService.getTaggedItems(folder.tag).first()
+        val current = favorites.value
+        val index = current.indexOfFirst { it.key == folder.key }.let { if (it < 0) current.size else it }
+        val rest = current.filterNot { it.key == folder.key }
+        val restored = items.filterNot { item -> rest.any { it.key == item.key } }
+        val updated = rest.toMutableList().apply { addAll(index.coerceAtMost(size), restored) }
+        favoritesService.updateFavorites(manuallySorted = updated, automaticallySorted = emptyList())
+        tagsService.deleteTag(folder.tag)
+    }
 
     /** Letra seleccionada en el riel; null = se muestran los favoritos. */
     val selectedLetter = MutableStateFlow<Char?>(null)

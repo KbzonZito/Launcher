@@ -142,4 +142,17 @@
     <string name="fork_glance_allow_location">Permitir ubicación para el clima</string>
     <string name="fork_preference_audio_media_apps">Apps de música al conectar audio</string>
     <string name="fork_preference_audio_media_apps_summary">Al conectar auriculares o un parlante Bluetooth, mostrar tus apps de música bajo el reloj</string>
+    <string name="fork_preference_letter_sort">Orden dentro de cada letra</string>
+    <string name="fork_letter_sort_alphabetical">Alfabético</string>
+    <string name="fork_letter_sort_most_used">Más usadas primero</string>
+    <string name="fork_letter_sort_recent">Usadas recientemente primero</string>
+    <string name="fork_letter_sort_newest">Instaladas recientemente primero</string>
+    <string name="fork_menu_folder">Añadir a carpeta…</string>
+    <string name="fork_folder_new">Nueva carpeta</string>
+    <string name="fork_folder_name">Nombre</string>
+    <string name="fork_folder_add_title">Añadir %1$s a…</string>
+    <string name="fork_folder_rename">Renombrar carpeta</string>
+    <string name="fork_folder_delete">Eliminar carpeta</string>
+    <string name="fork_folder_empty">Esta carpeta está vacía. Añade apps desde su menú.</string>
+    <string name="fork_folder_remove_item">Quitar de la carpeta</string>
 </resources>

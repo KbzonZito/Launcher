@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.kbzon.launcher.preferences.home.MinimalClockStyle
 import dev.kbzon.launcher.preferences.home.WaveIntensity
+import dev.kbzon.launcher.preferences.home.LetterSort
 import dev.kbzon.launcher.ui.common.SearchablePicker
 import dev.kbzon.launcher.ui.component.DismissableBottomSheet
 import dev.kbzon.launcher.ui.component.preferences.ListPreference
@@ -65,6 +66,7 @@ fun MinimalHomeSettingsScreen() {
     val usageSuggestions by settings.usageSuggestions.collectAsStateWithLifecycle(true)
     val railDoubleTap by settings.railDoubleTapLock.collectAsStateWithLifecycle(true)
     val wave by settings.waveIntensity.collectAsStateWithLifecycle(WaveIntensity.Normal)
+    val letterSort by settings.letterSort.collectAsStateWithLifecycle(LetterSort.Alphabetical)
     val bothEdges by settings.railBothEdges.collectAsStateWithLifecycle(true)
     val weatherKey by settings.weatherAppKey.collectAsStateWithLifecycle(null)
     val calendarKey by settings.calendarAppKey.collectAsStateWithLifecycle(null)
@@ -170,6 +172,18 @@ fun MinimalHomeSettingsScreen() {
         }
         item {
             PreferenceCategory(title = stringResource(R.string.fork_preference_category_rail)) {
+                ListPreference(
+                    title = stringResource(R.string.fork_preference_letter_sort),
+                    icon = R.drawable.sort_24px,
+                    items = listOf(
+                        ListPreferenceItem(stringResource(R.string.fork_letter_sort_alphabetical), LetterSort.Alphabetical),
+                        ListPreferenceItem(stringResource(R.string.fork_letter_sort_most_used), LetterSort.MostUsed),
+                        ListPreferenceItem(stringResource(R.string.fork_letter_sort_recent), LetterSort.Recent),
+                        ListPreferenceItem(stringResource(R.string.fork_letter_sort_newest), LetterSort.Newest),
+                    ),
+                    value = letterSort,
+                    onValueChanged = settings::setLetterSort,
+                )
                 SwitchPreference(
                     title = stringResource(R.string.fork_preference_usage_suggestions),
                     summary = stringResource(R.string.fork_preference_usage_suggestions_summary),

@@ -205,6 +205,9 @@ interface SearchableDao {
     @Query("SELECT `key` FROM Searchable WHERE `key` IN (:keys) ORDER BY `weight` DESC, pinPosition DESC")
     fun sortByWeight(keys: List<String>): Flow<List<String>>
 
+    @Query("SELECT `key`, `launchCount` FROM Searchable WHERE `key` IN (:keys)")
+    fun getLaunchCounts(keys: List<String>): Flow<Map<@MapColumn(columnName = "key") String, @MapColumn(columnName = "launchCount") Int>>
+
     @Query("SELECT `key`, `weight` FROM Searchable WHERE `key` IN (:keys)")
     fun getWeights(keys: List<String>): Flow<Map<@MapColumn(columnName = "key") String, @MapColumn(columnName = "weight") Double>>
 

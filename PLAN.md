@@ -230,7 +230,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **9** | Correcciones rápidas: reloj abre la app completa, clima junto a la alarma, solo home minimalista, sugerencias desactivables, doble toque en el riel = bloquear, ola más marcada, riel desde ambos bordes | ✅ PR #20 |
 | **10** | Fork total: código renombrado a `dev.kbzon.launcher`, sin upstream, plugins eliminados, Ko-fi, README propio, sin flavors ni traducciones extra | ✅ PR #21 |
 | **11** | Home configurable: menú rápido al mantener pulsado, gestos unificados en Ajustes → Gestos, botón de acción con 7 gestos, editar diseño (reloj y alfabeto movibles) | ✅ PR #22 |
-| **12** | Orden de lista por letra, carpetas (popup), reordenar favoritos | ⏳ v0.5 |
+| **12** | Orden de lista por letra, carpetas (popup), reordenar favoritos | ✅ v0.4.0 |
 | **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ⏳ v0.6 |
 | **14** | Búsqueda minimalista 2.0 | ⏳ v0.7 |
 | **15** | Limpieza de ajustes heredados | ⏳ futuro |
@@ -251,6 +251,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.3.1 | Entrega A: favoritos fijos y siempre visibles, reordenar arrastrando, lista a pantalla completa con una letra, márgenes simétricos, ola suave, burbuja junto al alfabeto, feedback al tocar |
 | v0.3.2 | Entrega B: botón de acción con posición elegible y más cómodo, Editar diseño sin interferencias de gestos (reloj movible), barra de edición compacta |
 | v0.3.3 | Entrega C: próximo evento + tarjeta de eventos, clima con permiso de ubicación, alarma sin falsos positivos, apps de música al conectar audio |
+| v0.4.0 | Fase 12: orden de cada letra (alfabético, más usadas, recientes, recién instaladas) y carpetas en favoritos (popup, renombrar, quitar, eliminar) — sin publicar aún |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -258,7 +259,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: fases 12 → 15 (§10)**, tras probar las entregas A–C en el teléfono, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: fases 13 → 15 (§10)**, tras probar las entregas A–C y la Fase 12 en el teléfono, en este orden: personalización visual → búsqueda 2.0 → limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -268,6 +269,8 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 - Widgets propios: batería de Galaxy Buds/Watch, temporizador/cronómetro, nota rápida; widgets de terceros incrustados en la home.
 - Animación de cierre: la app vuelve a la fila de la que salió.
 - Tablet: S Pen hover; widgets o agenda en la columna izquierda.
+- Carpetas: ordenar a mano las apps de dentro (hoy van en orden alfabético porque las etiquetas no guardan orden), arrastrar una app sobre otra para crear carpeta, y carpetas en la búsqueda.
+- Orden "Usadas recientemente": hoy usa el peso de uso de Kvaesitso (frecuencia con decaimiento); si no se siente bien, guardar la hora de la última apertura.
 - Accesibilidad: etiquetas de TalkBack en el riel, el botón de acción y las entradas especiales.
 
 ### Arreglos y mejoras tras v0.3.0 — plan de implementación (17-11-2026)
@@ -307,7 +310,7 @@ Bugs reportados el 16-11 (B1–B14) y mejoras pedidas el 17-11 (M1–M3), ordena
 | B13 | Alarma de las 22:30 que no existe | Causa probable: el sistema devuelve la próxima alarma de cualquier app (p. ej. la hora de dormir de Samsung). Mostrar solo alarmas creadas por la app de reloj (`AlarmClockInfo.showIntent.creatorPackage`). |
 | B14 | Apps de medios al conectar Bluetooth | Al conectarse unos auriculares o un parlante (`AudioDeviceCallback`, sin permisos extra), mostrar en el vistazo una fila con las apps de música elegidas por el usuario. |
 
-**Después:** Fase 12 (orden de la lista por letra y carpetas) → 13 → 14 → 15, como en §10.
+**Después:** ~~Fase 12~~ (hecha, v0.4.0) → 13 → 14 → 15, como en §10.
 
 ## 10. Plan de funciones v0.3 → v1.0
 
@@ -353,7 +356,8 @@ Decisiones tomadas (16-11-2026):
 3. **Botón de acción** (abajo, lado del riel): toque, doble toque, mantener y deslizar ↑ ↓ ← →, cada uno con su acción. Al arrastrar muestra hacia dónde va y vibra al cruzar el umbral. Por defecto: toque = buscar.
 4. **Modo "Editar diseño"**: arrastrar verticalmente el bloque superior (reloj + vistazo) y el riel (posición y alto). Se guarda como fracción de la pantalla, por orientación (teléfono y Tab).
 
-### Fase 12 — Riel, lista y carpetas (v0.5)
+### Fase 12 — Riel, lista y carpetas (v0.4.0)
+> ✅ Hecha. **Orden por letra** en Ajustes → Home → Alfabeto (más usadas = contador de aperturas; recientes = peso de uso con decaimiento; recién instaladas = fecha de instalación). **Carpetas**: menú de una app → "Añadir a carpeta…" → elegir una o "Nueva carpeta"; si la app era favorita, la carpeta ocupa su lugar. En favoritos se ve con un mosaico de 2×2; al tocarla, tarjeta con la cuadrícula (tocar abre, mantener pulsado → quitar), lápiz para renombrar y papelera para eliminar (sus apps vuelven a favoritos en su lugar). Las apps de dentro van en orden alfabético; ordenarlas a mano queda en §9.
 1. **Orden de la lista por letra**: alfabético, más usadas primero, recientes primero, recién instaladas primero.
 2. **Carpetas (popup)**: crear desde el menú de una app ("Nueva carpeta" / "Añadir a carpeta"); se muestran en favoritos con un ícono mosaico; al tocar, popup con cuadrícula de apps, renombrar y reordenar. Se construyen sobre las **etiquetas fijables de Kvaesitso** (ya existen y se guardan en la base de datos).
 3. ~~Reordenar favoritos arrastrando~~ → adelantado a la Entrega A (§9).

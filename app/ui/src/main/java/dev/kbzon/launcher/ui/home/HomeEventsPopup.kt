@@ -51,11 +51,13 @@ fun HomeEventsPopup(
     events: List<CalendarEvent>,
     onEvent: (CalendarEvent) -> Unit,
     onDismiss: () -> Unit,
+    insets: androidx.compose.foundation.layout.PaddingValues = androidx.compose.foundation.layout.PaddingValues(),
 ) {
     val context = LocalContext.current
     AnimatedVisibility(visible, enter = fadeIn(), exit = fadeOut()) {
         Box(
             Modifier
+                .bleed(insets)
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.35f))
                 .combinedClickable(interactionSource = null, indication = null, onClick = onDismiss),
