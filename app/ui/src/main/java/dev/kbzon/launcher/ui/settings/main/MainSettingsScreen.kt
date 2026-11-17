@@ -39,6 +39,12 @@ fun MainSettingsScreen() {
                     onClick = { backStack.add(dev.kbzon.launcher.ui.settings.home.MinimalHomeSettingsRoute) },
                 )
                 Preference(
+                    icon = R.drawable.sort_24px,
+                    title = stringResource(id = R.string.fork_settings_rail_list),
+                    summary = stringResource(id = R.string.fork_settings_rail_list_summary),
+                    onClick = { backStack.add(dev.kbzon.launcher.ui.settings.home.RailListSettingsRoute) },
+                )
+                Preference(
                     icon = R.drawable.gesture_24px,
                     title = stringResource(id = R.string.fork_settings_gestures),
                     summary = stringResource(id = R.string.fork_settings_gestures_summary),

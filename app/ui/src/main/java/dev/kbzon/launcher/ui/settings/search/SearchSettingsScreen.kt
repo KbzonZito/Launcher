@@ -60,9 +60,6 @@ fun SearchSettingsScreen() {
 
     var showFilterEditor by remember { mutableStateOf(false) }
 
-    val hasCalendarPlugins = false // [fork] sin plugins
-    val hasLocationPlugins = false
-    val hasContactPlugins = false
     val isTasksAppInstalled by viewModel.isTasksAppInstalled.collectAsStateWithLifecycle()
 
     val hasAppShortcutsPermission by viewModel.hasAppShortcutPermission.collectAsStateWithLifecycle(
@@ -89,6 +86,17 @@ fun SearchSettingsScreen() {
     val filterBar by viewModel.filterBar.collectAsStateWithLifecycle(null)
 
     PreferenceScreen(title = stringResource(R.string.preference_screen_search)) {
+        item { // [fork] Fase 15: opciones propias arriba de todo
+            PreferenceCategory {
+                val forkBackStack = dev.kbzon.launcher.ui.locals.LocalBackStack.current
+                Preference(
+                    title = stringResource(R.string.fork_settings_search_extras),
+                    summary = stringResource(R.string.fork_settings_search_extras_summary),
+                    icon = R.drawable.keyboard_24px,
+                    onClick = { forkBackStack.add(dev.kbzon.launcher.ui.settings.home.MinimalSearchSettingsRoute) },
+                )
+            }
+        }
         item {
             PreferenceCategory {
                 PreferenceWithSwitch(
@@ -129,40 +137,30 @@ fun SearchSettingsScreen() {
                     }
                 )
 
-                if (hasContactPlugins != false) {
-                    Preference(
+                GuardedPreference(
+                    locked = hasContactsPermission == false,
+                    onUnlock = {
+                        viewModel.requestContactsPermission(context as AppCompatActivity)
+                    },
+                    description = stringResource(R.string.missing_permission_contact_search_settings),
+                ) {
+                    PreferenceWithSwitch(
                         title = stringResource(R.string.preference_search_contacts),
                         summary = stringResource(R.string.preference_search_contacts_summary),
                         icon = R.drawable.person_24px,
+                        switchValue = contacts == true && hasContactsPermission == true,
+                        onSwitchChanged = {
+                            viewModel.setContacts(it)
+                        },
                         onClick = {
                             backStack.add(ContactsSettingsRoute)
                         },
+                        enabled = hasContactsPermission == true
                     )
-                } else {
-                    GuardedPreference(
-                        locked = hasContactsPermission == false,
-                        onUnlock = {
-                            viewModel.requestContactsPermission(context as AppCompatActivity)
-                        },
-                        description = stringResource(R.string.missing_permission_contact_search_settings),
-                    ) {
-                        PreferenceWithSwitch(
-                            title = stringResource(R.string.preference_search_contacts),
-                            summary = stringResource(R.string.preference_search_contacts_summary),
-                            icon = R.drawable.person_24px,
-                            switchValue = contacts == true && hasContactsPermission == true,
-                            onSwitchChanged = {
-                                viewModel.setContacts(it)
-                            },
-                            onClick = {
-                                backStack.add(ContactsSettingsRoute)
-                            },
-                            enabled = hasContactsPermission == true
-                        )
-                    }
                 }
+                
 
-                if (hasCalendarPlugins != false || isTasksAppInstalled != false) {
+                if (isTasksAppInstalled != false) {
                     Preference(
                         title = stringResource(R.string.preference_search_calendar),
                         summary = stringResource(R.string.preference_search_calendar_summary),
@@ -259,31 +257,20 @@ fun SearchSettingsScreen() {
                     },
                     description = stringResource(R.string.missing_permission_location_search),
                 ) {
-                    if (hasLocationPlugins != false) {
-                        Preference(
-                            title = stringResource(R.string.preference_search_locations),
-                            summary = stringResource(R.string.preference_search_locations_summary),
-                            icon = R.drawable.location_on_24px,
-                            enabled = hasLocationPermission == true,
-                            onClick = {
-                                backStack.add(LocationsSettingsRoute)
-                            }
-                        )
-                    } else {
-                        PreferenceWithSwitch(
-                            title = stringResource(R.string.preference_search_locations),
-                            summary = stringResource(R.string.preference_search_locations_summary),
-                            icon = R.drawable.location_on_24px,
-                            onClick = {
-                                backStack.add(LocationsSettingsRoute)
-                            },
-                            switchValue = places == true,
-                            onSwitchChanged = {
-                                viewModel.setPlacesSearch(it)
-                            },
-                            enabled = hasLocationPermission == true,
-                        )
-                    }
+                    PreferenceWithSwitch(
+                        title = stringResource(R.string.preference_search_locations),
+                        summary = stringResource(R.string.preference_search_locations_summary),
+                        icon = R.drawable.location_on_24px,
+                        onClick = {
+                            backStack.add(LocationsSettingsRoute)
+                        },
+                        switchValue = places == true,
+                        onSwitchChanged = {
+                            viewModel.setPlacesSearch(it)
+                        },
+                        enabled = hasLocationPermission == true,
+                    )
+                    
                 }
 
                 Preference(

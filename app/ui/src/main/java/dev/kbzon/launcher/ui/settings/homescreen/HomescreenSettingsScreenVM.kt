@@ -35,9 +35,6 @@ class HomescreenSettingsScreenVM(
     private val gestureSettings: GestureSettings,
 ) : ViewModel() {
 
-    var showClockWidgetSheet by mutableStateOf(false)
-
-
     val dimWallpaper = uiSettings.dimWallpaper
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
@@ -96,48 +93,6 @@ class HomescreenSettingsScreenVM(
         uiSettings.setHideNavigationBar(hideNavBar)
     }
 
-    val searchBarColor = uiSettings.searchBarColor
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
-    fun setSearchBarColor(color: SearchBarColors) {
-        uiSettings.setSearchBarColor(color)
-    }
-
-    val searchBarStyle = uiSettings.searchBarStyle
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
-    fun setSearchBarStyle(searchBarStyle: SearchBarStyle) {
-        uiSettings.setSearchBarStyle(searchBarStyle)
-    }
-
-    val fixedSearchBar = uiSettings.fixedSearchBar
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
-    fun setFixedSearchBar(fixedSearchBar: Boolean) {
-        uiSettings.setFixedSearchBar(fixedSearchBar)
-    }
-
-    val bottomSearchBar = uiSettings.bottomSearchBar
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
-    fun setBottomSearchBar(bottomSearchBar: Boolean) {
-        uiSettings.setBottomSearchBar(bottomSearchBar)
-    }
-
-    val dock = uiSettings.dock
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
-    fun setDock(dock: Boolean) {
-        uiSettings.setDock(dock)
-    }
-
-    val dockRows = uiSettings.dockRows
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 1)
-
-    fun setDockRows(rows: Int) {
-        uiSettings.setDockRows(rows)
-    }
-
     val fixedRotation = uiSettings.orientation.map { it != ScreenOrientation.Auto }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
@@ -157,13 +112,6 @@ class HomescreenSettingsScreenVM(
 
     fun setChargingAnimation(chargingAnimation: Boolean) {
         uiSettings.setChargingAnimation(chargingAnimation)
-    }
-
-    val widgetsOnHomeScreen = uiSettings.homeScreenWidgets
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
-
-    fun setWidgetsOnHomeScreen(widgetsOnHomeScreen: Boolean) {
-        uiSettings.setHomeScreenWidgets(widgetsOnHomeScreen)
     }
 
     companion object : KoinComponent {

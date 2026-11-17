@@ -255,6 +255,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.5.0 | Fase 13: fuente Manrope/Inter/sistema en toda la app, tamaño del texto de la home, 5 temas de color nuevos, íconos monocromo/contorno, relojes vertical/puntos/anillo, DESIGN.md (publicada dentro de v0.7.0) |
 | v0.6.0 | Fase 14: atajos de búsqueda con palabra clave (yt, p, g…), avisos de permiso en una línea, barra de búsqueda abajo y "tocar un contacto llama" en Ajustes → Home (publicada dentro de v0.7.0) |
 | v0.7.0 | Fase 15: Ajustes en tres grupos (Launcher · Aspecto · Sistema), fuera las opciones de la home de Kvaesitso y el código de plugins; primera release con las fases 12–15 |
+| v0.7.1 | Cierre de la Fase 15: Inicio y Alfabeto y lista separados, opciones de búsqueda dentro de Búsqueda, sin restos de plugins ni código muerto de la home de Kvaesitso — sin publicar aún |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -400,6 +401,7 @@ Decisiones tomadas (16-11-2026):
 
 ### Fase 15 — Limpieza de ajustes (v0.7.0)
 > ✅ Hecha. La lista principal quedó en tres grupos: **Launcher** (Home minimalista · Gestos y botón de acción · Búsqueda), **Aspecto** (Apariencia · Cuadrícula e íconos · Pantalla y fondo) y **Sistema** (Privacidad · Integraciones · Idioma · Copia de seguridad · Acerca de); Depuración pasó a Acerca de. Se quitaron de "Pantalla y fondo" el reloj, el dock, los widgets en la home y el estilo/posición de la barra de búsqueda de Kvaesitso (la posición está en Ajustes → Home). Se borró el código de plugins: proveedores de calendario, contactos, archivos, lugares y clima, `PluginRepository`/`NoPluginRepository`, la API y los contratos, y la opción de insignias de plugins. Se conservan la tabla de plugins de la base de datos (para no migrar) y `StorageStrategy`, que usan los datos guardados. Un proveedor de clima de plugin elegido antes vuelve a MET Norway.
+> **Cierre (v0.7.1):** "Inicio" y "Alfabeto y lista" quedaron como pantallas separadas (como pedía el plan), y las opciones propias de la búsqueda (barra abajo, tocar para llamar, atajos, prefijos) pasaron a Búsqueda → "Barra, contactos y atajos". Se quitaron los últimos restos de plugins (interruptores de plugins de contactos/lugares/archivos, sus preferencias y las insignias de plugins) y el código muerto de "Pantalla y fondo" (hoja del reloj, dock, estilo y posición de la barra de Kvaesitso).
 Incluye borrar los restos de plugins de la capa de datos (`NoPluginRepository` y proveedores `Plugin*`).
 Eliminar los ajustes heredados de Kvaesitso que no aplican a esta app (reloj y widgets de la home de Kvaesitso, dock, estilos de barra, etc.) y reorganizar en: Inicio · Riel y lista · Gestos y botón de acción · Búsqueda · Apariencia · Privacidad · Backup · Acerca de.
 

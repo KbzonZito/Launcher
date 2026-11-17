@@ -167,6 +167,12 @@ class SettingsActivity : BaseActivity() {
             entry<dev.kbzon.launcher.ui.settings.home.MinimalHomeSettingsRoute> { // [fork]
                 dev.kbzon.launcher.ui.settings.home.MinimalHomeSettingsScreen()
             }
+            entry<dev.kbzon.launcher.ui.settings.home.RailListSettingsRoute> { // [fork] Fase 15
+                dev.kbzon.launcher.ui.settings.home.MinimalHomeSettingsScreen(dev.kbzon.launcher.ui.settings.home.HomeSettingsSection.RailList)
+            }
+            entry<dev.kbzon.launcher.ui.settings.home.MinimalSearchSettingsRoute> { // [fork] Fase 15
+                dev.kbzon.launcher.ui.settings.home.MinimalHomeSettingsScreen(dev.kbzon.launcher.ui.settings.home.HomeSettingsSection.Search)
+            }
             entry<dev.kbzon.launcher.ui.settings.privacy.PrivacySettingsRoute> { // [fork]
                 dev.kbzon.launcher.ui.settings.privacy.PrivacySettingsScreen()
             }

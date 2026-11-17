@@ -6,7 +6,6 @@ import dev.kbzon.launcher.badges.providers.BadgeProvider
 import dev.kbzon.launcher.badges.providers.CloudBadgeProvider
 import dev.kbzon.launcher.badges.providers.HiddenItemBadgeProvider
 import dev.kbzon.launcher.badges.providers.NotificationBadgeProvider
-import dev.kbzon.launcher.badges.providers.PluginBadgeProvider
 import dev.kbzon.launcher.badges.providers.SuspendedAppsBadgeProvider
 import dev.kbzon.launcher.badges.providers.ProfileBadgeProvider
 import dev.kbzon.launcher.preferences.ui.BadgeSettings
@@ -55,9 +54,6 @@ internal class BadgeServiceImpl(
                 }
                 if (it.suspendedApps) {
                     providers += SuspendedAppsBadgeProvider()
-                }
-                if (it.plugins) {
-                    providers += PluginBadgeProvider(context)
                 }
                 badgeProviders.value = providers
             }

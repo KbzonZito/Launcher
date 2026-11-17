@@ -23,7 +23,6 @@ class FileSearchSettingsScreenVM : ViewModel(), KoinComponent {
     val loading = mutableStateOf(true)
 
 
-    val enabledPlugins = fileSearchSettings.enabledPlugins
 
 
     fun onResume() {
@@ -48,7 +47,4 @@ class FileSearchSettingsScreenVM : ViewModel(), KoinComponent {
         permissionsManager.requestPermission(context, PermissionGroup.ExternalStorage)
     }
 
-    fun setPluginEnabled(authority: String, enabled: Boolean) {
-        fileSearchSettings.setPluginEnabled(authority, enabled)
-    }
 }

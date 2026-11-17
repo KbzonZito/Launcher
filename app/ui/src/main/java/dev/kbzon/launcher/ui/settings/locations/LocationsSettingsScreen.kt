@@ -55,9 +55,8 @@ fun LocationsSettingsScreen() {
     val themeMap by viewModel.themeMap.collectAsState()
     val customTileServerUrl by viewModel.customTileServerUrl.collectAsState()
 
-    val enabledPlugins by viewModel.enabledPlugins.collectAsStateWithLifecycle(initialValue = null)
 
-    val anyLocationProviderEnabled = osmLocations ?: false || enabledPlugins.isNullOrEmpty().not()
+    val anyLocationProviderEnabled = osmLocations ?: false
 
 
     PreferenceScreen(title = stringResource(R.string.preference_search_locations)) {

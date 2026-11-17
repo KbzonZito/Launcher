@@ -16,7 +16,6 @@ import org.koin.core.component.inject
 class LocationsSettingsScreenVM : ViewModel(), KoinComponent {
     private val settings: LocationSearchSettings by inject()
 
-    val enabledPlugins = settings.enabledPlugins
 
     val osmLocations = settings.osmLocations
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
@@ -71,7 +70,4 @@ class LocationsSettingsScreenVM : ViewModel(), KoinComponent {
         settings.setThemeMap(themeMap)
     }
 
-    fun setPluginEnabled(authority: String, enabled: Boolean) {
-        settings.setPluginEnabled(authority, enabled)
-    }
 }

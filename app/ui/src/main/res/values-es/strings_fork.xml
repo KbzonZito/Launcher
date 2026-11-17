@@ -14,8 +14,8 @@
     <string name="fork_preference_incognito_summary">No registrar las aperturas: las apps frecuentes y el orden de la búsqueda dejan de aprender</string>
     <string name="fork_preference_secure_screens">Proteger la búsqueda de capturas</string>
     <string name="fork_preference_secure_screens_summary">Bloquea capturas y grabación de pantalla mientras se ven resultados de búsqueda o apps ocultas</string>
-    <string name="fork_preference_screen_minimal_home">Inicio minimalista</string>
-    <string name="fork_preference_screen_minimal_home_summary">Lista de favoritos y riel del alfabeto</string>
+    <string name="fork_preference_screen_minimal_home">Inicio</string>
+    <string name="fork_preference_screen_minimal_home_summary">Reloj, vistazo, fuente, íconos, colores</string>
     <string name="fork_preference_minimal_home">Usar inicio minimalista</string>
     <string name="fork_preference_minimal_home_summary">Reloj, línea de un vistazo, favoritos y riel del alfabeto en lugar de la pantalla de reloj y widgets</string>
     <string name="fork_preference_minimal_home_icons">Íconos de las apps</string>
@@ -193,4 +193,8 @@
     <string name="fork_settings_gestures_summary">Deslizar, dos dedos, botón de acción</string>
     <string name="fork_settings_display">Pantalla y fondo</string>
     <string name="fork_settings_display_summary">Oscurecer y desenfocar el fondo, barras del sistema, rotación</string>
+    <string name="fork_settings_rail_list">Alfabeto y lista</string>
+    <string name="fork_settings_rail_list_summary">Lado del riel, orden por letra, ola, vista previa de notificaciones</string>
+    <string name="fork_settings_search_extras">Barra, contactos y atajos</string>
+    <string name="fork_settings_search_extras_summary">Barra abajo, tocar para llamar, atajos de búsqueda, prefijos</string>
 </resources>
