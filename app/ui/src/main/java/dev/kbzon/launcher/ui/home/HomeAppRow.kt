@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import dev.kbzon.launcher.notifications.Notification
 import dev.kbzon.launcher.search.Application
 import dev.kbzon.launcher.search.SavableSearchable
+import dev.kbzon.launcher.search.Tag
 import dev.kbzon.launcher.ui.R
 import dev.kbzon.launcher.ui.common.SearchablePicker
 import dev.kbzon.launcher.ui.component.DismissableBottomSheet
@@ -106,6 +107,8 @@ fun HomeAppRow(
     var expanded by remember(item.key) { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
     var pickSwipeLeft by remember { mutableStateOf(false) }
+    var folderPicker by remember { mutableStateOf(false) }
+    var renamingFolder by remember { mutableStateOf(false) }
     // Límites de la fila en la ventana: la app se abre expandiéndose desde aquí.
     var rowBounds by remember { mutableStateOf<IntRect?>(null) }
     val dragOffset = remember { Animatable(0f) }
@@ -178,7 +181,11 @@ fun HomeAppRow(
                     )
                     .padding(vertical = 9.dp, horizontal = 6.dp),
             ) {
-                if (showIcons) {
+                if (item is Tag) {
+                    // Las carpetas siempre llevan su mosaico, aunque los iconos estén apagados.
+                    FolderIcon(vm, item, 30.dp)
+                    Spacer(Modifier.width(16.dp))
+                } else if (showIcons) {
                     val icon by remember(item.key) { vm.icon(item, iconSizePx) }.collectAsState(null)
                     ShapedLauncherIcon(size = 30.dp, icon = { icon })
                     Spacer(Modifier.width(16.dp))
@@ -236,7 +243,19 @@ fun HomeAppRow(
                 swipeLeftTarget = swipeLeftTarget,
                 onPickSwipeLeft = { pickSwipeLeft = true },
                 onReorderFavorites = onReorderFavorites,
+                onFolder = { folderPicker = true },
+                onRenameFolder = { renamingFolder = true },
             )
+
+            if (folderPicker) FolderPickerDialog(vm = vm, item = item, onDismiss = { folderPicker = false })
+            if (renamingFolder && item is Tag) {
+                FolderNameDialog(
+                    title = stringResource(R.string.fork_folder_rename),
+                    initial = item.displayLabel,
+                    onConfirm = { renamingFolder = false; vm.renameFolder(item, it) },
+                    onDismiss = { renamingFolder = false },
+                )
+            }
 
             DismissableBottomSheet(expanded = pickSwipeLeft, onDismissRequest = { pickSwipeLeft = false }) {
                 Column {
@@ -316,6 +335,8 @@ private fun HomeItemMenu(
     swipeLeftTarget: SavableSearchable?,
     onPickSwipeLeft: () -> Unit,
     onReorderFavorites: (() -> Unit)?,
+    onFolder: () -> Unit,
+    onRenameFolder: () -> Unit,
 ) {
     val context = LocalContext.current
     val pinned by remember(item.key) { vm.isPinned(item) }.collectAsState(false)
@@ -326,10 +347,18 @@ private fun HomeItemMenu(
             text = { Text(stringResource(text)) },
             onClick = { onDismiss(); action() },
         )
+        if (item is Tag) {
+            // Carpeta: solo renombrar, reordenar favoritos y eliminar (sus apps vuelven a favoritos).
+            entry(R.drawable.edit_24px, R.string.fork_folder_rename, onRenameFolder)
+            if (onReorderFavorites != null) entry(R.drawable.drag_indicator_24px, R.string.fork_reorder_title, onReorderFavorites)
+            entry(R.drawable.delete_24px, R.string.fork_folder_delete) { vm.deleteFolder(item) }
+            return@DropdownMenu
+        }
         if (pinned) entry(R.drawable.star_24px_filled, R.string.fork_menu_unpin) { vm.unpin(item) }
         else entry(R.drawable.star_24px, R.string.fork_menu_pin) { vm.pin(item) }
         if (pinned && onReorderFavorites != null) entry(R.drawable.drag_indicator_24px, R.string.fork_reorder_title, onReorderFavorites)
         if (onShowShortcuts != null) entry(R.drawable.apps_24px, R.string.fork_menu_shortcuts, onShowShortcuts)
+        if (!isHiddenItem) entry(R.drawable.create_new_folder_24px, R.string.fork_menu_folder, onFolder)
         entry(R.drawable.swipe_left_alt_24px, if (swipeLeftTarget == null) R.string.fork_menu_swipe_left else R.string.fork_menu_swipe_left_change, onPickSwipeLeft)
         if (swipeLeftTarget != null) entry(R.drawable.close_24px, R.string.fork_menu_swipe_left_clear) { vm.setSwipeLeftTarget(item, null) }
         entry(R.drawable.edit_24px, R.string.fork_menu_customize, onCustomize)

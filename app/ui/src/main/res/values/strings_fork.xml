@@ -143,4 +143,17 @@
     <string name="fork_glance_allow_location">Allow location for weather</string>
     <string name="fork_preference_audio_media_apps">Music apps when audio connects</string>
     <string name="fork_preference_audio_media_apps_summary">When Bluetooth headphones or a speaker connect, show your music apps under the clock</string>
+    <string name="fork_preference_letter_sort">Order within each letter</string>
+    <string name="fork_letter_sort_alphabetical">Alphabetical</string>
+    <string name="fork_letter_sort_most_used">Most used first</string>
+    <string name="fork_letter_sort_recent">Recently used first</string>
+    <string name="fork_letter_sort_newest">Newly installed first</string>
+    <string name="fork_menu_folder">Add to folder…</string>
+    <string name="fork_folder_new">New folder</string>
+    <string name="fork_folder_name">Name</string>
+    <string name="fork_folder_add_title">Add %1$s to…</string>
+    <string name="fork_folder_rename">Rename folder</string>
+    <string name="fork_folder_delete">Delete folder</string>
+    <string name="fork_folder_empty">This folder is empty. Add apps from their menu.</string>
+    <string name="fork_folder_remove_item">Remove from folder</string>
 </resources>

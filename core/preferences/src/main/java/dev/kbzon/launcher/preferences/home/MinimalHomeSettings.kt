@@ -109,6 +109,11 @@ class MinimalHomeSettings internal constructor(
 
     fun setWaveIntensity(value: WaveIntensity) = dataStore.update { it.copy(minimalHomeWaveIntensity = value) }
 
+    val letterSort: Flow<LetterSort>
+        get() = dataStore.data.map { it.minimalHomeLetterSort }.distinctUntilChanged()
+
+    fun setLetterSort(value: LetterSort) = dataStore.update { it.copy(minimalHomeLetterSort = value) }
+
     /** El riel también responde desde el borde contrario. */
     val railBothEdges: Flow<Boolean>
         get() = dataStore.data.map { it.minimalHomeRailBothEdges }.distinctUntilChanged()
