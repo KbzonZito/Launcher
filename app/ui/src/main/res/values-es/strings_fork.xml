@@ -133,4 +133,13 @@
     <string name="fork_button_position_opposite">Lado contrario</string>
     <string name="fork_button_position_center">Centro</string>
     <string name="fork_edit_layout_hint_short">Arrastra el reloj, el alfabeto y el botón</string>
+    <string name="fork_events_title">Próximos</string>
+    <string name="fork_events_empty">No hay eventos hoy ni mañana</string>
+    <string name="fork_events_all_day">Todo el día</string>
+    <string name="fork_events_today">Hoy</string>
+    <string name="fork_events_tomorrow">Mañana</string>
+    <string name="fork_glance_more_events">+%1$d</string>
+    <string name="fork_glance_allow_location">Permitir ubicación para el clima</string>
+    <string name="fork_preference_audio_media_apps">Apps de música al conectar audio</string>
+    <string name="fork_preference_audio_media_apps_summary">Al conectar auriculares o un parlante Bluetooth, mostrar tus apps de música bajo el reloj</string>
 </resources>

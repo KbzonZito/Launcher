@@ -127,13 +127,13 @@ fun MinimalHomeSettingsScreen() {
                     onValueChanged = settings::setClockStyle,
                     enabled = enabled,
                 )
+                val audioApps by settings.audioMediaApps.collectAsStateWithLifecycle(true)
                 SwitchPreference(
-                    title = stringResource(R.string.fork_preference_agenda),
-                    summary = stringResource(R.string.fork_preference_agenda_summary),
-                    icon = R.drawable.event_24px,
-                    value = agenda,
-                    onValueChanged = settings::setAgenda,
-                    enabled = enabled,
+                    title = stringResource(R.string.fork_preference_audio_media_apps),
+                    summary = stringResource(R.string.fork_preference_audio_media_apps_summary),
+                    icon = R.drawable.headphones_24px,
+                    value = audioApps,
+                    onValueChanged = settings::setAudioMediaApps,
                 )
                 SwitchPreference(
                     title = stringResource(R.string.fork_preference_media_player),

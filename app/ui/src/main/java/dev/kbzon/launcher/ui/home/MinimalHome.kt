@@ -202,6 +202,7 @@ fun MinimalHome(
     var draftLayout by remember { mutableStateOf<HomeLayout?>(null) }
     val layout = draftLayout ?: storedLayout
     var quickMenuY by remember { mutableStateOf<Float?>(null) }
+    var eventsPopup by remember { mutableStateOf(false) }
     var outerHeightPx by remember { mutableIntStateOf(1) }
     var outerWidthPx by remember { mutableIntStateOf(1) }
     val buttonPosition by vm.actionButtonPosition.collectAsState()
@@ -216,12 +217,13 @@ fun MinimalHome(
         homePresses.collect {
             vm.selectLetter(null)
             quickMenuY = null
+            eventsPopup = false
             reorderMode = false
             if (editMode) { editMode = false; draftLayout = null }
         }
     }
-    BackHandler(enabled = editMode || quickMenuY != null) {
-        if (quickMenuY != null) quickMenuY = null else { editMode = false; draftLayout = null }
+    BackHandler(enabled = editMode || quickMenuY != null || eventsPopup) {
+        if (eventsPopup) eventsPopup = false else if (quickMenuY != null) quickMenuY = null else { editMode = false; draftLayout = null }
     }
     // B7: dónde va el botón según la posición elegida y el lado del alfabeto.
     val buttonAlign = when (buttonPosition) {
@@ -290,7 +292,7 @@ fun MinimalHome(
                         },
                         scale = clockScale,
                     )
-                    GlanceLine(vm = vm, shadow = shadow)
+                    GlanceLine(vm = vm, shadow = shadow, onOpenEvents = { eventsPopup = true })
                     val mediaPlayerEnabled by vm.mediaPlayerEnabled.collectAsState()
                     if (mediaPlayerEnabled) HomeMediaPlayer(shadow = shadow)
                 }
@@ -592,6 +594,14 @@ fun MinimalHome(
                 }
             }
 
+            val eventsAhead by vm.eventsAhead.collectAsState()
+            HomeEventsPopup(
+                visible = eventsPopup,
+                events = eventsAhead,
+                onEvent = { ev -> eventsPopup = false; vm.launch(context, ev) },
+                onDismiss = { eventsPopup = false },
+            )
+
             HomeQuickMenu(
                 visible = quickMenuY != null,
                 anchorY = quickMenuY ?: 0f,
@@ -661,11 +671,13 @@ private fun HomeList(
 
 /** Próximo evento · clima · próxima alarma, cada uno abre su app. */
 @Composable
-private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?) {
+private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?, onOpenEvents: () -> Unit) {
     val context = LocalContext.current
-    val event by vm.nextEvent.collectAsState()
-    val upcoming by vm.upcomingEvents.collectAsState()
-    val agenda by vm.agendaEnabled.collectAsState()
+    val ahead by vm.eventsAhead.collectAsState()
+    val hasLocation by vm.hasLocationPermission.collectAsState()
+    val audioDevice by remember { vm.bluetoothAudioDevice(context) }.collectAsState(null)
+    val audioAppsEnabled by vm.audioMediaAppsEnabled.collectAsState()
+    val mediaApps by vm.mediaApps.collectAsState()
     val weatherApp by vm.weatherApp.collectAsState()
     val forecast by vm.weather.collectAsState()
     val alarm by remember { vm.nextAlarm(context) }.collectAsState(null)
@@ -675,26 +687,29 @@ private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?) {
     val dim = LocalContentColor.current.copy(alpha = 0.85f)
 
     Column(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        val events = if (agenda) upcoming else listOfNotNull(event)
-        events.forEach { ev ->
+        // M2: próximo evento; al tocarlo, tarjeta con los de hoy y mañana.
+        val next = ahead.firstOrNull { !it.allDay } ?: ahead.firstOrNull()
+        next?.let { ev ->
+            val more = ahead.size - 1
             GlanceItem(
                 icon = R.drawable.event_24px,
-                text = ev.glanceText(context),
+                text = ev.glanceText(context) + if (more > 0) "   " + stringResource(R.string.fork_glance_more_events, more) else "",
                 style = style,
                 color = dim,
-                onClick = { vm.launch(context, ev) },
+                onClick = onOpenEvents,
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             if (forecast == null) {
                 // Sin datos de clima: acceso directo para configurarlo (proveedor / ubicación).
+                // B12: sin permiso de ubicación no hay datos; pedirlo aquí mismo.
                 GlanceItem(
                     icon = R.drawable.light_mode_24px,
-                    text = stringResource(R.string.fork_glance_setup_weather),
+                    text = stringResource(if (hasLocation) R.string.fork_glance_setup_weather else R.string.fork_glance_allow_location),
                     style = style,
                     color = dim.copy(alpha = 0.6f),
                     onClick = {
-                        context.tryStart(
+                        if (!hasLocation) vm.requestLocationPermission(context) else context.tryStart(
                             Intent().setClassName(context, "dev.kbzon.launcher.ui.settings.SettingsActivity")
                                 .putExtra(dev.kbzon.launcher.ui.settings.SettingsActivity.EXTRA_ROUTE, dev.kbzon.launcher.ui.settings.SettingsActivity.ROUTE_WEATHER_INTEGRATION)
                         )
@@ -728,6 +743,20 @@ private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?) {
                     color = dim,
                     onClick = { context.tryStart(Intent(AlarmClock.ACTION_SHOW_ALARMS)) },
                 )
+            }
+        }
+        // B14: audio Bluetooth conectado → acceso a las apps de música.
+        if (audioAppsEnabled && audioDevice != null && mediaApps.isNotEmpty()) {
+            val iconPx = with(LocalDensity.current) { 28.dp.roundToPx() }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Icon(painterResource(R.drawable.headphones_24px), contentDescription = null, tint = dim, modifier = Modifier.size(16.dp))
+                Text(audioDevice.orEmpty(), style = style, color = dim, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 140.dp))
+                mediaApps.forEach { app ->
+                    val icon by remember(app.key) { vm.icon(app, iconPx) }.collectAsState(null)
+                    Box(Modifier.combinedClickable(interactionSource = null, indication = null, onClick = { vm.launch(context, app) })) {
+                        ShapedLauncherIcon(size = 28.dp, icon = { icon })
+                    }
+                }
             }
         }
     }

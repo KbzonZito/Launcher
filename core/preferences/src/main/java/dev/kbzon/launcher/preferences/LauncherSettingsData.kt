@@ -137,6 +137,7 @@ data class LauncherSettingsData internal constructor(
     val minimalHomeRailBothEdges: Boolean = true,
     // [fork] Fase 11
     val minimalHomeActionButton: Boolean = true,
+    val minimalHomeAudioMediaApps: Boolean = true,
     val minimalHomeActionButtonPosition: dev.kbzon.launcher.preferences.home.ActionButtonPosition = dev.kbzon.launcher.preferences.home.ActionButtonPosition.RailSide,
     val minimalHomeActionButtonActions: dev.kbzon.launcher.preferences.home.ActionButtonActions = dev.kbzon.launcher.preferences.home.ActionButtonActions(),
     val minimalHomeLayoutPortrait: dev.kbzon.launcher.preferences.home.HomeLayout = dev.kbzon.launcher.preferences.home.HomeLayout(),

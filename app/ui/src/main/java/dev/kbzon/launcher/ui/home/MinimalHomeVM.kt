@@ -69,6 +69,7 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     private val notificationRepository: NotificationRepository by inject()
     private val appShortcutRepository: AppShortcutRepository by inject()
     private val globalActions: GlobalActionsService by inject()
+    private val musicService: dev.kbzon.launcher.music.MusicService by inject()
 
     val showIcons = homeSettings.showIcons.stateIn(viewModelScope, SharingStarted.Eagerly, true)
     val railOnLeft = homeSettings.railOnLeft.stateIn(viewModelScope, SharingStarted.Eagerly, false)
@@ -330,14 +331,26 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
         .map { it.firstOrNull() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    /**
+     * Próxima alarma del reloj. B13: el sistema devuelve la próxima alarma de *cualquier* app (p. ej. la
+     * hora de dormir de Samsung); solo se muestra si la creó la app de reloj (o la elegida en "El reloj abre").
+     */
     fun nextAlarm(context: Context): Flow<Long?> = callbackFlow {
         val alarmManager: AlarmManager = context.getSystemService() ?: run {
             trySend(null); awaitClose { }; return@callbackFlow
         }
-        trySend(alarmManager.nextAlarmClock?.triggerTime)
+        fun current(): Long? {
+            val info = alarmManager.nextAlarmClock ?: return null
+            val creator = info.showIntent?.creatorPackage ?: return null
+            val clockPkg = context.packageManager
+                .resolveActivity(Intent(android.provider.AlarmClock.ACTION_SHOW_ALARMS), 0)?.activityInfo?.packageName
+            val chosenPkg = (clockApp.value as? Application)?.componentName?.packageName
+            return if (creator == clockPkg || creator == chosenPkg) info.triggerTime else null
+        }
+        trySend(current())
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                trySend(alarmManager.nextAlarmClock?.triggerTime)
+                trySend(current())
             }
         }
         context.registerReceiver(receiver, IntentFilter(AlarmManager.ACTION_NEXT_ALARM_CLOCK_CHANGED))
@@ -366,6 +379,70 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
         trySend(parse(context.registerReceiver(receiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))))
         awaitClose { context.unregisterReceiver(receiver) }
     }
+
+    /** Eventos de hoy y mañana para la tarjeta del reloj (M2). */
+    val eventsAhead: StateFlow<List<CalendarEvent>> = permissionsManager
+        .hasPermission(PermissionGroup.Calendar)
+        .flatMapLatest { granted ->
+            if (!granted) flowOf(emptyList())
+            else {
+                val now = System.currentTimeMillis()
+                val endOfTomorrow = java.util.Calendar.getInstance().apply {
+                    add(java.util.Calendar.DAY_OF_YEAR, 2)
+                    set(java.util.Calendar.HOUR_OF_DAY, 0); set(java.util.Calendar.MINUTE, 0)
+                }.timeInMillis
+                calendarRepository.findMany(from = now, to = endOfTomorrow).map { events ->
+                    events.filter { it.isCompleted != true && it.endTime > now }
+                        .sortedWith(compareBy<CalendarEvent> { it.startTime ?: it.endTime }.thenBy { !it.allDay })
+                        .take(12)
+                }
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val hasLocationPermission = permissionsManager.hasPermission(PermissionGroup.Location)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    fun requestLocationPermission(context: Context) {
+        (context as? androidx.appcompat.app.AppCompatActivity)?.let {
+            permissionsManager.requestPermission(it, PermissionGroup.Location)
+        }
+    }
+
+    // B14: apps de música al conectar audio Bluetooth.
+    val audioMediaAppsEnabled = homeSettings.audioMediaApps.stateIn(viewModelScope, SharingStarted.Eagerly, true)
+
+    /** Nombre del dispositivo de audio Bluetooth conectado, o null. Sin permisos (AudioDeviceCallback). */
+    fun bluetoothAudioDevice(context: Context): Flow<String?> = callbackFlow {
+        val audio: android.media.AudioManager = context.getSystemService() ?: run {
+            trySend(null); awaitClose { }; return@callbackFlow
+        }
+        val types = setOf(
+            android.media.AudioDeviceInfo.TYPE_BLUETOOTH_A2DP,
+            android.media.AudioDeviceInfo.TYPE_BLE_HEADSET,
+            android.media.AudioDeviceInfo.TYPE_BLE_SPEAKER,
+            android.media.AudioDeviceInfo.TYPE_HEARING_AID,
+        )
+        fun current() = audio.getDevices(android.media.AudioManager.GET_DEVICES_OUTPUTS)
+            .firstOrNull { it.type in types }?.productName?.toString()
+        val callback = object : android.media.AudioDeviceCallback() {
+            override fun onAudioDevicesAdded(added: Array<out android.media.AudioDeviceInfo>?) { trySend(current()) }
+            override fun onAudioDevicesRemoved(removed: Array<out android.media.AudioDeviceInfo>?) { trySend(current()) }
+        }
+        trySend(current())
+        audio.registerAudioDeviceCallback(callback, null)
+        awaitClose { audio.unregisterAudioDeviceCallback(callback) }
+    }
+
+    /** Apps de música instaladas (la última usada primero), hasta 4. */
+    val mediaApps: StateFlow<List<Application>> = combine(
+        apps,
+        kotlinx.coroutines.flow.flow { emit(musicService.getInstalledPlayerPackages()) },
+    ) { all, players ->
+        val last = musicService.lastPlayerPackage
+        val pkgs = (listOfNotNull(last) + players).distinct()
+        pkgs.mapNotNull { p -> all.firstOrNull { it.componentName.packageName == p } }.take(4)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun icon(searchable: SavableSearchable, size: Int): Flow<LauncherIcon?> =
         iconService.getIcon(searchable, size)

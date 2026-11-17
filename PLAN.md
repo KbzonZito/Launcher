@@ -250,6 +250,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.3.0 | Fases 9–11: correcciones del riel/reloj/clima, fork total (código propio, sin plugins, Ko-fi), home configurable (menú rápido, gestos unificados, botón de acción, editar diseño) |
 | v0.3.1 | Entrega A: favoritos fijos y siempre visibles, reordenar arrastrando, lista a pantalla completa con una letra, márgenes simétricos, ola suave, burbuja junto al alfabeto, feedback al tocar |
 | v0.3.2 | Entrega B: botón de acción con posición elegible y más cómodo, Editar diseño sin interferencias de gestos (reloj movible), barra de edición compacta |
+| v0.3.3 | Entrega C: próximo evento + tarjeta de eventos, clima con permiso de ubicación, alarma sin falsos positivos, apps de música al conectar audio |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -257,7 +258,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: entrega C de arreglos y mejoras (§9) y luego fases 12 → 15 (§10)**, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: fases 12 → 15 (§10)**, tras probar las entregas A–C en el teléfono, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -298,6 +299,7 @@ Bugs reportados el 16-11 (B1–B14) y mejoras pedidas el 17-11 (M1–M3), ordena
 | B11 | El aviso inferior estorba | Reemplazarlo por una barra superior compacta con "Restablecer" y "Listo" y una pista breve que se oculta sola. |
 
 **Entrega C — Vistazo: reloj, eventos, clima, alarma y medios (v0.3.3)**
+> ✅ Hecha (PR #26, apilado sobre #25). Próximo evento con "+N" y tarjeta de hoy/mañana; el clima pide el permiso de ubicación desde el vistazo (y la espera de ubicación bajó de 10 min a 30 s); la alarma solo se muestra si la creó la app de reloj; fila de apps de música al conectar audio Bluetooth (reproductores instalados, el último usado primero). Sin verificar en emulador: datos de clima reales (el emulador no tiene ubicación por red) y la fila Bluetooth. Pendiente: elegir a mano las apps de esa fila.
 | # | Qué | Cómo |
 |---|---|---|
 | M2 | Próximo evento bajo el reloj; al tocarlo, popup con los siguientes | Una línea con el próximo evento; al tocarla, tarjeta flotante con los eventos de hoy y mañana (tocar uno lo abre en la app de calendario). |
