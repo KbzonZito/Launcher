@@ -10,7 +10,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.kbzon.launcher.search.Contact
 import dev.kbzon.launcher.ui.R
-import dev.kbzon.launcher.ui.component.MissingPermissionBanner
+import dev.kbzon.launcher.ui.component.CompactPermissionRow
 import dev.kbzon.launcher.ui.launcher.search.common.ShowAllButton
 import dev.kbzon.launcher.ui.launcher.search.common.list.ListItem
 import dev.kbzon.launcher.ui.launcher.search.common.list.ListResults
@@ -45,17 +45,10 @@ fun LazyListScope.ContactResults(
         },
         before = if (missingPermission) {
             {
-                MissingPermissionBanner(
-                    modifier = Modifier.padding(8.dp),
-                    text = stringResource(R.string.missing_permission_contact_search),
-                    onClick = onPermissionRequest,
-                    secondaryAction = {
-                        OutlinedButton(onClick = onPermissionRequestRejected) {
-                            Text(
-                                stringResource(R.string.turn_off),
-                            )
-                        }
-                    }
+                CompactPermissionRow(
+                    category = stringResource(R.string.fork_category_contacts),
+                    onGrant = onPermissionRequest,
+                    onTurnOff = onPermissionRequestRejected,
                 )
             }
         } else null,

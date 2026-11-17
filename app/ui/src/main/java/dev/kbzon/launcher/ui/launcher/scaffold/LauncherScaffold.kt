@@ -1403,7 +1403,7 @@ internal fun LauncherScaffold(
                             }
                             state.isSearchBarFocused = it
                         },
-                        onKeyboardActionGo = if (launchOnEnter) {
+                        onKeyboardActionGo = if (launchOnEnter || searchVM.keywordAction.value != null) { // [fork] atajos
                             { searchVM.launchBestMatchOrAction(activity) }
                         } else null,
                         highlightedAction = highlightedResult as? SearchAction,

@@ -114,6 +114,14 @@ class MinimalHomeSettings internal constructor(
 
     fun setLetterSort(value: LetterSort) = dataStore.update { it.copy(minimalHomeLetterSort = value) }
 
+    /** Palabras clave de las acciones de búsqueda (clave de la acción → palabra; "" = sin palabra). */
+    val searchKeywords: Flow<Map<String, String>>
+        get() = dataStore.data.map { it.minimalSearchKeywords }.distinctUntilChanged()
+
+    fun setSearchKeyword(actionKey: String, keyword: String) = dataStore.update {
+        it.copy(minimalSearchKeywords = it.minimalSearchKeywords + (actionKey to keyword.trim().lowercase()))
+    }
+
     val appFont: Flow<AppFont>
         get() = dataStore.data.map { it.minimalHomeAppFont }.distinctUntilChanged()
 

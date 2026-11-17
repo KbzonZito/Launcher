@@ -172,4 +172,18 @@
     <string name="fork_clock_vertical">Vertical</string>
     <string name="fork_clock_dots">Matriz de puntos</string>
     <string name="fork_clock_ring">Anillo</string>
+    <string name="fork_permission_missing_short">%1$s: falta permiso</string>
+    <string name="fork_permission_allow">Permitir</string>
+    <string name="fork_category_shortcuts">Atajos de apps</string>
+    <string name="fork_category_calendar">Calendario</string>
+    <string name="fork_category_places">Lugares</string>
+    <string name="fork_category_contacts">Contactos</string>
+    <string name="fork_category_files">Archivos</string>
+    <string name="fork_search_bottom_bar">Barra de búsqueda abajo</string>
+    <string name="fork_search_bottom_bar_summary">Al alcance del pulgar; los resultados empiezan desde abajo</string>
+    <string name="fork_search_call_on_tap">Tocar un contacto llama</string>
+    <string name="fork_search_call_on_tap_summary">Si no, abre la ficha con botones de llamar y mensaje</string>
+    <string name="fork_search_keywords_title">Atajos de búsqueda</string>
+    <string name="fork_search_keywords_summary">yt gatos → YouTube, p spotify → Google Play, g clima → web</string>
+    <string name="fork_search_keywords_help">Escribe la palabra clave, un espacio y lo que buscas; Enter lo abre en esa acción. Déjala vacía para desactivarla.</string>
 </resources>

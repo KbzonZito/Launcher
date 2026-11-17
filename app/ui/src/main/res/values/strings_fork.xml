@@ -173,4 +173,18 @@
     <string name="fork_clock_vertical">Vertical</string>
     <string name="fork_clock_dots">Dot matrix</string>
     <string name="fork_clock_ring">Ring</string>
+    <string name="fork_permission_missing_short">%1$s: permission needed</string>
+    <string name="fork_permission_allow">Allow</string>
+    <string name="fork_category_shortcuts">App shortcuts</string>
+    <string name="fork_category_calendar">Calendar</string>
+    <string name="fork_category_places">Places</string>
+    <string name="fork_category_contacts">Contacts</string>
+    <string name="fork_category_files">Files</string>
+    <string name="fork_search_bottom_bar">Search bar at the bottom</string>
+    <string name="fork_search_bottom_bar_summary">Within thumb reach; results start from the bottom</string>
+    <string name="fork_search_call_on_tap">Tapping a contact calls</string>
+    <string name="fork_search_call_on_tap_summary">Otherwise it opens the contact card with call and message buttons</string>
+    <string name="fork_search_keywords_title">Search keywords</string>
+    <string name="fork_search_keywords_summary">yt cats → YouTube, p spotify → Google Play, g weather → web</string>
+    <string name="fork_search_keywords_help">Type the keyword, a space and your search; Enter opens it in that action. Leave it empty to disable.</string>
 </resources>

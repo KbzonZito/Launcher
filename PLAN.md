@@ -232,7 +232,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **11** | Home configurable: menú rápido al mantener pulsado, gestos unificados en Ajustes → Gestos, botón de acción con 7 gestos, editar diseño (reloj y alfabeto movibles) | ✅ PR #22 |
 | **12** | Orden de lista por letra, carpetas (popup), reordenar favoritos | ✅ v0.4.0 |
 | **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ✅ v0.5.0 |
-| **14** | Búsqueda minimalista 2.0 | ⏳ v0.7 |
+| **14** | Búsqueda minimalista 2.0 | ✅ v0.6.0 (parcial) |
 | **15** | Limpieza de ajustes heredados | ⏳ futuro |
 | ~~continuo~~ | ~~`upstream-sync` mensual por tag~~ — cancelado por el fork total | — |
 
@@ -253,6 +253,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.3.3 | Entrega C: próximo evento + tarjeta de eventos, clima con permiso de ubicación, alarma sin falsos positivos, apps de música al conectar audio |
 | v0.4.0 | Fase 12: orden de cada letra (alfabético, más usadas, recientes, recién instaladas) y carpetas en favoritos (popup, renombrar, quitar, eliminar) — sin publicar aún |
 | v0.5.0 | Fase 13: fuente Manrope/Inter/sistema en toda la app, tamaño del texto de la home, 5 temas de color nuevos, íconos monocromo/contorno, relojes vertical/puntos/anillo, DESIGN.md — sin publicar aún |
+| v0.6.0 | Fase 14: atajos de búsqueda con palabra clave (yt, p, g…), avisos de permiso en una línea, barra de búsqueda abajo y "tocar un contacto llama" en Ajustes → Home — sin publicar aún |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -260,7 +261,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: fases 14 → 15 (§10)**, tras probar las entregas A–C y las fases 12–13 en el teléfono: búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: Fase 15 (§10)**, tras probar las entregas A–C y las fases 12–14 en el teléfono: limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -272,6 +273,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 - Tablet: S Pen hover; widgets o agenda en la columna izquierda.
 - Carpetas: ordenar a mano las apps de dentro (hoy van en orden alfabético porque las etiquetas no guardan orden), arrastrar una app sobre otra para crear carpeta, y carpetas en la búsqueda.
 - Personalización (resto de la Fase 13): más relojes (flip, mundial/dual para la Tab, binario, segmentos), fuente propia del reloj, tamaños separados para lista/reloj/vistazo, temas que agrupen también forma y transparencias en un solo paso, glifo generado (inicial) para apps sin capa monocroma, aplicar DESIGN.md a hojas y ajustes heredados de Kvaesitso.
+- Búsqueda (resto de la Fase 14): todos los resultados como filas de lista con encabezados discretos (hoy siguen en tarjetas casi transparentes), botones de llamar/mensaje directamente en la fila del contacto, revisar la navegación con flechas en teclado físico en la Tab S9.
 - Orden "Usadas recientemente": hoy usa el peso de uso de Kvaesitso (frecuencia con decaimiento); si no se siente bien, guardar la hora de la última apertura.
 - Accesibilidad: etiquetas de TalkBack en el riel, el botón de acción y las entradas especiales.
 
@@ -373,7 +375,8 @@ Decisiones tomadas (16-11-2026):
 4. **Íconos como Niagara**, además de lo que ya trae Kvaesitso (packs de íconos, temáticos): *Original*, *Monocromo* (capa monocroma de Android 13+, teñida con el acento), *Contorno* (glifo monocromo dentro de un contorno fino, sin relleno) y *Sin íconos*. Si una app no trae capa monocroma, se genera una a partir del ícono o se usa su inicial.
 5. **Más relojes**: portar los de Kvaesitso (binario, segmentos, órbita, digital 2), y nuevos: flip, mundial/dual (útil en la Tab), matriz de puntos, vertical y anillo de agenda. Fuente del reloj configurable.
 
-### Fase 14 — Búsqueda minimalista 2.0 (v0.7)
+### Fase 14 — Búsqueda minimalista 2.0 (v0.6.0)
+> ✅ Hecha en parte. **Atajos con palabra clave**: "yt gatos" pone YouTube primero y Enter lo abre; vienen sugeridas (g = web, yt = YouTube, p = Google Play, w = Wikipedia, m = Maps…) y se editan en Ajustes → Home → Atajos de búsqueda. **Permisos** en una línea ("Contactos: falta permiso · Permitir · ×"). **Barra abajo** y **tocar un contacto llama** expuestos en Ajustes → Home (ya existían en Kvaesitso). Calculadora y conversor ya funcionaban en línea. Pendiente (en §9): resultados como filas sin tarjetas, botones en la fila del contacto y revisar el teclado físico.
 1. Todos los tipos de resultado como filas de lista (igual que la home), sin tarjetas, con encabezados de sección discretos.
 2. Avisos de permisos compactos (una sola línea por categoría).
 3. Acciones rápidas en contactos (llamar, mensaje), calculadora y conversor en línea.
