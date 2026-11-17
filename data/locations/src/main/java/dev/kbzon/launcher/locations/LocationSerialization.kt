@@ -1,12 +1,9 @@
 package dev.kbzon.launcher.locations
 
+import dev.kbzon.launcher.plugin.config.StorageStrategy
 import android.content.Context
-import dev.kbzon.launcher.locations.providers.PluginLocation
-import dev.kbzon.launcher.locations.providers.PluginLocationProvider
 import dev.kbzon.launcher.locations.providers.openstreetmaps.OsmLocation
 import dev.kbzon.launcher.locations.providers.openstreetmaps.OsmLocationProvider
-import dev.kbzon.launcher.plugin.PluginRepository
-import dev.kbzon.launcher.plugin.config.StorageStrategy
 import dev.kbzon.launcher.search.SavableSearchable
 import dev.kbzon.launcher.search.SearchableDeserializer
 import dev.kbzon.launcher.search.SearchableSerializer
@@ -105,98 +102,4 @@ internal class OsmLocationDeserializer(
     }
 }
 
-internal class PluginLocationSerializer : SearchableSerializer {
-    override fun serialize(searchable: SavableSearchable): String {
-        searchable as PluginLocation
-        return when (searchable.storageStrategy) {
-            StorageStrategy.StoreReference -> Json.Lenient.encodeToString(
-                SerializedLocation(
-                    id = searchable.id,
-                    authority = searchable.authority,
-                    storageStrategy = StorageStrategy.StoreReference,
-                )
-            )
 
-            else -> {
-                Json.Lenient.encodeToString(
-                    SerializedLocation(
-                        id = searchable.id,
-                        lat = searchable.latitude,
-                        lon = searchable.longitude,
-                        icon = searchable.icon,
-                        category = searchable.category,
-                        label = searchable.label,
-                        address = searchable.address,
-                        websiteUrl = searchable.websiteUrl,
-                        phoneNumber = searchable.phoneNumber,
-                        emailAddress = searchable.emailAddress,
-                        userRating = searchable.userRating,
-                        userRatingCount = searchable.userRatingCount,
-                        attribution = searchable.attribution,
-                        openingSchedule = searchable.openingSchedule,
-                        timestamp = searchable.timestamp,
-                        departures = searchable.departures,
-                        acceptedPaymentMethods = searchable.acceptedPaymentMethods,
-                        fixMeUrl = searchable.fixMeUrl,
-                        authority = searchable.authority,
-                        storageStrategy = searchable.storageStrategy,
-                    )
-                )
-            }
-        }
-    }
-
-    override val typePrefix: String
-        get() = PluginLocation.DOMAIN
-}
-
-internal class PluginLocationDeserializer(
-    private val context: Context,
-    private val pluginRepository: PluginRepository,
-) : SearchableDeserializer {
-    override suspend fun deserialize(serialized: String): SavableSearchable? {
-        val json = Json.Lenient.decodeFromString<SerializedLocation>(serialized)
-        val authority = json.authority ?: return null
-        val id = json.id ?: return null
-        val strategy = json.storageStrategy ?: StorageStrategy.StoreCopy
-
-        val plugin = pluginRepository.get(authority).firstOrNull() ?: return null
-        if (!plugin.enabled) return null
-
-        return when (strategy) {
-            StorageStrategy.StoreReference -> {
-                PluginLocationProvider(context, authority).get(id).getOrNull()
-            }
-
-            else -> {
-                val timestamp = json.timestamp ?: 0
-                PluginLocation(
-                    id = id,
-                    latitude = json.lat ?: return null,
-                    longitude = json.lon ?: return null,
-                    icon = json.icon,
-                    category = json.category,
-                    label = json.label ?: return null,
-                    address = json.address,
-                    websiteUrl = json.websiteUrl,
-                    phoneNumber = json.phoneNumber,
-                    emailAddress = json.emailAddress,
-                    userRating = json.userRating,
-                    userRatingCount = json.userRatingCount,
-                    openingSchedule = json.openingSchedule,
-                    timestamp = timestamp,
-                    departures = json.departures,
-                    fixMeUrl = json.fixMeUrl,
-                    attribution = json.attribution,
-                    acceptedPaymentMethods = json.acceptedPaymentMethods,
-                    authority = authority,
-                    storageStrategy = strategy,
-                    updatedSelf = {
-                        if (it !is PluginLocation) UpdateResult.TemporarilyUnavailable()
-                        else PluginLocationProvider(context, authority).refresh(it, timestamp).asUpdateResult()
-                    }
-                )
-            }
-        }
-    }
-}

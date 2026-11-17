@@ -233,7 +233,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **12** | Orden de lista por letra, carpetas (popup), reordenar favoritos | ✅ v0.4.0 |
 | **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ✅ v0.5.0 |
 | **14** | Búsqueda minimalista 2.0 | ✅ v0.6.0 (parcial) |
-| **15** | Limpieza de ajustes heredados | ⏳ futuro |
+| **15** | Limpieza de ajustes heredados | ✅ v0.7.0 |
 | ~~continuo~~ | ~~`upstream-sync` mensual por tag~~ — cancelado por el fork total | — |
 
 Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), apertura animada + Espacio privado en el candado + batería en el vistazo (PR #15), búsqueda minimalista (PR #14), teclado físico + borrar estadísticas + mapas offline (PR #13), identidad propia (PR #12). Pendientes: ver §9.
@@ -251,9 +251,10 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.3.1 | Entrega A: favoritos fijos y siempre visibles, reordenar arrastrando, lista a pantalla completa con una letra, márgenes simétricos, ola suave, burbuja junto al alfabeto, feedback al tocar |
 | v0.3.2 | Entrega B: botón de acción con posición elegible y más cómodo, Editar diseño sin interferencias de gestos (reloj movible), barra de edición compacta |
 | v0.3.3 | Entrega C: próximo evento + tarjeta de eventos, clima con permiso de ubicación, alarma sin falsos positivos, apps de música al conectar audio |
-| v0.4.0 | Fase 12: orden de cada letra (alfabético, más usadas, recientes, recién instaladas) y carpetas en favoritos (popup, renombrar, quitar, eliminar) — sin publicar aún |
-| v0.5.0 | Fase 13: fuente Manrope/Inter/sistema en toda la app, tamaño del texto de la home, 5 temas de color nuevos, íconos monocromo/contorno, relojes vertical/puntos/anillo, DESIGN.md — sin publicar aún |
-| v0.6.0 | Fase 14: atajos de búsqueda con palabra clave (yt, p, g…), avisos de permiso en una línea, barra de búsqueda abajo y "tocar un contacto llama" en Ajustes → Home — sin publicar aún |
+| v0.4.0 | Fase 12: orden de cada letra (alfabético, más usadas, recientes, recién instaladas) y carpetas en favoritos (popup, renombrar, quitar, eliminar) (publicada dentro de v0.7.0) |
+| v0.5.0 | Fase 13: fuente Manrope/Inter/sistema en toda la app, tamaño del texto de la home, 5 temas de color nuevos, íconos monocromo/contorno, relojes vertical/puntos/anillo, DESIGN.md (publicada dentro de v0.7.0) |
+| v0.6.0 | Fase 14: atajos de búsqueda con palabra clave (yt, p, g…), avisos de permiso en una línea, barra de búsqueda abajo y "tocar un contacto llama" en Ajustes → Home (publicada dentro de v0.7.0) |
+| v0.7.0 | Fase 15: Ajustes en tres grupos (Launcher · Aspecto · Sistema), fuera las opciones de la home de Kvaesitso y el código de plugins; primera release con las fases 12–15 |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -261,21 +262,35 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: Fase 15 (§10)**, tras probar las entregas A–C y las fases 12–14 en el teléfono: limpieza de ajustes.
+**Las fases 9–15 están hechas (v0.7.0).** Lo que sigue es esta lista, en orden de prioridad. Marcar con [x] al terminar.
 
-**Fuera de las fases (seguir haciendo en paralelo)**
-- Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
-- Medir el arranque en el S24 Ultra con `:baselineprofile` y fijar objetivos con números.
-- Nombre definitivo de la app.
-- Notificaciones en la lista: deslizar para descartar, tocar la vista previa para abrir la notificación.
-- Widgets propios: batería de Galaxy Buds/Watch, temporizador/cronómetro, nota rápida; widgets de terceros incrustados en la home.
-- Animación de cierre: la app vuelve a la fila de la que salió.
-- Tablet: S Pen hover; widgets o agenda en la columna izquierda.
-- Carpetas: ordenar a mano las apps de dentro (hoy van en orden alfabético porque las etiquetas no guardan orden), arrastrar una app sobre otra para crear carpeta, y carpetas en la búsqueda.
-- Personalización (resto de la Fase 13): más relojes (flip, mundial/dual para la Tab, binario, segmentos), fuente propia del reloj, tamaños separados para lista/reloj/vistazo, temas que agrupen también forma y transparencias en un solo paso, glifo generado (inicial) para apps sin capa monocroma, aplicar DESIGN.md a hojas y ajustes heredados de Kvaesitso.
-- Búsqueda (resto de la Fase 14): todos los resultados como filas de lista con encabezados discretos (hoy siguen en tarjetas casi transparentes), botones de llamar/mensaje directamente en la fila del contacto, revisar la navegación con flechas en teclado físico en la Tab S9.
-- Orden "Usadas recientemente": hoy usa el peso de uso de Kvaesitso (frecuencia con decaimiento); si no se siente bien, guardar la hora de la última apertura.
-- Accesibilidad: etiquetas de TalkBack en el riel, el botón de acción y las entradas especiales.
+**1. Probar en los dispositivos (antes de construir más)**
+- [ ] Instalar v0.7.0 encima en el S24 Ultra y la Tab S9 y revisar: clima con datos reales, fila de apps de música con Bluetooth, que no aparezca la alarma fantasma de las 22:30, acción Recientes del botón, teclado físico de la Tab, vibración del riel, 120 Hz, dos dedos, reproductor.
+- [ ] Medianoche OLED en modo oscuro, reloj vertical, "tocar un contacto llama" y el editor de atajos de búsqueda (sin probar en el emulador).
+
+**2. Lo que quedó de las fases 13 y 14**
+- [ ] Búsqueda: todos los resultados como filas de lista sin tarjetas, con encabezados discretos.
+- [ ] Botones de llamar y mensaje directamente en la fila del contacto.
+- [ ] Revisar la navegación con flechas en el teclado físico de la Tab S9.
+- [ ] Más relojes: flip, mundial/dual (útil en la Tab), binario, segmentos; fuente propia del reloj.
+- [ ] Tamaños separados para lista, reloj y vistazo (hoy hay uno solo para la home).
+- [ ] Temas "todo en uno" (colores + forma + transparencias en un paso) y glifo generado (inicial) para apps sin capa monocroma.
+- [ ] Aplicar DESIGN.md a las hojas y pantallas de ajustes heredadas de Kvaesitso.
+- [ ] Carpetas: ordenar a mano las apps de dentro (hoy alfabético), crear carpeta arrastrando una app sobre otra, carpetas en la búsqueda.
+
+**3. Backlog de la home**
+- [ ] Notificaciones en la lista: deslizar para descartar, tocar la vista previa para abrir la notificación.
+- [ ] Animación de cierre: la app vuelve a la fila de la que salió.
+- [ ] Widgets propios: batería de Galaxy Buds/Watch, temporizador/cronómetro, nota rápida; widgets de terceros incrustados en la home.
+- [ ] Elegir a mano las apps de la fila de música al conectar audio Bluetooth.
+- [ ] Orden "Usadas recientemente": si no se siente bien con el peso de uso, guardar la hora de la última apertura.
+
+**4. Rendimiento y calidad**
+- [ ] Medir el arranque en el S24 Ultra con `:baselineprofile` y fijar objetivos con números.
+- [ ] Accesibilidad: etiquetas de TalkBack en el riel, el botón de acción y las entradas especiales.
+- [ ] Tablet: S Pen hover; widgets o agenda en la columna izquierda.
+
+**5. Nombre definitivo de la app.**
 
 ### Arreglos y mejoras tras v0.3.0 — plan de implementación (17-11-2026)
 
@@ -383,7 +398,8 @@ Decisiones tomadas (16-11-2026):
 4. Atajos de búsqueda propios (p. ej. `yt` → YouTube, `m` → Maps), además de los prefijos de categoría.
 5. Opción de barra de búsqueda abajo (alcance del pulgar) y navegación con teclado físico (flechas + Enter).
 
-### Fase 15 — Limpieza de ajustes (futuro)
+### Fase 15 — Limpieza de ajustes (v0.7.0)
+> ✅ Hecha. La lista principal quedó en tres grupos: **Launcher** (Home minimalista · Gestos y botón de acción · Búsqueda), **Aspecto** (Apariencia · Cuadrícula e íconos · Pantalla y fondo) y **Sistema** (Privacidad · Integraciones · Idioma · Copia de seguridad · Acerca de); Depuración pasó a Acerca de. Se quitaron de "Pantalla y fondo" el reloj, el dock, los widgets en la home y el estilo/posición de la barra de búsqueda de Kvaesitso (la posición está en Ajustes → Home). Se borró el código de plugins: proveedores de calendario, contactos, archivos, lugares y clima, `PluginRepository`/`NoPluginRepository`, la API y los contratos, y la opción de insignias de plugins. Se conservan la tabla de plugins de la base de datos (para no migrar) y `StorageStrategy`, que usan los datos guardados. Un proveedor de clima de plugin elegido antes vuelve a MET Norway.
 Incluye borrar los restos de plugins de la capa de datos (`NoPluginRepository` y proveedores `Plugin*`).
 Eliminar los ajustes heredados de Kvaesitso que no aplican a esta app (reloj y widgets de la home de Kvaesitso, dock, estilos de barra, etc.) y reorganizar en: Inicio · Riel y lista · Gestos y botón de acción · Búsqueda · Apariencia · Privacidad · Backup · Acerca de.
 

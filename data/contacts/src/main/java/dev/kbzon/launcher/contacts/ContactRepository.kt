@@ -2,7 +2,6 @@ package dev.kbzon.launcher.contacts
 
 import android.content.Context
 import dev.kbzon.launcher.contacts.providers.AndroidContactProvider
-import dev.kbzon.launcher.contacts.providers.PluginContactProvider
 import dev.kbzon.launcher.permissions.PermissionGroup
 import dev.kbzon.launcher.permissions.PermissionsManager
 import dev.kbzon.launcher.preferences.search.ContactSearchSettings
@@ -37,7 +36,7 @@ internal class ContactRepository(
             val providers = providerIds.mapNotNull {
                 when (it) {
                     "local" -> if (perm) AndroidContactProvider(context) else null
-                    else -> PluginContactProvider(context, it)
+                    else -> null // [fork] plugins eliminados
                 }
             }
 

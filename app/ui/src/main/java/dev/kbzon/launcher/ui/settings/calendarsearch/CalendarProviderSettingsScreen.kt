@@ -12,7 +12,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
 import dev.kbzon.launcher.calendar.providers.CalendarList
-import dev.kbzon.launcher.plugin.PluginState
 import dev.kbzon.launcher.themes.colors.atTone
 import dev.kbzon.launcher.ui.R
 import dev.kbzon.launcher.ui.component.preferences.CheckboxPreference

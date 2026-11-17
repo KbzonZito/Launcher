@@ -187,4 +187,11 @@
     <string name="fork_search_keywords_title">Search keywords</string>
     <string name="fork_search_keywords_summary">yt cats → YouTube, p spotify → Google Play, g weather → web</string>
     <string name="fork_search_keywords_help">Type the keyword, a space and your search; Enter opens it in that action. Leave it empty to disable.</string>
+    <string name="fork_settings_group_launcher">Launcher</string>
+    <string name="fork_settings_group_look">Look</string>
+    <string name="fork_settings_group_system">System</string>
+    <string name="fork_settings_gestures">Gestures and action button</string>
+    <string name="fork_settings_gestures_summary">Swipes, two fingers, action button</string>
+    <string name="fork_settings_display">Display and wallpaper</string>
+    <string name="fork_settings_display_summary">Wallpaper dim and blur, system bars, rotation</string>
 </resources>

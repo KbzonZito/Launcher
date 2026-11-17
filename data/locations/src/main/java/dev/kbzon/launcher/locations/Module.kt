@@ -1,6 +1,5 @@
 package dev.kbzon.launcher.locations
 
-import dev.kbzon.launcher.locations.providers.PluginLocation
 import dev.kbzon.launcher.locations.providers.openstreetmaps.OsmLocation
 import dev.kbzon.launcher.locations.providers.openstreetmaps.OsmLocationProvider
 import dev.kbzon.launcher.search.Location
@@ -15,5 +14,4 @@ val locationsModule = module {
     single<LocationsRepository> { LocationsRepository(androidContext(), get(), get(), get()) }
     factory<SearchableRepository<Location>>(named<Location>()) { get<LocationsRepository>() }
     factory<SearchableDeserializer>(named(OsmLocation.DOMAIN)) { OsmLocationDeserializer(get()) }
-    factory<SearchableDeserializer>(named(PluginLocation.DOMAIN)) { PluginLocationDeserializer(androidContext(), get()) }
 }

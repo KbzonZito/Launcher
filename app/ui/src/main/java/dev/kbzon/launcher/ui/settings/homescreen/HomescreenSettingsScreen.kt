@@ -85,7 +85,7 @@ fun HomescreenSettingsScreen() {
     val hideNavBar by viewModel.hideNavBar.collectAsStateWithLifecycle(null)
     val chargingAnimation by viewModel.chargingAnimation.collectAsStateWithLifecycle(null)
 
-    PreferenceScreen(title = stringResource(id = R.string.preference_screen_homescreen)) {
+    PreferenceScreen(title = stringResource(id = R.string.fork_settings_display)) {
         item {
             PreferenceCategory {
                 SwitchPreference(
@@ -102,39 +102,7 @@ fun HomescreenSettingsScreen() {
             PreferenceCategory(
                 title = stringResource(id = R.string.preference_category_widgets)
             ) {
-                Preference(
-                    title = stringResource(R.string.preference_screen_clockwidget),
-                    summary = stringResource(R.string.preference_screen_clockwidget_summary),
-                    onClick = {
-                        viewModel.showClockWidgetSheet = true
-                    }
-                )
-                SwitchPreference(
-                    title = stringResource(R.string.preference_clockwidget_favorites_part),
-                    summary = stringResource(R.string.preference_clockwidget_favorites_part_summary),
-                    value = dock == true,
-                    onValueChanged = {
-                        viewModel.setDock(it)
-                    },
-                )
-                AnimatedVisibility(dock == true) {
-                    SliderPreference(
-                        title = stringResource(R.string.preference_clockwidget_dock_rows),
-                        value = dockRows,
-                        min = 1,
-                        max = 4,
-                        onValueChanged = {
-                            viewModel.setDockRows(it)
-                        }
-                    )
-                }
-                SwitchPreference(
-                    title = stringResource(R.string.preference_widgets_on_home_screen),
-                    summary = stringResource(R.string.preference_widgets_on_home_screen_summary),
-                    value = widgetsOnHomeScreen == true,
-                    onValueChanged = {
-                        viewModel.setWidgetsOnHomeScreen(it)
-                    })
+                // [fork] Fase 15: fuera reloj/dock/widgets de la home de Kvaesitso (la home es la minimalista).
                 SwitchPreference(
                     title = stringResource(id = R.string.preference_edit_button),
                     summary = stringResource(id = R.string.preference_widgets_edit_button_summary),
@@ -144,42 +112,6 @@ fun HomescreenSettingsScreen() {
                     })
             }
 
-        }
-        item {
-            PreferenceCategory(stringResource(R.string.preference_category_searchbar)) {
-                SearchBarStylePreference(
-                    title = stringResource(R.string.preference_search_bar_style),
-                    summary = stringResource(R.string.preference_search_bar_style_summary),
-                    value = searchBarStyle,
-                    colors = searchBarColor,
-                    onStyleChanged = {
-                        viewModel.setSearchBarStyle(it)
-                    },
-                    onColorsChanged = {
-                        viewModel.setSearchBarColor(it)
-                    }
-                )
-
-                ListPreference(
-                    title = stringResource(R.string.preference_layout_search_bar_position),
-                    items = listOf(
-                        stringResource(R.string.search_bar_position_top) to false,
-                        stringResource(R.string.search_bar_position_bottom) to true,
-                    ),
-                    value = bottomSearchBar,
-                    onValueChanged = {
-                        if (it != null) viewModel.setBottomSearchBar(it)
-                    },
-                )
-                SwitchPreference(
-                    title = stringResource(R.string.preference_layout_fixed_search_bar),
-                    summary = stringResource(R.string.preference_layout_fixed_search_bar_summary),
-                    value = fixedSearchBar == true,
-                    onValueChanged = {
-                        viewModel.setFixedSearchBar(it)
-                    },
-                )
-            }
         }
         item {
             PreferenceCategory(stringResource(id = R.string.preference_category_wallpaper)) {

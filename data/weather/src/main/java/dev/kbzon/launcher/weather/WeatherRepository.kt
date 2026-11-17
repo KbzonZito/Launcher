@@ -8,9 +8,6 @@ import dev.kbzon.launcher.devicepose.DevicePoseProvider
 import dev.kbzon.launcher.ktx.or
 import dev.kbzon.launcher.permissions.PermissionGroup
 import dev.kbzon.launcher.permissions.PermissionsManager
-import dev.kbzon.launcher.plugin.PluginApi
-import dev.kbzon.launcher.plugin.PluginRepository
-import dev.kbzon.launcher.plugin.PluginType
 import dev.kbzon.launcher.preferences.LatLon
 import dev.kbzon.launcher.preferences.weather.WeatherLocation
 import dev.kbzon.launcher.preferences.weather.WeatherSettings
@@ -42,7 +39,6 @@ internal class WeatherRepositoryImpl(
     private val context: Context,
     private val database: AppDatabase,
     private val settings: WeatherSettings,
-    private val pluginRepository: PluginRepository
 ) : WeatherRepository, KoinComponent {
 
     private val scope = CoroutineScope(Job() + Dispatchers.Default)
@@ -191,13 +187,7 @@ internal class WeatherRepositoryImpl(
                 )
             )
         }
-        val pluginProviders = pluginRepository.findMany(type = PluginType.Weather, enabled = true)
-        return pluginProviders.map {
-            providers + it.mapNotNull {
-                val config = PluginApi(it.authority, context.contentResolver).getWeatherPluginConfig() ?: return@mapNotNull null
-                WeatherProviderInfo(it.authority, it.label, config.managedLocation)
-            }
-        }
+        return kotlinx.coroutines.flow.flowOf(providers.toList())
     }
 }
 
@@ -216,7 +206,7 @@ class WeatherUpdateWorker(
         val settingsData = settings.first()
         val provider = WeatherProvider.getInstance(settingsData.provider)
 
-        // [fork] Breezy Weather y los plugins leen de apps locales; el resto usa internet.
+        // [fork] Breezy Weather lee de una app local; el resto usa internet.
         if (settingsData.provider in setOf("metno", "owm", "brightsky") && privacySettings.offlineMode.first()) {
             Log.d("WeatherUpdateWorker", "Offline mode: skipping weather update")
             return Result.success()

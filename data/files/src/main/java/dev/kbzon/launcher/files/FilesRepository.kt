@@ -2,7 +2,6 @@ package dev.kbzon.launcher.files
 
 import android.content.Context
 import dev.kbzon.launcher.files.providers.LocalFileProvider
-import dev.kbzon.launcher.files.providers.PluginFileProvider
 import dev.kbzon.launcher.permissions.PermissionGroup
 import dev.kbzon.launcher.permissions.PermissionsManager
 import dev.kbzon.launcher.preferences.search.FileSearchSettings
@@ -54,7 +53,7 @@ internal class FileRepository(
 
                     // [fork] Nextcloud/ownCloud eliminados (privacidad); los favoritos guardados siguen deserializándose.
                     "nextcloud", "owncloud" -> null
-                    else -> PluginFileProvider(context, it)
+                    else -> null // [fork] plugins eliminados
                 }
             }
 
