@@ -26,6 +26,11 @@ import dev.kbzon.launcher.preferences.GestureAction
 import dev.kbzon.launcher.preferences.home.HomeLayout
 import dev.kbzon.launcher.ui.settings.SettingsActivity
 import kotlin.math.roundToInt
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableFloatStateOf
+import dev.kbzon.launcher.preferences.home.ActionButtonPosition
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.shrinkVertically
@@ -122,6 +127,7 @@ fun MinimalHome(
     openSearch: () -> Unit = {},
     openWidgets: () -> Unit = {},
     homePresses: kotlinx.coroutines.flow.Flow<Unit> = kotlinx.coroutines.flow.emptyFlow(),
+    onEditModeChange: (Boolean) -> Unit = {},
 ) {
     val vm: MinimalHomeVM = viewModel()
     val context = LocalContext.current
@@ -197,6 +203,10 @@ fun MinimalHome(
     val layout = draftLayout ?: storedLayout
     var quickMenuY by remember { mutableStateOf<Float?>(null) }
     var outerHeightPx by remember { mutableIntStateOf(1) }
+    var outerWidthPx by remember { mutableIntStateOf(1) }
+    val buttonPosition by vm.actionButtonPosition.collectAsState()
+    // B9: mientras se edita, el scaffold no reacciona a gestos (lock/unlock).
+    LaunchedEffect(editMode) { onEditModeChange(editMode) }
     val actionButtonEnabled by vm.actionButtonEnabled.collectAsState()
     val actionButtonActions by vm.actionButtonActions.collectAsState()
     val splitSwipeDown by vm.splitSwipeDown.collectAsState()
@@ -213,6 +223,15 @@ fun MinimalHome(
     BackHandler(enabled = editMode || quickMenuY != null) {
         if (quickMenuY != null) quickMenuY = null else { editMode = false; draftLayout = null }
     }
+    // B7: dónde va el botón según la posición elegida y el lado del alfabeto.
+    val buttonAlign = when (buttonPosition) {
+        ActionButtonPosition.RailSide -> if (railOnLeft) Alignment.BottomStart else Alignment.BottomEnd
+        ActionButtonPosition.OppositeSide -> if (railOnLeft) Alignment.BottomEnd else Alignment.BottomStart
+        ActionButtonPosition.Center -> Alignment.BottomCenter
+    }
+    // B6: si el botón queda a la izquierda o al centro, la lista le deja espacio abajo.
+    val reserveForButton = actionButtonEnabled && buttonAlign != Alignment.BottomEnd && layout.buttonLift < 0.05f
+    val listBottomSpace = if (reserveForButton) 104.dp else 32.dp
     fun updateDraft(transform: (HomeLayout) -> HomeLayout) {
         draftLayout = transform(draftLayout ?: storedLayout)
     }
@@ -221,7 +240,7 @@ fun MinimalHome(
         Box(
             modifier = modifier
                 .fillMaxSize()
-                .onSizeChanged { outerHeightPx = it.height.coerceAtLeast(1) }
+                .onSizeChanged { outerHeightPx = it.height.coerceAtLeast(1); outerWidthPx = it.width.coerceAtLeast(1) }
                 .homeGestures(
                     splitSwipeDown = { vm.splitSwipeDown.value },
                     onSwipeDown = { leftHalf ->
@@ -232,6 +251,7 @@ fun MinimalHome(
                         view.performHapticFeedback(HapticFeedbackConstants.GESTURE_END)
                         runAction(if (up) vm.twoFingerUp.value else vm.twoFingerDown.value)
                     },
+                    enabled = { !editMode },
                     onLongPress = { pos ->
                         if (!editMode) {
                             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
@@ -384,7 +404,7 @@ fun MinimalHome(
                         Column(Modifier.weight(1f).fillMaxHeight()) {
                             Spacer(Modifier.weight(1f))
                             listSection()
-                            Spacer(Modifier.height(32.dp))
+                            Spacer(Modifier.height(listBottomSpace))
                         }
                     }
                 } else {
@@ -401,7 +421,7 @@ fun MinimalHome(
                         }
                         Spacer(Modifier.weight(1f))
                         listSection()
-                        Spacer(Modifier.height(32.dp))
+                        Spacer(Modifier.height(listBottomSpace))
                     }
                 }
             }
@@ -421,7 +441,7 @@ fun MinimalHome(
             val onRailDoubleTap: (() -> Unit)? = if (railDoubleTapLock) ({ vm.lockScreen(context) }) else null
 
             // Zona invisible en el borde contrario: el riel funciona desde ambos lados.
-            if (railBothEdges) {
+            if (railBothEdges && !editMode) {
                 RailMirrorZone(
                     state = railState,
                     letters = railEntries,
@@ -463,9 +483,55 @@ fun MinimalHome(
                     onAction = runAction,
                     accent = accent,
                     modifier = Modifier
-                        .align(if (railOnLeft) Alignment.BottomStart else Alignment.BottomEnd)
-                        .padding(horizontal = 14.dp, vertical = 18.dp),
+                        .align(buttonAlign)
+                        .offset { IntOffset(0, -(layout.buttonLift * outerHeightPx).roundToInt()) }
+                        // B8: más adentro, en la zona cómoda del pulgar.
+                        .padding(horizontal = 32.dp, vertical = 24.dp),
                 )
+            }
+            if (actionButtonEnabled && editMode) {
+                // Botón arrastrable en "Editar diseño": horizontal se acomoda a izquierda/centro/derecha, vertical lo sube.
+                var dragX by remember { mutableFloatStateOf(0f) }
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .align(buttonAlign)
+                        .offset { IntOffset(dragX.roundToInt(), -(layout.buttonLift * outerHeightPx).roundToInt()) }
+                        .padding(horizontal = 32.dp, vertical = 24.dp)
+                        .size(56.dp)
+                        .border(1.5.dp, accent, CircleShape)
+                        .pointerInput(railOnLeft, buttonPosition) {
+                            detectDragGestures(
+                                onDragEnd = {
+                                    val base = when (buttonAlign) {
+                                        Alignment.BottomStart -> 0f
+                                        Alignment.BottomCenter -> 0.5f
+                                        else -> 1f
+                                    }
+                                    val x = base + dragX / outerWidthPx
+                                    val side = when {
+                                        x < 0.33f -> 0 // izquierda
+                                        x > 0.66f -> 2 // derecha
+                                        else -> 1
+                                    }
+                                    vm.setActionButtonPosition(
+                                        when (side) {
+                                            1 -> ActionButtonPosition.Center
+                                            0 -> if (railOnLeft) ActionButtonPosition.RailSide else ActionButtonPosition.OppositeSide
+                                            else -> if (railOnLeft) ActionButtonPosition.OppositeSide else ActionButtonPosition.RailSide
+                                        }
+                                    )
+                                    dragX = 0f
+                                },
+                            ) { change, amount ->
+                                change.consume()
+                                dragX += amount.x
+                                updateDraft { it.copy(buttonLift = (it.buttonLift - amount.y / outerHeightPx).coerceIn(0f, 0.5f)) }
+                            }
+                        },
+                ) {
+                    Icon(painterResource(R.drawable.search_24px), contentDescription = null, tint = accent)
+                }
             }
 
             if (editMode) {
@@ -500,27 +566,28 @@ fun MinimalHome(
                         Box(Modifier.size(width = 28.dp, height = 6.dp).background(accent, RoundedCornerShape(3.dp)))
                     }
                 }
+                // B11: barra superior compacta; la pista se oculta sola.
+                var showHint by remember { mutableStateOf(true) }
+                LaunchedEffect(Unit) { kotlinx.coroutines.delay(3000); showHint = false }
                 Surface(
-                    shape = RoundedCornerShape(24.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp).widthIn(max = 420.dp),
+                    shape = RoundedCornerShape(50),
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.94f),
+                    modifier = Modifier.align(Alignment.TopCenter).padding(top = 8.dp),
                 ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(stringResource(R.string.fork_edit_layout_hint), style = MaterialTheme.typography.bodyMedium)
-                        Spacer(Modifier.height(12.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedButton(onClick = { draftLayout = HomeLayout() }, modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.fork_edit_layout_reset))
-                            }
-                            Button(
-                                onClick = {
-                                    draftLayout?.let { vm.saveLayout(landscape, it) }
-                                    draftLayout = null
-                                    editMode = false
-                                },
-                                modifier = Modifier.weight(1f),
-                            ) { Text(stringResource(R.string.fork_edit_layout_done)) }
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)) {
+                        AnimatedVisibility(showHint) {
+                            Text(
+                                stringResource(R.string.fork_edit_layout_hint_short),
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.padding(horizontal = 10.dp),
+                            )
                         }
+                        TextButton(onClick = { draftLayout = HomeLayout() }) { Text(stringResource(R.string.fork_edit_layout_reset)) }
+                        TextButton(onClick = {
+                            draftLayout?.let { vm.saveLayout(landscape, it) }
+                            draftLayout = null
+                            editMode = false
+                        }) { Text(stringResource(R.string.fork_edit_layout_done)) }
                     }
                 }
             }

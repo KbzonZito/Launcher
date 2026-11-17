@@ -120,6 +120,12 @@ class MinimalHomeSettings internal constructor(
 
     fun setActionButton(enabled: Boolean) = dataStore.update { it.copy(minimalHomeActionButton = enabled) }
 
+    val actionButtonPosition: Flow<ActionButtonPosition>
+        get() = dataStore.data.map { it.minimalHomeActionButtonPosition }.distinctUntilChanged()
+
+    fun setActionButtonPosition(position: ActionButtonPosition) =
+        dataStore.update { it.copy(minimalHomeActionButtonPosition = position) }
+
     val actionButtonActions: Flow<ActionButtonActions>
         get() = dataStore.data.map { it.minimalHomeActionButtonActions }.distinctUntilChanged()
 

@@ -30,4 +30,10 @@ data class HomeLayout(
     val clockOffset: Float = 0f,
     val railCenter: Float = 0.5f,
     val railHeight: Float = 0.62f,
+    /** cuánto sube el botón de acción desde su posición base (0 … 0.5 del alto) */
+    val buttonLift: Float = 0f,
 )
+
+/** [fork] Posición horizontal del botón de acción. */
+@Serializable
+enum class ActionButtonPosition { RailSide, OppositeSide, Center }

@@ -34,6 +34,7 @@ fun Modifier.homeGestures(
     onSwipeDown: (leftHalf: Boolean) -> Unit,
     onTwoFinger: (up: Boolean) -> Unit,
     onLongPress: (Offset) -> Unit,
+    enabled: () -> Boolean = { true },
 ): Modifier = pointerInput(Unit) {
     val slop = viewConfiguration.touchSlop
     val swipeDownThreshold = 28.dp.toPx()
@@ -43,6 +44,7 @@ fun Modifier.homeGestures(
 
     awaitEachGesture {
         val down = awaitFirstDown(requireUnconsumed = false)
+        if (!enabled()) return@awaitEachGesture // p. ej. en "Editar diseño"
         val downConsumedByChild = down.isConsumed // p. ej. el riel
         val startX = down.position.x
         var done = false
