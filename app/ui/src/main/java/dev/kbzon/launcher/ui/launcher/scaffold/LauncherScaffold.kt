@@ -653,6 +653,7 @@ internal class LauncherScaffoldState(
     }
 
     suspend fun onHomeButtonPress() {
+        if (currentComponent == null) config.homeComponent.onHomeButtonPressed() // [fork]
         performTapGesture(Gesture.HomeButton)
 
     }
@@ -1112,7 +1113,10 @@ internal fun LauncherScaffold(
                         } else {
                             activity.onBackPressedDispatcher.onBackPressed()
                         }
-                    } else if (activity.pauseTime > 0L && System.currentTimeMillis() - activity.pauseTime > 5000L) {
+                    } else if (activity.pauseTime > 0L && (activity.wasStopped || System.currentTimeMillis() - activity.pauseTime > 5000L)) {
+                        // [fork] B1: si el launcher dejó de verse (pantalla apagada, se abrió una app), al volver
+                        // se muestra siempre la home con los favoritos, aunque hayan pasado menos de 5 s.
+                        activity.wasStopped = false
                         if (!state.isLocked) {
                             if (state.currentComponent?.survivesPause != true) {
                                 state.reset()

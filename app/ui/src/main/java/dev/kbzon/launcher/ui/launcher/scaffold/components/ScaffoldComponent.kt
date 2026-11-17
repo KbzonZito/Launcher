@@ -71,6 +71,9 @@ internal abstract class ScaffoldComponent {
     open fun searchBarModifier(state: LauncherScaffoldState, defaultModifier: Modifier): Modifier =
         defaultModifier
 
+    /** [fork] Se pulsó el botón de inicio estando ya en la home. */
+    open fun onHomeButtonPressed() {}
+
     protected var isActive by mutableStateOf(false)
 
     /**

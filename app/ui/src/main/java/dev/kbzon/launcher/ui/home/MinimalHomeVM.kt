@@ -65,6 +65,7 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     private val weatherRepository: WeatherRepository by inject()
     private val permissionsManager: PermissionsManager by inject()
     private val homeSettings: MinimalHomeSettings by inject()
+    private val context: Context by inject()
     private val notificationRepository: NotificationRepository by inject()
     private val appShortcutRepository: AppShortcutRepository by inject()
     private val globalActions: GlobalActionsService by inject()
@@ -179,8 +180,42 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     )
 
     fun isPinned(item: SavableSearchable): Flow<Boolean> = favoritesService.isPinned(item)
-    fun pin(item: SavableSearchable) = favoritesService.pinItem(item)
-    fun unpin(item: SavableSearchable) = favoritesService.unpinItem(item)
+    // B2: los favoritos de la home tienen orden manual (no se reordenan por uso).
+    fun pin(item: SavableSearchable) {
+        val current = favorites.value
+        if (current.any { it.key == item.key }) return
+        favoritesService.updateFavorites(manuallySorted = current + item, automaticallySorted = emptyList())
+    }
+
+    fun unpin(item: SavableSearchable) {
+        favoritesService.updateFavorites(
+            manuallySorted = favorites.value.filterNot { it.key == item.key },
+            automaticallySorted = emptyList(),
+        )
+    }
+
+    /** Guarda un nuevo orden de favoritos (reordenar arrastrando). */
+    fun reorderFavorites(ordered: List<SavableSearchable>) {
+        favoritesService.updateFavorites(manuallySorted = ordered, automaticallySorted = emptyList())
+    }
+
+    init {
+        // Migración única: los favoritos fijados antes quedaban en "orden automático" (por uso).
+        // Se pasan a orden manual conservando el orden que se veía.
+        val prefs = context.getSharedPreferences("fork_migrations", Context.MODE_PRIVATE)
+        if (!prefs.getBoolean("favorites_manual_v1", false)) {
+            viewModelScope.launch {
+                val current = favoritesService.getFavorites(
+                    minPinnedLevel = PinnedLevel.AutomaticallySorted,
+                    limit = 20,
+                ).first()
+                if (current.isNotEmpty()) {
+                    favoritesService.updateFavorites(manuallySorted = current, automaticallySorted = emptyList())
+                }
+                prefs.edit().putBoolean("favorites_manual_v1", true).apply()
+            }
+        }
+    }
     fun hide(item: SavableSearchable) = favoritesService.setVisibility(item, VisibilityLevel.Hidden)
     fun unhide(item: SavableSearchable) = favoritesService.setVisibility(item, VisibilityLevel.Default)
 

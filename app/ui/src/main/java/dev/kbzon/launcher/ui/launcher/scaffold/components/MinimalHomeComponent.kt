@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,13 +34,17 @@ import dev.kbzon.launcher.ui.launcher.scaffold.LauncherScaffoldState
  * los sigue manejando LauncherScaffold.
  */
 internal object MinimalHomeComponent : ScaffoldComponent() {
-    private val listState = LazyListState()
+    // Lista activa de la home (favoritos o una letra); cada lista tiene su propio estado.
+    private var activeList by mutableStateOf<LazyListState?>(null)
+
+    private val homePresses = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    override fun onHomeButtonPressed() { homePresses.tryEmit(Unit) }
 
     override val drawBackground: Boolean = false
     override val showSearchBar: Boolean = false
 
-    override val isAtTop: State<Boolean?> = derivedStateOf { !listState.canScrollBackward }
-    override val isAtBottom: State<Boolean?> = derivedStateOf { !listState.canScrollForward }
+    override val isAtTop: State<Boolean?> = derivedStateOf { activeList?.canScrollBackward != true }
+    override val isAtBottom: State<Boolean?> = derivedStateOf { activeList?.canScrollForward != true }
 
     /** Solo se llama en reposo: la barra de búsqueda aparece al deslizar hacia la búsqueda. */
     override fun searchBarModifier(state: LauncherScaffoldState, defaultModifier: Modifier): Modifier =
@@ -59,7 +66,8 @@ internal object MinimalHomeComponent : ScaffoldComponent() {
         val scaffoldScope = rememberCoroutineScope()
         MinimalHome(
             insets = insets,
-            listState = listState,
+            onActiveListState = { activeList = it },
+            homePresses = homePresses,
             openSearch = { scaffoldScope.launch { state.onSearchBarTap() } },
             openWidgets = {
                 scaffoldScope.launch {

@@ -28,6 +28,11 @@ import dev.kbzon.launcher.ui.settings.SettingsActivity
 import kotlin.math.roundToInt
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.runtime.SideEffect
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -112,10 +117,11 @@ import java.util.Locale
 @Composable
 fun MinimalHome(
     insets: PaddingValues,
-    listState: LazyListState,
+    onActiveListState: (LazyListState) -> Unit = {},
     modifier: Modifier = Modifier,
     openSearch: () -> Unit = {},
     openWidgets: () -> Unit = {},
+    homePresses: kotlinx.coroutines.flow.Flow<Unit> = kotlinx.coroutines.flow.emptyFlow(),
 ) {
     val vm: MinimalHomeVM = viewModel()
     val context = LocalContext.current
@@ -169,7 +175,8 @@ fun MinimalHome(
 
     BackHandler(enabled = selectedLetter != null) { vm.selectLetter(null) }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { vm.selectLetter(null) }
-    LaunchedEffect(selectedLetter) { listState.scrollToItem(0) }
+    var reorderMode by remember { mutableStateOf(false) }
+    LaunchedEffect(selectedLetter) { if (selectedLetter != null) reorderMode = false }
 
     val onLaunch: (SavableSearchable, IntRect?) -> Unit = { item, bounds ->
         if (vm.launch(context, item, bounds)) vm.selectLetter(null)
@@ -194,6 +201,15 @@ fun MinimalHome(
     val actionButtonActions by vm.actionButtonActions.collectAsState()
     val splitSwipeDown by vm.splitSwipeDown.collectAsState()
     val clockStyleNow by vm.clockStyle.collectAsState()
+    // Botón de inicio estando en la home: volver a la vista principal (como Niagara).
+    LaunchedEffect(homePresses) {
+        homePresses.collect {
+            vm.selectLetter(null)
+            quickMenuY = null
+            reorderMode = false
+            if (editMode) { editMode = false; draftLayout = null }
+        }
+    }
     BackHandler(enabled = editMode || quickMenuY != null) {
         if (quickMenuY != null) quickMenuY = null else { editMode = false; draftLayout = null }
     }
@@ -230,7 +246,10 @@ fun MinimalHome(
                 val large = maxWidth >= 600.dp
                 // Dos columnas solo en horizontal; la Tab en vertical usa una columna más grande.
                 val wide = large && maxWidth > maxHeight
+                // M1: con una letra elegida (o reordenando), la lista usa casi todo el alto.
+                val focusedList = !wide && (selectedLetter != null || reorderMode)
                 val listMaxHeight = when {
+                    focusedList -> maxHeight * 0.82f
                     wide -> maxHeight * 0.8f
                     large -> maxHeight * 0.5f
                     else -> 460.dp
@@ -285,6 +304,10 @@ fun MinimalHome(
                             contentAlignment = Alignment.BottomStart,
                             label = "homeList",
                         ) { letter ->
+                            // B1: cada lista tiene su propio estado de scroll (antes se compartía entre la lista
+                            // saliente y la entrante durante la transición, y los favoritos podían quedar desplazados).
+                            val ownListState = rememberLazyListState()
+                            if (letter == selectedLetter) SideEffect { onActiveListState(ownListState) }
                             val (header, items) = when (letter) {
                                 null -> null to favorites
                                 MinimalHomeVM.RECENT -> stringResource(R.string.fork_minimal_home_frequent) to frequentApps
@@ -318,6 +341,16 @@ fun MinimalHome(
                                         color = contentColor.copy(alpha = 0.7f),
                                         modifier = Modifier.padding(bottom = 8.dp),
                                     )
+                                } else if (letter == null && reorderMode) {
+                                    HomeReorderFavorites(
+                                        items = items,
+                                        vm = vm,
+                                        showIcons = showIcons,
+                                        shadow = shadow,
+                                        accent = accent,
+                                        maxHeight = listMaxHeight,
+                                        onDone = { vm.reorderFavorites(it); reorderMode = false },
+                                    )
                                 } else {
                                     HomeList(
                                         items = items,
@@ -328,18 +361,17 @@ fun MinimalHome(
                                         isHiddenSection = letter == MinimalHomeVM.HIDDEN,
                                         shadow = shadow,
                                         accent = accent,
-                                        listState = listState,
+                                        listState = ownListState,
                                         onLaunch = onLaunch,
+                                        onReorderFavorites = if (letter == null) ({ reorderMode = true }) else null,
                                     )
                                 }
                             }
                         }
                     }
                 }
-                val sidePadding = Modifier.padding(
-                    start = if (railOnLeft) 56.dp else 28.dp,
-                    end = if (railOnLeft) 28.dp else 56.dp,
-                )
+                // B3: margen simétrico del ancho del alfabeto, para deslizar cómodo en cualquier borde.
+                val sidePadding = Modifier.padding(horizontal = 56.dp)
                 if (wide) {
                     Row(Modifier.fillMaxSize().then(sidePadding).padding(horizontal = 24.dp)) {
                         Column(
@@ -357,8 +389,16 @@ fun MinimalHome(
                     }
                 } else {
                     Column(Modifier.fillMaxSize().then(sidePadding)) {
-                        Spacer(Modifier.height(40.dp))
-                        clockBlock()
+                        AnimatedVisibility(
+                            visible = !focusedList,
+                            enter = fadeIn(spring(stiffness = 600f)) + expandVertically(spring(dampingRatio = 0.9f, stiffness = 500f)),
+                            exit = fadeOut(spring(stiffness = 900f)) + shrinkVertically(spring(dampingRatio = 0.9f, stiffness = 600f)),
+                        ) {
+                            Column {
+                                Spacer(Modifier.height(40.dp))
+                                clockBlock()
+                            }
+                        }
                         Spacer(Modifier.weight(1f))
                         listSection()
                         Spacer(Modifier.height(32.dp))
@@ -410,6 +450,8 @@ fun MinimalHome(
                 railOnLeft = railOnLeft,
                 intensity = waveIntensity,
                 heightFraction = layout.railHeight,
+                bubbleColor = MaterialTheme.colorScheme.primary,
+                onBubble = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier
                     .align(BiasAlignment(if (railOnLeft) -1f else 1f, layout.railCenter * 2f - 1f))
                     .padding(horizontal = 8.dp),
@@ -523,6 +565,7 @@ private fun HomeList(
     accent: Color,
     listState: LazyListState,
     onLaunch: (SavableSearchable, IntRect?) -> Unit,
+    onReorderFavorites: (() -> Unit)? = null,
 ) {
     val swipeLeftTargets by vm.swipeLeftTargets.collectAsState()
     LazyColumn(
@@ -542,6 +585,7 @@ private fun HomeList(
                 accent = accent,
                 onLaunch = onLaunch,
                 swipeLeftTarget = swipeLeftTargets[item.key],
+                onReorderFavorites = onReorderFavorites,
                 modifier = Modifier.animateItem(),
             )
         }
