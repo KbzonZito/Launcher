@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.foundation.focusable
@@ -64,6 +65,13 @@ internal object MinimalHomeComponent : ScaffoldComponent() {
             if (state.currentComponent == null) runCatching { focusRequester.requestFocus() }
         }
         val scaffoldScope = rememberCoroutineScope()
+        // [fork] Fase 13: tamaño del texto de la home (escala solo los sp de la home).
+        val homeSettings: dev.kbzon.launcher.preferences.home.MinimalHomeSettings = org.koin.compose.koinInject()
+        val textScale by remember { homeSettings.textScale }.collectAsState(1f)
+        val density = androidx.compose.ui.platform.LocalDensity.current
+        androidx.compose.runtime.CompositionLocalProvider(
+            androidx.compose.ui.platform.LocalDensity provides androidx.compose.ui.unit.Density(density.density, density.fontScale * textScale),
+        ) {
         MinimalHome(
             insets = insets,
             onActiveListState = { activeList = it },
@@ -91,5 +99,6 @@ internal object MinimalHomeComponent : ScaffoldComponent() {
                     true
                 },
         )
+        }
     }
 }

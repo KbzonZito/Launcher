@@ -172,6 +172,9 @@ private val clockLabels = listOf(
     MinimalClockStyle.Words to R.string.fork_clock_words,
     MinimalClockStyle.Analog to R.string.fork_clock_analog,
     MinimalClockStyle.DayProgress to R.string.fork_clock_day_progress,
+    MinimalClockStyle.Vertical to R.string.fork_clock_vertical,
+    MinimalClockStyle.DotMatrix to R.string.fork_clock_dots,
+    MinimalClockStyle.Ring to R.string.fork_clock_ring,
 )
 
 @Composable

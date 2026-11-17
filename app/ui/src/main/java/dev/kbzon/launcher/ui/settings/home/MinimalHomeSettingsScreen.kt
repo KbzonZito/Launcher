@@ -67,6 +67,9 @@ fun MinimalHomeSettingsScreen() {
     val railDoubleTap by settings.railDoubleTapLock.collectAsStateWithLifecycle(true)
     val wave by settings.waveIntensity.collectAsStateWithLifecycle(WaveIntensity.Normal)
     val letterSort by settings.letterSort.collectAsStateWithLifecycle(LetterSort.Alphabetical)
+    val appFont by settings.appFont.collectAsStateWithLifecycle(dev.kbzon.launcher.preferences.home.AppFont.Manrope)
+    val textScale by settings.textScale.collectAsStateWithLifecycle(1f)
+    val iconStyle by settings.iconStyle.collectAsStateWithLifecycle(dev.kbzon.launcher.preferences.home.HomeIconStyle.Original)
     val bothEdges by settings.railBothEdges.collectAsStateWithLifecycle(true)
     val weatherKey by settings.weatherAppKey.collectAsStateWithLifecycle(null)
     val calendarKey by settings.calendarAppKey.collectAsStateWithLifecycle(null)
@@ -82,6 +85,12 @@ fun MinimalHomeSettingsScreen() {
         MinimalClockStyle.Words to R.string.fork_clock_words,
         MinimalClockStyle.Analog to R.string.fork_clock_analog,
         MinimalClockStyle.DayProgress to R.string.fork_clock_day_progress,
+        MinimalClockStyle.Vertical to R.string.fork_clock_vertical,
+        MinimalClockStyle.DotMatrix to R.string.fork_clock_dots,
+        MinimalClockStyle.Ring to R.string.fork_clock_ring,
+    MinimalClockStyle.Vertical to R.string.fork_clock_vertical,
+    MinimalClockStyle.DotMatrix to R.string.fork_clock_dots,
+    MinimalClockStyle.Ring to R.string.fork_clock_ring,
     )
     val gestureOptions = remember {
         setOf(
@@ -94,12 +103,61 @@ fun MinimalHomeSettingsScreen() {
     PreferenceScreen(title = stringResource(R.string.fork_preference_screen_minimal_home)) {
         item {
             PreferenceCategory {
-                SwitchPreference(
+                // [fork] Fase 13: estilo de íconos ("none" = sin íconos).
+                ListPreference(
                     title = stringResource(R.string.fork_preference_minimal_home_icons),
                     icon = R.drawable.apps_24px,
-                    value = showIcons,
-                    onValueChanged = settings::setShowIcons,
+                    items = listOf(
+                        ListPreferenceItem(stringResource(R.string.fork_icons_original), "original"),
+                        ListPreferenceItem(stringResource(R.string.fork_icons_monochrome), "monochrome"),
+                        ListPreferenceItem(stringResource(R.string.fork_icons_outline), "outline"),
+                        ListPreferenceItem(stringResource(R.string.fork_icons_none), "none"),
+                    ),
+                    value = if (!showIcons) "none" else when (iconStyle) {
+                        dev.kbzon.launcher.preferences.home.HomeIconStyle.Original -> "original"
+                        dev.kbzon.launcher.preferences.home.HomeIconStyle.Monochrome -> "monochrome"
+                        dev.kbzon.launcher.preferences.home.HomeIconStyle.Outline -> "outline"
+                    },
+                    onValueChanged = {
+                        when (it) {
+                            "none" -> settings.setShowIcons(false)
+                            "monochrome" -> settings.setIconStyle(dev.kbzon.launcher.preferences.home.HomeIconStyle.Monochrome)
+                            "outline" -> settings.setIconStyle(dev.kbzon.launcher.preferences.home.HomeIconStyle.Outline)
+                            else -> settings.setIconStyle(dev.kbzon.launcher.preferences.home.HomeIconStyle.Original)
+                        }
+                    },
                     enabled = enabled,
+                )
+                ListPreference(
+                    title = stringResource(R.string.fork_preference_app_font),
+                    icon = R.drawable.text_fields_24px,
+                    items = listOf(
+                        ListPreferenceItem("Manrope", dev.kbzon.launcher.preferences.home.AppFont.Manrope),
+                        ListPreferenceItem("Inter", dev.kbzon.launcher.preferences.home.AppFont.Inter),
+                        ListPreferenceItem(stringResource(R.string.fork_font_system), dev.kbzon.launcher.preferences.home.AppFont.System),
+                        ListPreferenceItem(stringResource(R.string.fork_font_theme), dev.kbzon.launcher.preferences.home.AppFont.Theme),
+                    ),
+                    value = appFont,
+                    onValueChanged = settings::setAppFont,
+                )
+                ListPreference(
+                    title = stringResource(R.string.fork_preference_text_size),
+                    icon = R.drawable.format_size_24px,
+                    items = listOf(
+                        ListPreferenceItem(stringResource(R.string.fork_text_size_small), 0.85f),
+                        ListPreferenceItem(stringResource(R.string.fork_text_size_normal), 1f),
+                        ListPreferenceItem(stringResource(R.string.fork_text_size_large), 1.15f),
+                        ListPreferenceItem(stringResource(R.string.fork_text_size_xlarge), 1.3f),
+                    ),
+                    value = textScale,
+                    onValueChanged = settings::setTextScale,
+                )
+                val themeBackStack = dev.kbzon.launcher.ui.locals.LocalBackStack.current
+                Preference(
+                    title = stringResource(R.string.fork_preference_color_theme),
+                    summary = stringResource(R.string.fork_preference_color_theme_summary),
+                    icon = R.drawable.palette_24px,
+                    onClick = { themeBackStack.add(dev.kbzon.launcher.ui.settings.colorscheme.ColorSchemesSettingsRoute) },
                 )
                 SwitchPreference(
                     title = stringResource(R.string.fork_preference_minimal_home_notification_previews),

@@ -31,3 +31,5 @@ Si te sirve, puedes invitarme un café en [Ko-fi](https://ko-fi.com/kbzonzito).
 GPL-3.0 (ver [LICENSE.txt](LICENSE.txt)).
 
 Este proyecto nació como fork de [Kvaesitso](https://github.com/MM2-0/Kvaesitso), de MM2-0 y sus colaboradores, también GPL-3.0. Gracias por su trabajo.
+
+Fuentes incluidas: [Manrope](https://github.com/googlefonts/manrope) (The Manrope Project Authors) e [Inter](https://github.com/rsms/inter) (The Inter Project Authors), ambas con licencia [SIL Open Font License 1.1](https://openfontlicense.org).

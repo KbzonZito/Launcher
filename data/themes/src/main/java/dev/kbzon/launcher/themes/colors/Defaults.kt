@@ -233,3 +233,14 @@ val BlackAndWhiteDarkColorScheme = ColorScheme(
     surfaceContainerLow = StaticColor(0xFF000000.toInt()),
     surfaceContainerLowest = StaticColor(0xFF000000.toInt()),
 )
+/** [fork] Oscuro con superficies negras puras (pantallas OLED); el resto, como el oscuro por defecto. */
+val OledDarkColorScheme = DefaultDarkColorScheme.copy(
+    background = StaticColor(0xFF000000.toInt()),
+    surface = StaticColor(0xFF000000.toInt()),
+    surfaceDim = StaticColor(0xFF000000.toInt()),
+    surfaceContainerLowest = StaticColor(0xFF000000.toInt()),
+    surfaceContainerLow = StaticColor(0xFF0A0A0C.toInt()),
+    surfaceContainer = StaticColor(0xFF111114.toInt()),
+    surfaceContainerHigh = StaticColor(0xFF19191D.toInt()),
+    surfaceContainerHighest = StaticColor(0xFF222227.toInt()),
+)

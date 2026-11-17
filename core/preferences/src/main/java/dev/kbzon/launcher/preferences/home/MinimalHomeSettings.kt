@@ -114,6 +114,34 @@ class MinimalHomeSettings internal constructor(
 
     fun setLetterSort(value: LetterSort) = dataStore.update { it.copy(minimalHomeLetterSort = value) }
 
+    val appFont: Flow<AppFont>
+        get() = dataStore.data.map { it.minimalHomeAppFont }.distinctUntilChanged()
+
+    fun setAppFont(value: AppFont) = dataStore.update { it.copy(minimalHomeAppFont = value) }
+
+    /** Escala del texto de la home (lista, reloj y vistazo). */
+    val textScale: Flow<Float>
+        get() = dataStore.data.map { it.minimalHomeTextScale }.distinctUntilChanged()
+
+    fun setTextScale(value: Float) = dataStore.update { it.copy(minimalHomeTextScale = value) }
+
+    val iconStyle: Flow<HomeIconStyle>
+        get() = dataStore.data.map { it.minimalHomeIconStyle }.distinctUntilChanged()
+
+    /**
+     * Cambia el estilo de íconos. Monocromo y Contorno activan los íconos temáticos de Kvaesitso
+     * (forzados para las apps sin capa monocroma), así la búsqueda queda con el mismo estilo.
+     */
+    fun setIconStyle(value: HomeIconStyle) = dataStore.update {
+        val themed = value != HomeIconStyle.Original
+        it.copy(
+            minimalHomeIconStyle = value,
+            minimalHomeShowIcons = true,
+            iconsThemed = themed,
+            iconsForceThemed = themed,
+        )
+    }
+
     /** El riel también responde desde el borde contrario. */
     val railBothEdges: Flow<Boolean>
         get() = dataStore.data.map { it.minimalHomeRailBothEdges }.distinctUntilChanged()

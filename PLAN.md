@@ -231,7 +231,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **10** | Fork total: código renombrado a `dev.kbzon.launcher`, sin upstream, plugins eliminados, Ko-fi, README propio, sin flavors ni traducciones extra | ✅ PR #21 |
 | **11** | Home configurable: menú rápido al mantener pulsado, gestos unificados en Ajustes → Gestos, botón de acción con 7 gestos, editar diseño (reloj y alfabeto movibles) | ✅ PR #22 |
 | **12** | Orden de lista por letra, carpetas (popup), reordenar favoritos | ✅ v0.4.0 |
-| **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ⏳ v0.6 |
+| **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ✅ v0.5.0 |
 | **14** | Búsqueda minimalista 2.0 | ⏳ v0.7 |
 | **15** | Limpieza de ajustes heredados | ⏳ futuro |
 | ~~continuo~~ | ~~`upstream-sync` mensual por tag~~ — cancelado por el fork total | — |
@@ -252,6 +252,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.3.2 | Entrega B: botón de acción con posición elegible y más cómodo, Editar diseño sin interferencias de gestos (reloj movible), barra de edición compacta |
 | v0.3.3 | Entrega C: próximo evento + tarjeta de eventos, clima con permiso de ubicación, alarma sin falsos positivos, apps de música al conectar audio |
 | v0.4.0 | Fase 12: orden de cada letra (alfabético, más usadas, recientes, recién instaladas) y carpetas en favoritos (popup, renombrar, quitar, eliminar) — sin publicar aún |
+| v0.5.0 | Fase 13: fuente Manrope/Inter/sistema en toda la app, tamaño del texto de la home, 5 temas de color nuevos, íconos monocromo/contorno, relojes vertical/puntos/anillo, DESIGN.md — sin publicar aún |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -259,7 +260,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: fases 13 → 15 (§10)**, tras probar las entregas A–C y la Fase 12 en el teléfono, en este orden: personalización visual → búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: fases 14 → 15 (§10)**, tras probar las entregas A–C y las fases 12–13 en el teléfono: búsqueda 2.0 → limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -270,6 +271,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 - Animación de cierre: la app vuelve a la fila de la que salió.
 - Tablet: S Pen hover; widgets o agenda en la columna izquierda.
 - Carpetas: ordenar a mano las apps de dentro (hoy van en orden alfabético porque las etiquetas no guardan orden), arrastrar una app sobre otra para crear carpeta, y carpetas en la búsqueda.
+- Personalización (resto de la Fase 13): más relojes (flip, mundial/dual para la Tab, binario, segmentos), fuente propia del reloj, tamaños separados para lista/reloj/vistazo, temas que agrupen también forma y transparencias en un solo paso, glifo generado (inicial) para apps sin capa monocroma, aplicar DESIGN.md a hojas y ajustes heredados de Kvaesitso.
 - Orden "Usadas recientemente": hoy usa el peso de uso de Kvaesitso (frecuencia con decaimiento); si no se siente bien, guardar la hora de la última apertura.
 - Accesibilidad: etiquetas de TalkBack en el riel, el botón de acción y las entradas especiales.
 
@@ -362,7 +364,8 @@ Decisiones tomadas (16-11-2026):
 2. **Carpetas (popup)**: crear desde el menú de una app ("Nueva carpeta" / "Añadir a carpeta"); se muestran en favoritos con un ícono mosaico; al tocar, popup con cuadrícula de apps, renombrar y reordenar. Se construyen sobre las **etiquetas fijables de Kvaesitso** (ya existen y se guardan en la base de datos).
 3. ~~Reordenar favoritos arrastrando~~ → adelantado a la Entrega A (§9).
 
-### Fase 13 — Personalización visual (v0.6)
+### Fase 13 — Personalización visual (v0.5.0)
+> ✅ Hecha en lo principal. **Fuente** (Ajustes → Home): Manrope por defecto, Inter, la del sistema o la del tema; se aplica a toda la app. **Tamaño del texto de la home** (4 pasos, escala lista, reloj y vistazo). **Temas de color** nuevos: Grafito, Medianoche OLED, Papel, Bosque y Arena, junto a los de Kvaesitso y su editor (enlace desde Ajustes → Home). **Íconos**: Original, Monocromo, Contorno y Sin íconos. **Relojes** nuevos: vertical, matriz de puntos y anillo. **DESIGN.md** con color, tipografía, forma, íconos y movimiento. Lo que queda (más relojes, fuente del reloj, temas "todo en uno", glifo generado) está en §9.
 > **Preferencias del usuario (16-11-2026):** fuente **Manrope** y la **fuente del sistema** como opciones; estilo **minimalista con tarjetas**. El resto queda a criterio de diseño.
 1. **Estilo unificado** (`DESIGN.md`): paleta y roles de color, escala tipográfica, espaciados, radios, sombras (ninguna) y curvas de animación. Se aplica a la home, búsqueda, menús, hojas y ajustes, para que todo se vea como una sola app.
 2. **Temas**: temas predeterminados (p. ej. *Grafito*, *Medianoche OLED*, *Papel*, *Bosque*, *Arena*) y editor para crear y editar. Un tema agrupa colores, forma, tipografía, transparencias y estilo de íconos. Se apoya en el editor de temas de Kvaesitso, simplificado.

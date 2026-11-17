@@ -112,10 +112,12 @@ fun ShapedLauncherIcon(
 
     val defaultIconSize = LocalGridSettings.current.iconSize.dp
 
+    // [fork] Fase 13: íconos monocromos/contorno de la home (glifo del color dado, sin fondo).
+    val glyphColor = LocalIconGlyphColor.current
     val renderSettings = LauncherIconRenderSettings(
         size = defaultIconSize.toPixels().toInt(),
-        fgThemeColor = MaterialTheme.colorScheme.onPrimaryContainer.toArgb(),
-        bgThemeColor = MaterialTheme.colorScheme.primaryContainer.toArgb(),
+        fgThemeColor = glyphColor?.toArgb() ?: MaterialTheme.colorScheme.onPrimaryContainer.toArgb(),
+        bgThemeColor = if (glyphColor != null) 0 else MaterialTheme.colorScheme.primaryContainer.toArgb(),
         fgTone = if (LocalDarkTheme.current) 90 else 10,
         bgTone = if (LocalDarkTheme.current) 30 else 90,
     )
@@ -314,6 +316,9 @@ class BitmapShaderBrush(
 }
 
 val LocalIconShape = compositionLocalOf<Shape> { CircleShape }
+
+/** [fork] Si no es null, los íconos temáticos se dibujan solo como glifo de este color. */
+val LocalIconGlyphColor = compositionLocalOf<Color?> { null }
 
 fun getShape(iconShape: IconShape): Shape {
     return when (iconShape) {

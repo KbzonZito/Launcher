@@ -947,4 +947,9 @@
     <string name="search_action_private_space_lock">Bloquear espacio privado</string>
     <string name="search_action_private_space_unlock">Desbloquear espacio privado</string>
     <string name="preference_currencies">Divisa</string>
+    <string name="fork_theme_graphite">Grafito</string>
+    <string name="fork_theme_midnight">Medianoche OLED</string>
+    <string name="fork_theme_paper">Papel</string>
+    <string name="fork_theme_forest">Bosque</string>
+    <string name="fork_theme_sand">Arena</string>
 </resources>

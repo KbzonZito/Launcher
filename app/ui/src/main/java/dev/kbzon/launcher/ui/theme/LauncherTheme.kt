@@ -16,6 +16,9 @@ import dev.kbzon.launcher.ui.theme.shapes.shapesOf
 import dev.kbzon.launcher.ui.theme.transparency.LocalTransparencyScheme
 import dev.kbzon.launcher.ui.theme.transparency.transparencySchemeOf
 import dev.kbzon.launcher.ui.theme.typography.typographyOf
+import dev.kbzon.launcher.ui.theme.typography.fontfamily.LocalAppFontFamily
+import dev.kbzon.launcher.ui.theme.typography.fontfamily.fontFamilyOf
+import dev.kbzon.launcher.ui.theme.typography.fontfamily.withFontFamily
 import kotlinx.coroutines.flow.flatMapLatest
 import org.koin.compose.koinInject
 import dev.kbzon.launcher.preferences.ColorScheme as ColorSchemePref
@@ -27,6 +30,9 @@ fun LauncherTheme(
 ) {
     val uiSettings: UiSettings = koinInject()
     val themeRepository: ThemeRepository = koinInject()
+    val homeSettings: dev.kbzon.launcher.preferences.home.MinimalHomeSettings = koinInject()
+    // [fork] Fase 13: fuente única para toda la app.
+    val appFont by remember { homeSettings.appFont }.collectAsState(dev.kbzon.launcher.preferences.home.AppFont.Manrope)
 
     val themeColors by remember {
         uiSettings.colorsId.flatMapLatest {
@@ -69,7 +75,11 @@ fun LauncherTheme(
     }
 
     val shapes = shapesOf(themeShapes!!)
-    val typography = typographyOf(themeTypography!!)
+    val appFontFamily = remember(appFont) { fontFamilyOf(appFont) }
+    val baseTypography = typographyOf(themeTypography!!)
+    val typography = remember(baseTypography, appFontFamily) {
+        appFontFamily?.let { baseTypography.withFontFamily(it) } ?: baseTypography
+    }
 
     val transparencyScheme = transparencySchemeOf(themeTransparencies!!)
 
@@ -77,6 +87,7 @@ fun LauncherTheme(
     CompositionLocalProvider(
         LocalDarkTheme provides darkTheme,
         LocalTransparencyScheme provides transparencyScheme,
+        LocalAppFontFamily provides appFontFamily,
     ) {
         MaterialExpressiveTheme(
             colorScheme = colorScheme,
