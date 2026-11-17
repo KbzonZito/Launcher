@@ -2,6 +2,10 @@ package dev.kbzon.launcher.ui.home
 
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
@@ -88,6 +92,7 @@ fun HomeAppRow(
     accent: Color,
     onLaunch: (SavableSearchable, IntRect?) -> Unit,
     swipeLeftTarget: SavableSearchable? = null,
+    onReorderFavorites: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -105,6 +110,13 @@ fun HomeAppRow(
     var rowBounds by remember { mutableStateOf<IntRect?>(null) }
     val dragOffset = remember { Animatable(0f) }
     val canExpand = item is Application
+    // M3: respuesta visual al tocar (píldora tenue + leve reducción con resorte).
+    val pressSource = remember { MutableInteractionSource() }
+    val pressed by pressSource.collectIsPressedAsState()
+    val pressScale by animateFloatAsState(if (pressed) 0.96f else 1f, spring(dampingRatio = 0.6f, stiffness = 900f), label = "press")
+    val pressBg by animateColorAsState(
+        if (pressed) LocalContentColor.current.copy(alpha = 0.10f) else Color.Transparent, label = "pressBg",
+    )
 
     Column(modifier = modifier.fillMaxWidth()) {
         Box {
@@ -149,17 +161,22 @@ fun HomeAppRow(
                             }
                         }
                     }
+                    .graphicsLayer { scaleX = pressScale; scaleY = pressScale }
+                    .background(pressBg, RoundedCornerShape(14.dp))
                     .combinedClickable(
-                        interactionSource = remember { MutableInteractionSource() },
+                        interactionSource = pressSource,
                         indication = null,
-                        onClick = { onLaunch(item, rowBounds) },
+                        onClick = {
+                            view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                            onLaunch(item, rowBounds)
+                        },
                         onLongClick = {
                             HomeLongPressGuard.markChildLongPress()
                             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                             menuOpen = true
                         },
                     )
-                    .padding(vertical = 9.dp),
+                    .padding(vertical = 9.dp, horizontal = 6.dp),
             ) {
                 if (showIcons) {
                     val icon by remember(item.key) { vm.icon(item, iconSizePx) }.collectAsState(null)
@@ -218,6 +235,7 @@ fun HomeAppRow(
                 onCustomize = { sheetManager.showCustomizeSearchableModal(item) },
                 swipeLeftTarget = swipeLeftTarget,
                 onPickSwipeLeft = { pickSwipeLeft = true },
+                onReorderFavorites = onReorderFavorites,
             )
 
             DismissableBottomSheet(expanded = pickSwipeLeft, onDismissRequest = { pickSwipeLeft = false }) {
@@ -297,6 +315,7 @@ private fun HomeItemMenu(
     onCustomize: () -> Unit,
     swipeLeftTarget: SavableSearchable?,
     onPickSwipeLeft: () -> Unit,
+    onReorderFavorites: (() -> Unit)?,
 ) {
     val context = LocalContext.current
     val pinned by remember(item.key) { vm.isPinned(item) }.collectAsState(false)
@@ -309,6 +328,7 @@ private fun HomeItemMenu(
         )
         if (pinned) entry(R.drawable.star_24px_filled, R.string.fork_menu_unpin) { vm.unpin(item) }
         else entry(R.drawable.star_24px, R.string.fork_menu_pin) { vm.pin(item) }
+        if (pinned && onReorderFavorites != null) entry(R.drawable.drag_indicator_24px, R.string.fork_reorder_title, onReorderFavorites)
         if (onShowShortcuts != null) entry(R.drawable.apps_24px, R.string.fork_menu_shortcuts, onShowShortcuts)
         entry(R.drawable.swipe_left_alt_24px, if (swipeLeftTarget == null) R.string.fork_menu_swipe_left else R.string.fork_menu_swipe_left_change, onPickSwipeLeft)
         if (swipeLeftTarget != null) entry(R.drawable.close_24px, R.string.fork_menu_swipe_left_clear) { vm.setSwipeLeftTarget(item, null) }

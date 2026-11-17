@@ -480,6 +480,14 @@ abstract class SharedLauncherActivity(
         isNewIntent = true
     }
 
+    /** [fork] true si la activity pasó por onStop (no solo una pausa, como la de un diálogo de huella). */
+    var wasStopped = false
+
+    override fun onStop() {
+        super.onStop()
+        wasStopped = true
+    }
+
     override fun onPause() {
         super.onPause()
         isNewIntent = false

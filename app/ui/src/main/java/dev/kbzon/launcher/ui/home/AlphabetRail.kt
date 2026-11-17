@@ -48,7 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.kbzon.launcher.preferences.home.WaveIntensity
 import dev.kbzon.launcher.ui.R
+import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -161,6 +163,8 @@ fun AlphabetRail(
     intensity: WaveIntensity,
     modifier: Modifier = Modifier,
     heightFraction: Float = 0.62f,
+    bubbleColor: Color = accent,
+    onBubble: Color = Color.Black,
 ) {
     if (letters.isEmpty()) return
     val view = LocalView.current
@@ -202,8 +206,9 @@ fun AlphabetRail(
                         if (waveStrength == 0f || state.heightPx == 0) return@graphicsLayer
                         val slot = state.heightPx.toFloat() / letters.size
                         val center = slot * (index + 0.5f)
-                        val distance = abs(lastY - center) / (slot * 4f)
-                        val influence = max(0f, 1f - distance).let { it * it } * waveStrength
+                        // B4: curva coseno ancha (~6 letras a cada lado): subida y bajada largas, sin pico.
+                        val distance = abs(lastY - center) / (slot * 6f)
+                        val influence = (if (distance < 1f) (1f + cos(PI.toFloat() * distance)) / 2f else 0f) * waveStrength
                         val scale = 1f + (intensity.scale) * influence
                         scaleX = scale
                         scaleY = scale
@@ -230,6 +235,32 @@ fun AlphabetRail(
                     style = MaterialTheme.typography.labelSmall,
                     modifier = waveModifier,
                 )
+            }
+        }
+        // B5: burbuja con la letra, siempre junto al alfabeto y a la altura del dedo.
+        val idx = state.currentIndex
+        if (!state.touchY.isNaN() && idx in letters.indices) {
+            val letter = letters[idx]
+            val bubble = 60.dp
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .offset {
+                        val b = bubble.roundToPx()
+                        val gap = 20.dp.roundToPx()
+                        val railW = 40.dp.roundToPx()
+                        val x = if (railOnLeft) railW + bulgePx.roundToInt() + gap else -b - bulgePx.roundToInt() - gap
+                        IntOffset(x, (state.touchY - b / 2f).roundToInt())
+                    }
+                    .requiredSize(bubble)
+                    .background(bubbleColor, CircleShape),
+            ) {
+                if (letter == MinimalHomeVM.HIDDEN) {
+                    Icon(painterResource(R.drawable.lock_20px), contentDescription = null, tint = onBubble, modifier = Modifier.size(22.dp))
+                } else {
+                    Text(letter.toString(), color = onBubble, fontSize = 28.sp, fontWeight = FontWeight.Medium)
+                }
             }
         }
     }
@@ -269,27 +300,7 @@ fun RailMirrorZone(
             .railHeight(letters.size, heightFraction)
             .railTouch(state, letters, mirror = true, view, { currentOnLetter }, { currentOnRelease }, { currentOnDoubleTap }, { currentOnDrag }),
     ) {
-        val idx = state.currentIndex
-        if (state.fromMirror && !state.touchY.isNaN() && idx in letters.indices) {
-            val letter = letters[idx]
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .offset {
-                        val gap = with(density) { 24.dp.roundToPx() }
-                        val b = with(density) { bubble.roundToPx() }
-                        val x = if (zoneOnLeft) with(density) { zoneWidth.roundToPx() } + gap else -b - gap
-                        IntOffset(x, (state.touchY - b / 2f).roundToInt())
-                    }
-                    .requiredSize(bubble)
-                    .background(accent, CircleShape),
-            ) {
-                if (letter == MinimalHomeVM.HIDDEN) {
-                    Icon(painterResource(R.drawable.lock_20px), contentDescription = null, tint = onAccent, modifier = Modifier.size(22.dp))
-                } else {
-                    Text(letter.toString(), color = onAccent, fontSize = 28.sp, fontWeight = FontWeight.Medium)
-                }
-            }
-        }
+        // La burbuja ahora la dibuja el alfabeto visible (siempre de su lado).
+
     }
 }

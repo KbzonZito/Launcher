@@ -128,4 +128,5 @@
     <string name="fork_edit_layout_hint">Drag the clock and the alphabet. Pull the alphabet\'s handle to change its height.</string>
     <string name="fork_edit_layout_reset">Reset</string>
     <string name="fork_edit_layout_done">Done</string>
+    <string name="fork_reorder_title">Reorder favorites</string>
 </resources>

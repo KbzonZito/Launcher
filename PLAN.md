@@ -248,6 +248,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.1.1 | Identidad propia: nombre "Launcher", ícono, enlaces |
 | v0.2.0 | Búsqueda minimalista, teclado físico, borrar estadísticas, mapas offline, apertura animada, Espacio privado en el candado, batería en el vistazo, backups cifrados, mini reproductor |
 | v0.3.0 | Fases 9–11: correcciones del riel/reloj/clima, fork total (código propio, sin plugins, Ko-fi), home configurable (menú rápido, gestos unificados, botón de acción, editar diseño) |
+| v0.3.1 | Entrega A: favoritos fijos y siempre visibles, reordenar arrastrando, lista a pantalla completa con una letra, márgenes simétricos, ola suave, burbuja junto al alfabeto, feedback al tocar |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -255,7 +256,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: entregas A → B → C de arreglos y mejoras (§9) y luego fases 12 → 15 (§10)**, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: entregas B → C de arreglos y mejoras (§9) y luego fases 12 → 15 (§10)**, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -272,6 +273,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 Bugs reportados el 16-11 (B1–B14) y mejoras pedidas el 17-11 (M1–M3), ordenados en tres entregas. Cada entrega termina con prueba en el emulador, PR y release.
 
 **Entrega A — Favoritos, alfabeto y lista (v0.3.1)**
+> ✅ Hecha (PR #24). Causas encontradas: **B1** — Kvaesitso solo volvía a la home tras 5 s de pausa, así que al desbloquear o volver rápido de una app seguía abierta la búsqueda o el panel de widgets (sin favoritos); ahora vuelve siempre que el launcher deja de verse. Además, cada lista tiene su propio estado de scroll y el botón de inicio cierra la letra/menús. **B2** — los favoritos pasaron a orden manual (migración automática conservando el orden).
 | # | Qué | Cómo |
 |---|---|---|
 | B2 | Favoritos con orden fijo, sin moverse por el uso | Causa: fijar guarda `pinPosition = 1` (ordenado automático, por peso de uso). Fijar como **ordenado manual** (`pinPosition > 1`) y migrar una vez los favoritos actuales conservando el orden visible. |

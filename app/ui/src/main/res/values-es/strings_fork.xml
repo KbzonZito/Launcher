@@ -127,4 +127,5 @@
     <string name="fork_edit_layout_hint">Arrastra el reloj y el alfabeto. Tira del asa del alfabeto para cambiar su alto.</string>
     <string name="fork_edit_layout_reset">Restablecer</string>
     <string name="fork_edit_layout_done">Listo</string>
+    <string name="fork_reorder_title">Reordenar favoritos</string>
 </resources>
