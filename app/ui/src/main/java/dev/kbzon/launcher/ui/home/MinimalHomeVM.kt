@@ -144,6 +144,7 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     /** Apps agrupadas por su letra índice, en orden. */
     val letterSort = homeSettings.letterSort.stateIn(viewModelScope, SharingStarted.Eagerly, LetterSort.Alphabetical)
     fun setLetterSort(value: LetterSort) = homeSettings.setLetterSort(value)
+    val iconStyle = homeSettings.iconStyle.stateIn(viewModelScope, SharingStarted.Eagerly, dev.kbzon.launcher.preferences.home.HomeIconStyle.Original)
 
     /**
      * Apps agrupadas por su letra índice, en orden. Dentro de cada letra se ordenan según

@@ -1,5 +1,6 @@
 package dev.kbzon.launcher.ui.home
 
+import dev.kbzon.launcher.ui.theme.typography.fontfamily.LocalAppFontFamily
 import android.text.format.DateFormat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -73,13 +75,13 @@ fun HomeClock(
     val dateText: @Composable (TextStyle) -> Unit = { st ->
         Text(date, style = st.copy(shadow = shadow), modifier = Modifier.noRippleClick { onDateClick(now) })
     }
-    val dateStyle = TextStyle(fontSize = (17 * scale).sp, fontWeight = FontWeight.Medium)
+    val dateStyle = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = (17 * scale).sp, fontWeight = FontWeight.Medium)
 
     when (style) {
         MinimalClockStyle.Thin -> Column {
             Text(
                 "$hours:$minutes",
-                style = TextStyle(fontSize = (76 * scale).sp, fontWeight = FontWeight.Thin, letterSpacing = (-2).sp, shadow = shadow),
+                style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = (76 * scale).sp, fontWeight = FontWeight.Thin, letterSpacing = (-2).sp, shadow = shadow),
                 modifier = timeModifier,
             )
             dateText(dateStyle)
@@ -88,14 +90,14 @@ fun HomeClock(
         MinimalClockStyle.Bold -> Column {
             Text(
                 "$hours:$minutes",
-                style = TextStyle(fontSize = (68 * scale).sp, fontWeight = FontWeight.Black, letterSpacing = (-3).sp, shadow = shadow),
+                style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = (68 * scale).sp, fontWeight = FontWeight.Black, letterSpacing = (-3).sp, shadow = shadow),
                 modifier = timeModifier,
             )
             dateText(dateStyle.copy(fontWeight = FontWeight.Light, fontSize = (18 * scale).sp))
         }
 
         MinimalClockStyle.Stacked -> Column(modifier = timeModifier) {
-            val big = TextStyle(fontSize = (104 * scale).sp, fontWeight = FontWeight.Light, lineHeight = (92 * scale).sp, letterSpacing = (-4).sp, shadow = shadow)
+            val big = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = (104 * scale).sp, fontWeight = FontWeight.Light, lineHeight = (92 * scale).sp, letterSpacing = (-4).sp, shadow = shadow)
             Text(hours.padStart(2, '0'), style = big)
             Text(minutes, style = big, color = accent)
             Spacer(Modifier.height(8.dp))
@@ -105,7 +107,7 @@ fun HomeClock(
         MinimalClockStyle.Words -> Column {
             Text(
                 timeInWords(now, Locale.getDefault()),
-                style = TextStyle(fontSize = (40 * scale).sp, fontWeight = FontWeight.Light, lineHeight = (44 * scale).sp, shadow = shadow),
+                style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = (40 * scale).sp, fontWeight = FontWeight.Light, lineHeight = (44 * scale).sp, shadow = shadow),
                 modifier = timeModifier.padding(end = 24.dp),
             )
             Spacer(Modifier.height(10.dp))
@@ -121,13 +123,101 @@ fun HomeClock(
         MinimalClockStyle.DayProgress -> Column {
             Text(
                 "$hours:$minutes",
-                style = TextStyle(fontSize = (64 * scale).sp, fontWeight = FontWeight.Thin, letterSpacing = (-2).sp, shadow = shadow),
+                style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = (64 * scale).sp, fontWeight = FontWeight.Thin, letterSpacing = (-2).sp, shadow = shadow),
                 modifier = timeModifier,
             )
             dateText(dateStyle)
             Spacer(Modifier.height(14.dp))
             DayProgressBar(now = now, accent = accent, shadow = shadow)
         }
+
+        // [fork] Fase 13: relojes nuevos.
+        MinimalClockStyle.Vertical -> Column {
+            val digit = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = (54 * scale).sp, fontWeight = FontWeight.ExtraLight, lineHeight = (52 * scale).sp, shadow = shadow)
+            Column(modifier = timeModifier, horizontalAlignment = Alignment.CenterHorizontally) {
+                hours.padStart(2, '0').forEach { Text(it.toString(), style = digit) }
+                minutes.forEach { Text(it.toString(), style = digit, color = accent) }
+            }
+            Spacer(Modifier.height(10.dp))
+            dateText(dateStyle)
+        }
+
+        MinimalClockStyle.DotMatrix -> Column {
+            DotMatrixTime("$hours:$minutes", accent = accent, modifier = timeModifier, dot = 6.dp * scale)
+            Spacer(Modifier.height(14.dp))
+            dateText(dateStyle)
+        }
+
+        MinimalClockStyle.Ring -> Column {
+            RingClock(
+                now = now,
+                text = "$hours:$minutes",
+                accent = accent,
+                shadow = shadow,
+                scale = scale,
+                modifier = timeModifier.size(168.dp * scale),
+            )
+            Spacer(Modifier.height(14.dp))
+            dateText(dateStyle)
+        }
+    }
+}
+
+/** Patrones 3×5 de cada dígito (1 = punto encendido), fila por fila. */
+private val DotDigits = mapOf(
+    '0' to "111101101101111", '1' to "010110010010111", '2' to "111001111100111", '3' to "111001111001111",
+    '4' to "101101111001001", '5' to "111100111001111", '6' to "111100111101111", '7' to "111001010010010",
+    '8' to "111101111101111", '9' to "111101111001111", ':' to "000010000010000",
+)
+
+/** Hora dibujada con puntos, como un panel LED; los puntos apagados quedan tenues. */
+@Composable
+private fun DotMatrixTime(text: String, accent: Color, modifier: Modifier, dot: androidx.compose.ui.unit.Dp) {
+    val color = LocalContentColor.current
+    val glyphs = text.mapNotNull { DotDigits[it] }
+    val cols = glyphs.size * 3 + (glyphs.size - 1)
+    Canvas(modifier.size(width = dot * 1.6f * cols, height = dot * 1.6f * 5)) {
+        val step = size.height / 5f
+        val r = step * 0.36f
+        var x0 = 0
+        glyphs.forEachIndexed { gi, pattern ->
+            for (row in 0 until 5) for (col in 0 until 3) {
+                val on = pattern[row * 3 + col] == '1'
+                val isMinute = gi > glyphs.size - 3
+                drawCircle(
+                    color = when {
+                        !on -> color.copy(alpha = 0.10f)
+                        isMinute -> accent
+                        else -> color
+                    },
+                    radius = r,
+                    center = Offset((x0 + col) * step + step / 2, row * step + step / 2),
+                )
+            }
+            x0 += 4
+        }
+    }
+}
+
+/** Hora en el centro de un anillo que se completa con los minutos de la hora. */
+@Composable
+private fun RingClock(now: Long, text: String, accent: Color, shadow: Shadow?, scale: Float, modifier: Modifier) {
+    val cal = Calendar.getInstance().apply { timeInMillis = now }
+    val progress = cal.get(Calendar.MINUTE) / 60f
+    val sweep by animateFloatAsState(progress * 360f, spring(dampingRatio = 0.8f, stiffness = 200f), label = "ring")
+    val color = LocalContentColor.current
+    Box(modifier, contentAlignment = Alignment.Center) {
+        Canvas(Modifier.matchParentSize()) {
+            val stroke = 3.dp.toPx()
+            val inset = stroke / 2
+            val arcSize = androidx.compose.ui.geometry.Size(size.width - stroke, size.height - stroke)
+            drawArc(color.copy(alpha = 0.18f), 0f, 360f, false, Offset(inset, inset), arcSize, style = androidx.compose.ui.graphics.drawscope.Stroke(stroke))
+            drawArc(accent, -90f, sweep, false, Offset(inset, inset), arcSize, style = androidx.compose.ui.graphics.drawscope.Stroke(stroke, cap = StrokeCap.Round))
+        }
+        Text(
+            text,
+            style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = (40 * scale).sp, fontWeight = FontWeight.Light, shadow = shadow),
+        )
     }
 }
 

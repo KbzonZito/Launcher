@@ -1,5 +1,6 @@
 package dev.kbzon.launcher.ui.home
 
+import dev.kbzon.launcher.ui.theme.typography.fontfamily.LocalAppFontFamily
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -74,7 +75,7 @@ fun HomeReorderFavorites(
             Text(
                 stringResource(R.string.fork_reorder_title),
                 color = accent,
-                style = TextStyle(fontSize = 22.sp, shadow = shadow),
+                style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 22.sp, shadow = shadow),
                 modifier = Modifier.weight(1f),
             )
             TextButton(onClick = { onDone(order) }) { Text(stringResource(R.string.fork_edit_layout_done), color = accent) }
@@ -109,7 +110,7 @@ fun HomeReorderFavorites(
                             item.displayLabel,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = TextStyle(fontSize = 20.sp, shadow = shadow),
+                            style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 20.sp, shadow = shadow),
                             modifier = Modifier.weight(1f),
                         )
                         Icon(

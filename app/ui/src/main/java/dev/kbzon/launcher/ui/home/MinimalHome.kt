@@ -1,5 +1,6 @@
 package dev.kbzon.launcher.ui.home
 
+import dev.kbzon.launcher.ui.theme.typography.fontfamily.LocalAppFontFamily
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
@@ -242,7 +243,12 @@ fun MinimalHome(
         draftLayout = transform(draftLayout ?: storedLayout)
     }
 
-    CompositionLocalProvider(LocalContentColor provides contentColor) {
+    val iconStyle by vm.iconStyle.collectAsState()
+    CompositionLocalProvider(
+        LocalContentColor provides contentColor,
+        dev.kbzon.launcher.ui.component.LocalIconGlyphColor provides
+            if (iconStyle == dev.kbzon.launcher.preferences.home.HomeIconStyle.Original) null else contentColor,
+    ) {
         Box(
             modifier = modifier
                 .fillMaxSize()
@@ -345,7 +351,7 @@ fun MinimalHome(
                                     Text(
                                         text = header,
                                         color = accent,
-                                        style = TextStyle(
+                                        style = TextStyle(fontFamily = LocalAppFontFamily.current,
                                             fontSize = if (header.length == 1) 44.sp else 28.sp,
                                             fontWeight = FontWeight.Light,
                                             shadow = shadow,
@@ -363,7 +369,7 @@ fun MinimalHome(
                                             if (letter == null) R.string.fork_minimal_home_empty_favorites
                                             else R.string.fork_minimal_home_empty_section
                                         ),
-                                        style = TextStyle(fontSize = 15.sp, shadow = shadow),
+                                        style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 15.sp, shadow = shadow),
                                         color = contentColor.copy(alpha = 0.7f),
                                         modifier = Modifier.padding(bottom = 8.dp),
                                     )
@@ -695,7 +701,7 @@ private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?, onOpenEvents: () -> U
     val alarm by remember { vm.nextAlarm(context) }.collectAsState(null)
     val battery by remember { vm.battery(context) }.collectAsState(null)
     val measurementSystem = LocalMeasurementSystem.current
-    val style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium, shadow = shadow)
+    val style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 14.sp, fontWeight = FontWeight.Medium, shadow = shadow)
     val dim = LocalContentColor.current.copy(alpha = 0.85f)
 
     Column(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {

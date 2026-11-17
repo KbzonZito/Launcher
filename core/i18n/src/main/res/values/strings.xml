@@ -1129,4 +1129,9 @@
     <string name="typo_preview_medium2">Preview</string>
     <string name="typo_preview_long">The quick brown fox\njumps over 1234790</string>
     <string name="preference_category_donate">Support the development</string>
+    <string name="fork_theme_graphite">Graphite</string>
+    <string name="fork_theme_midnight">Midnight OLED</string>
+    <string name="fork_theme_paper">Paper</string>
+    <string name="fork_theme_forest">Forest</string>
+    <string name="fork_theme_sand">Sand</string>
 </resources>

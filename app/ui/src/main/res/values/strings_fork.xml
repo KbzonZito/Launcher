@@ -19,7 +19,7 @@
     <string name="fork_preference_screen_minimal_home_summary">Favorites list and alphabet rail</string>
     <string name="fork_preference_minimal_home">Use minimal home</string>
     <string name="fork_preference_minimal_home_summary">Clock, glance line, favorites and an alphabet rail instead of the clock and widgets screen</string>
-    <string name="fork_preference_minimal_home_icons">Show app icons</string>
+    <string name="fork_preference_minimal_home_icons">App icons</string>
     <string name="fork_preference_minimal_home_rail_left">Alphabet on the left</string>
     <string name="fork_preference_minimal_home_rail_left_summary">For using the phone with your left hand</string>
     <string name="fork_minimal_home_empty_favorites">Pick a letter on the right to see your apps. Long-press an app → pin it to favorites.</string>
@@ -156,4 +156,21 @@
     <string name="fork_folder_delete">Delete folder</string>
     <string name="fork_folder_empty">This folder is empty. Add apps from their menu.</string>
     <string name="fork_folder_remove_item">Remove from folder</string>
+    <string name="fork_icons_original">Original</string>
+    <string name="fork_icons_monochrome">Monochrome</string>
+    <string name="fork_icons_outline">Outline</string>
+    <string name="fork_icons_none">No icons</string>
+    <string name="fork_preference_app_font">Font</string>
+    <string name="fork_font_system">System font</string>
+    <string name="fork_font_theme">From the typography theme</string>
+    <string name="fork_preference_text_size">Home text size</string>
+    <string name="fork_text_size_small">Small</string>
+    <string name="fork_text_size_normal">Normal</string>
+    <string name="fork_text_size_large">Large</string>
+    <string name="fork_text_size_xlarge">Extra large</string>
+    <string name="fork_preference_color_theme">Color theme</string>
+    <string name="fork_preference_color_theme_summary">Graphite, Midnight OLED, Paper, Forest, Sand or your own</string>
+    <string name="fork_clock_vertical">Vertical</string>
+    <string name="fork_clock_dots">Dot matrix</string>
+    <string name="fork_clock_ring">Ring</string>
 </resources>

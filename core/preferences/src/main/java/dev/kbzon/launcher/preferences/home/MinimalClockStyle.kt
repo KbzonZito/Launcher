@@ -12,4 +12,7 @@ enum class MinimalClockStyle {
     @SerialName("words") Words,
     @SerialName("analog") Analog,
     @SerialName("day_progress") DayProgress,
+    @SerialName("vertical") Vertical,
+    @SerialName("dots") DotMatrix,
+    @SerialName("ring") Ring,
 }

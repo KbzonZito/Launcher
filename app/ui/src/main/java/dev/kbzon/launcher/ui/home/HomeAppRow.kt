@@ -1,5 +1,6 @@
 package dev.kbzon.launcher.ui.home
 
+import dev.kbzon.launcher.ui.theme.typography.fontfamily.LocalAppFontFamily
 import android.view.HapticFeedbackConstants
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,6 +15,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -187,7 +189,20 @@ fun HomeAppRow(
                     Spacer(Modifier.width(16.dp))
                 } else if (showIcons) {
                     val icon by remember(item.key) { vm.icon(item, iconSizePx) }.collectAsState(null)
-                    ShapedLauncherIcon(size = 30.dp, icon = { icon })
+                    val iconStyle by vm.iconStyle.collectAsState()
+                    if (iconStyle == dev.kbzon.launcher.preferences.home.HomeIconStyle.Outline) {
+                        // Contorno fino con el glifo dentro, más pequeño.
+                        Box(
+                            Modifier
+                                .size(30.dp)
+                                .border(1.dp, LocalContentColor.current.copy(alpha = 0.7f), dev.kbzon.launcher.ui.component.LocalIconShape.current),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            ShapedLauncherIcon(size = 26.dp, icon = { icon })
+                        }
+                    } else {
+                        ShapedLauncherIcon(size = 30.dp, icon = { icon })
+                    }
                     Spacer(Modifier.width(16.dp))
                 }
                 Column(Modifier.weight(1f, fill = false)) {
@@ -195,7 +210,7 @@ fun HomeAppRow(
                         text = item.displayLabel,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Normal, shadow = shadow),
+                        style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 22.sp, fontWeight = FontWeight.Normal, shadow = shadow),
                     )
                     val latest = notifications.firstOrNull()
                     if (showPreview && latest != null) {
@@ -204,7 +219,7 @@ fun HomeAppRow(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             color = LocalContentColor.current.copy(alpha = 0.7f),
-                            style = TextStyle(fontSize = 13.sp, shadow = shadow),
+                            style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 13.sp, shadow = shadow),
                         )
                     }
                 }
@@ -290,7 +305,7 @@ fun HomeAppRow(
                         Text(
                             stringResource(R.string.fork_minimal_home_no_shortcuts),
                             color = LocalContentColor.current.copy(alpha = 0.6f),
-                            style = TextStyle(fontSize = 14.sp, shadow = shadow),
+                            style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 14.sp, shadow = shadow),
                             modifier = Modifier.padding(vertical = 6.dp),
                         )
                     }
@@ -313,7 +328,7 @@ fun HomeAppRow(
                                 shortcut.displayLabel,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                style = TextStyle(fontSize = 16.sp, shadow = shadow),
+                                style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 16.sp, shadow = shadow),
                             )
                         }
                     }

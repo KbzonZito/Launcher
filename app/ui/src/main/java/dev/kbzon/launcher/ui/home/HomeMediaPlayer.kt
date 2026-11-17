@@ -1,5 +1,6 @@
 package dev.kbzon.launcher.ui.home
 
+import dev.kbzon.launcher.ui.theme.typography.fontfamily.LocalAppFontFamily
 import android.app.ActivityOptions
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -94,7 +95,7 @@ fun HomeMediaPlayer(shadow: Shadow?, modifier: Modifier = Modifier) {
                         title.orEmpty(),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Medium, shadow = shadow),
+                        style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 15.sp, fontWeight = FontWeight.Medium, shadow = shadow),
                     )
                     artist?.takeIf { it.isNotBlank() }?.let {
                         Text(
@@ -102,7 +103,7 @@ fun HomeMediaPlayer(shadow: Shadow?, modifier: Modifier = Modifier) {
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             color = dim,
-                            style = TextStyle(fontSize = 13.sp, shadow = shadow),
+                            style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 13.sp, shadow = shadow),
                         )
                     }
                 }

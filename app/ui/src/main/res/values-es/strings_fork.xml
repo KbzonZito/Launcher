@@ -18,7 +18,7 @@
     <string name="fork_preference_screen_minimal_home_summary">Lista de favoritos y riel del alfabeto</string>
     <string name="fork_preference_minimal_home">Usar inicio minimalista</string>
     <string name="fork_preference_minimal_home_summary">Reloj, línea de un vistazo, favoritos y riel del alfabeto en lugar de la pantalla de reloj y widgets</string>
-    <string name="fork_preference_minimal_home_icons">Mostrar íconos de apps</string>
+    <string name="fork_preference_minimal_home_icons">Íconos de las apps</string>
     <string name="fork_preference_minimal_home_rail_left">Alfabeto a la izquierda</string>
     <string name="fork_preference_minimal_home_rail_left_summary">Para usar el teléfono con la mano izquierda</string>
     <string name="fork_minimal_home_empty_favorites">Elige una letra a la derecha para ver tus apps. Mantén pulsada una app → fíjala en favoritos.</string>
@@ -155,4 +155,21 @@
     <string name="fork_folder_delete">Eliminar carpeta</string>
     <string name="fork_folder_empty">Esta carpeta está vacía. Añade apps desde su menú.</string>
     <string name="fork_folder_remove_item">Quitar de la carpeta</string>
+    <string name="fork_icons_original">Original</string>
+    <string name="fork_icons_monochrome">Monocromo</string>
+    <string name="fork_icons_outline">Contorno</string>
+    <string name="fork_icons_none">Sin íconos</string>
+    <string name="fork_preference_app_font">Fuente</string>
+    <string name="fork_font_system">Fuente del sistema</string>
+    <string name="fork_font_theme">La del tema de tipografía</string>
+    <string name="fork_preference_text_size">Tamaño del texto de la home</string>
+    <string name="fork_text_size_small">Pequeño</string>
+    <string name="fork_text_size_normal">Normal</string>
+    <string name="fork_text_size_large">Grande</string>
+    <string name="fork_text_size_xlarge">Muy grande</string>
+    <string name="fork_preference_color_theme">Tema de color</string>
+    <string name="fork_preference_color_theme_summary">Grafito, Medianoche OLED, Papel, Bosque, Arena o uno propio</string>
+    <string name="fork_clock_vertical">Vertical</string>
+    <string name="fork_clock_dots">Matriz de puntos</string>
+    <string name="fork_clock_ring">Anillo</string>
 </resources>
