@@ -255,7 +255,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: fases 12 → 15 (§10)**, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: entregas A → B → C de arreglos y mejoras (§9) y luego fases 12 → 15 (§10)**, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -266,6 +266,42 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 - Animación de cierre: la app vuelve a la fila de la que salió.
 - Tablet: S Pen hover; widgets o agenda en la columna izquierda.
 - Accesibilidad: etiquetas de TalkBack en el riel, el botón de acción y las entradas especiales.
+
+### Arreglos y mejoras tras v0.3.0 — plan de implementación (17-11-2026)
+
+Bugs reportados el 16-11 (B1–B14) y mejoras pedidas el 17-11 (M1–M3), ordenados en tres entregas. Cada entrega termina con prueba en el emulador, PR y release.
+
+**Entrega A — Favoritos, alfabeto y lista (v0.3.1)**
+| # | Qué | Cómo |
+|---|---|---|
+| B2 | Favoritos con orden fijo, sin moverse por el uso | Causa: fijar guarda `pinPosition = 1` (ordenado automático, por peso de uso). Fijar como **ordenado manual** (`pinPosition > 1`) y migrar una vez los favoritos actuales conservando el orden visible. |
+| B1 | Favoritos que a veces desaparecen (al desbloquear / volver de una app) | Reproducir primero. Hipótesis: la lista comparte su estado de scroll con la de letras y vuelve desplazada; la transición de `AnimatedContent` queda a medias al pausar la activity; o un fallo de lanzamiento los "resetea". Arreglo según la causa, con prueba que la cubra. |
+| — | Reordenar favoritos arrastrando (adelantado de la Fase 12) | Mantener pulsado → "Reordenar"; arrastrar filas; guardar con `updateFavorites`. Complementa B2. |
+| M1 | Al usar el alfabeto, las apps usan todo el espacio; el reloj y el vistazo desaparecen | Con una letra seleccionada, el bloque superior se desvanece hacia arriba y la lista ocupa todo el alto; vuelve al cerrar la letra. |
+| B3 | Margen estándar a ambos lados | Margen simétrico igual al ancho del alfabeto (~56 dp) a izquierda y derecha, para deslizar cómodo en cualquier borde y poder cambiar de lado sin que nada se mueva. |
+| B4 | Ola más suave | Curva más ancha y redondeada (coseno en vez de cuadrática, alcance de ~6 letras), menos pico. |
+| B5 | Burbuja de la letra siempre, del lado del alfabeto | Mostrar la burbuja en todo arrastre, junto al alfabeto (a la altura del dedo), venga el gesto del borde que venga. |
+| M3 | Más feedback visual al tocar una app | Al presionar: fondo tenue tipo píldora + leve reducción de escala con resorte; vibración corta al abrir. |
+
+**Entrega B — Botón de acción y Editar diseño (v0.3.2)**
+| # | Qué | Cómo |
+|---|---|---|
+| B8 | Botón más adentro | Separación del borde de ~32 dp (zona cómoda del pulgar). |
+| B6 | Con el alfabeto a la izquierda el botón choca con la lista | La lista reserva el espacio del botón (padding inferior) y el botón respeta los márgenes de B3. |
+| B7 | Posición del botón elegible | Opciones: lado del alfabeto, lado contrario, centro; además arrastrable en Editar diseño. |
+| B9 | Los gestos siguen activos al editar | En modo edición se desactivan los gestos de la home y del scaffold (deslizar, dos dedos, mantener pulsado) y el alfabeto no responde. |
+| B10 | El reloj no se puede mover | Consecuencia de B9 (el scaffold se queda con el arrastre vertical); se verifica tras B9 con prueba en el emulador. |
+| B11 | El aviso inferior estorba | Reemplazarlo por una barra superior compacta con "Restablecer" y "Listo" y una pista breve que se oculta sola. |
+
+**Entrega C — Vistazo: reloj, eventos, clima, alarma y medios (v0.3.3)**
+| # | Qué | Cómo |
+|---|---|---|
+| M2 | Próximo evento bajo el reloj; al tocarlo, popup con los siguientes | Una línea con el próximo evento; al tocarla, tarjeta flotante con los eventos de hoy y mañana (tocar uno lo abre en la app de calendario). |
+| B12 | Clima | Causa: la ubicación automática está activa pero nunca se pide el permiso de ubicación, así que no hay datos. Pedir el permiso desde "Configurar clima" (o elegir ubicación manual) y mostrar el clima actual; tocar abre la app elegida en "El clima abre". Samsung Weather no comparte sus datos con otras apps: para ver *su* clima tal cual, la vía es incrustar su widget (se evalúa aquí). Breezy Weather sí comparte datos y ya está soportado. |
+| B13 | Alarma de las 22:30 que no existe | Causa probable: el sistema devuelve la próxima alarma de cualquier app (p. ej. la hora de dormir de Samsung). Mostrar solo alarmas creadas por la app de reloj (`AlarmClockInfo.showIntent.creatorPackage`). |
+| B14 | Apps de medios al conectar Bluetooth | Al conectarse unos auriculares o un parlante (`AudioDeviceCallback`, sin permisos extra), mostrar en el vistazo una fila con las apps de música elegidas por el usuario. |
+
+**Después:** Fase 12 (orden de la lista por letra y carpetas) → 13 → 14 → 15, como en §10.
 
 ## 10. Plan de funciones v0.3 → v1.0
 
@@ -314,7 +350,7 @@ Decisiones tomadas (16-11-2026):
 ### Fase 12 — Riel, lista y carpetas (v0.5)
 1. **Orden de la lista por letra**: alfabético, más usadas primero, recientes primero, recién instaladas primero.
 2. **Carpetas (popup)**: crear desde el menú de una app ("Nueva carpeta" / "Añadir a carpeta"); se muestran en favoritos con un ícono mosaico; al tocar, popup con cuadrícula de apps, renombrar y reordenar. Se construyen sobre las **etiquetas fijables de Kvaesitso** (ya existen y se guardan en la base de datos).
-3. **Reordenar favoritos arrastrando** directamente en la home.
+3. ~~Reordenar favoritos arrastrando~~ → adelantado a la Entrega A (§9).
 
 ### Fase 13 — Personalización visual (v0.6)
 > **Preferencias del usuario (16-11-2026):** fuente **Manrope** y la **fuente del sistema** como opciones; estilo **minimalista con tarjetas**. El resto queda a criterio de diseño.
