@@ -128,4 +128,9 @@
     <string name="fork_edit_layout_reset">Restablecer</string>
     <string name="fork_edit_layout_done">Listo</string>
     <string name="fork_reorder_title">Reordenar favoritos</string>
+    <string name="fork_button_position">Posición</string>
+    <string name="fork_button_position_rail">Lado del alfabeto</string>
+    <string name="fork_button_position_opposite">Lado contrario</string>
+    <string name="fork_button_position_center">Centro</string>
+    <string name="fork_edit_layout_hint_short">Arrastra el reloj, el alfabeto y el botón</string>
 </resources>

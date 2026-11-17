@@ -236,6 +236,20 @@ fun GestureSettingsScreen() {
                     value = buttonEnabled,
                     onValueChanged = viewModel::setActionButton,
                 )
+                val position by viewModel.actionButtonPosition.collectAsStateWithLifecycle(dev.kbzon.launcher.preferences.home.ActionButtonPosition.RailSide)
+                if (buttonEnabled) {
+                    dev.kbzon.launcher.ui.component.preferences.ListPreference(
+                        title = stringResource(R.string.fork_button_position),
+                        icon = R.drawable.radio_button_checked_24px,
+                        items = listOf(
+                            stringResource(R.string.fork_button_position_rail) to dev.kbzon.launcher.preferences.home.ActionButtonPosition.RailSide,
+                            stringResource(R.string.fork_button_position_opposite) to dev.kbzon.launcher.preferences.home.ActionButtonPosition.OppositeSide,
+                            stringResource(R.string.fork_button_position_center) to dev.kbzon.launcher.preferences.home.ActionButtonPosition.Center,
+                        ),
+                        value = position,
+                        onValueChanged = viewModel::setActionButtonPosition,
+                    )
+                }
                 val a = actions
                 if (buttonEnabled && a != null) {
                     @Composable

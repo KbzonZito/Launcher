@@ -102,6 +102,8 @@ internal class GestureSettingsScreenVM : ViewModel(), KoinComponent {
     val actionButton = homeSettings.actionButton
     fun setActionButton(enabled: Boolean) = homeSettings.setActionButton(enabled)
     val actionButtonActions = homeSettings.actionButtonActions
+    val actionButtonPosition = homeSettings.actionButtonPosition
+    fun setActionButtonPosition(p: dev.kbzon.launcher.preferences.home.ActionButtonPosition) = homeSettings.setActionButtonPosition(p)
     fun setActionButtonAction(
         searchable: SavableSearchable?,
         transform: (dev.kbzon.launcher.preferences.home.ActionButtonActions) -> dev.kbzon.launcher.preferences.home.ActionButtonActions,

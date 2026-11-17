@@ -249,6 +249,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.2.0 | Búsqueda minimalista, teclado físico, borrar estadísticas, mapas offline, apertura animada, Espacio privado en el candado, batería en el vistazo, backups cifrados, mini reproductor |
 | v0.3.0 | Fases 9–11: correcciones del riel/reloj/clima, fork total (código propio, sin plugins, Ko-fi), home configurable (menú rápido, gestos unificados, botón de acción, editar diseño) |
 | v0.3.1 | Entrega A: favoritos fijos y siempre visibles, reordenar arrastrando, lista a pantalla completa con una letra, márgenes simétricos, ola suave, burbuja junto al alfabeto, feedback al tocar |
+| v0.3.2 | Entrega B: botón de acción con posición elegible y más cómodo, Editar diseño sin interferencias de gestos (reloj movible), barra de edición compacta |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -256,7 +257,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Siguiente: entregas B → C de arreglos y mejoras (§9) y luego fases 12 → 15 (§10)**, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
+**Siguiente: entrega C de arreglos y mejoras (§9) y luego fases 12 → 15 (§10)**, en este orden: riel y lista → personalización visual → búsqueda 2.0 → limpieza de ajustes.
 
 **Fuera de las fases (seguir haciendo en paralelo)**
 - Probar cada release en el S24 Ultra y la Tab S9 (vibración del riel, 120 Hz, dos dedos, reproductor, atajos reales).
@@ -286,6 +287,7 @@ Bugs reportados el 16-11 (B1–B14) y mejoras pedidas el 17-11 (M1–M3), ordena
 | M3 | Más feedback visual al tocar una app | Al presionar: fondo tenue tipo píldora + leve reducción de escala con resorte; vibración corta al abrir. |
 
 **Entrega B — Botón de acción y Editar diseño (v0.3.2)**
+> ✅ Hecha (PR #25, apilado sobre #24). Al editar se bloquea el scaffold (`lock()`), los gestos de la home y la zona del borde contrario: así el reloj ya se mueve (B10 era consecuencia de B9). Botón: posición lado del alfabeto / contrario / centro (Ajustes → Gestos o arrastrándolo al editar; también se puede subir), a 32 dp del borde, y la lista le deja espacio cuando queda a la izquierda o al centro. Barra de edición compacta arriba.
 | # | Qué | Cómo |
 |---|---|---|
 | B8 | Botón más adentro | Separación del borde de ~32 dp (zona cómoda del pulgar). |

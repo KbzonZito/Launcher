@@ -263,6 +263,9 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     fun setShowIcons(show: Boolean) = homeSettings.setShowIcons(show)
     fun setSplitSwipeDown(enabled: Boolean) = homeSettings.setSplitSwipeDown(enabled)
     fun setActionButton(enabled: Boolean) = homeSettings.setActionButton(enabled)
+    val actionButtonPosition = homeSettings.actionButtonPosition
+        .stateIn(viewModelScope, SharingStarted.Eagerly, dev.kbzon.launcher.preferences.home.ActionButtonPosition.RailSide)
+    fun setActionButtonPosition(p: dev.kbzon.launcher.preferences.home.ActionButtonPosition) = homeSettings.setActionButtonPosition(p)
 
     /**
      * Apaga la pantalla. Necesita el servicio de accesibilidad del launcher; si no está activo,

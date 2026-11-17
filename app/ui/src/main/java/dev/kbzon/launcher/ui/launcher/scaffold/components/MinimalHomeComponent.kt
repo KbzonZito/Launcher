@@ -68,6 +68,7 @@ internal object MinimalHomeComponent : ScaffoldComponent() {
             insets = insets,
             onActiveListState = { activeList = it },
             homePresses = homePresses,
+            onEditModeChange = { editing -> scaffoldScope.launch { if (editing) state.lock() else state.unlock() } },
             openSearch = { scaffoldScope.launch { state.onSearchBarTap() } },
             openWidgets = {
                 scaffoldScope.launch {

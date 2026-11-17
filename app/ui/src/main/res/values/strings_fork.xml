@@ -129,4 +129,9 @@
     <string name="fork_edit_layout_reset">Reset</string>
     <string name="fork_edit_layout_done">Done</string>
     <string name="fork_reorder_title">Reorder favorites</string>
+    <string name="fork_button_position">Position</string>
+    <string name="fork_button_position_rail">Alphabet side</string>
+    <string name="fork_button_position_opposite">Opposite side</string>
+    <string name="fork_button_position_center">Center</string>
+    <string name="fork_edit_layout_hint_short">Drag the clock, the alphabet and the button</string>
 </resources>
