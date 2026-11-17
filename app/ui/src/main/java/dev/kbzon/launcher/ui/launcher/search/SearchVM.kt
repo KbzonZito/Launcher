@@ -75,6 +75,15 @@ class SearchVM : ViewModel(), KoinComponent {
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val searchService: SearchService by inject()
+    // [fork] Fase 14: atajos con palabra clave ("yt gatos").
+    private val searchActionService: dev.kbzon.launcher.searchactions.SearchActionService by inject()
+    private val homeSettings: dev.kbzon.launcher.preferences.home.MinimalHomeSettings by inject()
+    private val actionBuilders = searchActionService.getSearchActionBuilders()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    private val keywordOverrides = homeSettings.searchKeywords
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
+    /** Acción elegida con palabra clave en la búsqueda actual (se muestra primera y Enter la lanza). */
+    val keywordAction = mutableStateOf<String?>(null)
 
     val searchQuery = mutableStateOf("")
     val isSearchEmpty = mutableStateOf(true)
@@ -187,7 +196,9 @@ class SearchVM : ViewModel(), KoinComponent {
 
         // [fork] Prefijos ("c ana" = solo contactos). La barra sigue mostrando el texto original;
         // los filtros visibles pasan a la categoría del prefijo y se restauran al borrarlo.
-        val prefixed = dev.kbzon.launcher.ui.search.SearchPrefixes.parse(query)
+        val keyword = dev.kbzon.launcher.ui.search.SearchKeywords.match(query, actionBuilders.value, keywordOverrides.value)
+        keywordAction.value = keyword?.builder?.label
+        val prefixed = if (keyword != null) null else dev.kbzon.launcher.ui.search.SearchPrefixes.parse(query)
         if (prefixed != null) {
             val base = filtersBeforePrefix ?: filters.value.also { filtersBeforePrefix = it }
             filters.value = with(dev.kbzon.launcher.ui.search.SearchPrefixes) { prefixed.applyTo(base) }
@@ -196,7 +207,7 @@ class SearchVM : ViewModel(), KoinComponent {
             filtersBeforePrefix = null
         }
         val filters = filters.value
-        @Suppress("NAME_SHADOWING") val query = prefixed?.query ?: query
+        @Suppress("NAME_SHADOWING") val query = keyword?.query ?: prefixed?.query ?: query
 
         if (filters.enabledCategories == 1) {
             expandedCategory.value = when {
@@ -332,10 +343,17 @@ class SearchVM : ViewModel(), KoinComponent {
                         unitConverterResults.updateItems(results.unitConverters)
 
                         if (results.searchActions != null) {
-                            searchActionResults.updateItems(results.searchActions!!)
+                            val chosen = keyword?.builder?.label
+                            searchActionResults.updateItems(
+                                if (chosen == null) results.searchActions!!
+                                else results.searchActions!!.sortedByDescending { it.label == chosen }
+                            )
                         }
+                        val keywordMatch = keyword?.builder?.label?.let { l -> searchActionResults.firstOrNull { it.label == l } }
 
-                        if (launchOnEnter.value) {
+                        if (keywordMatch != null) {
+                            bestMatch.value = keywordMatch
+                        } else if (launchOnEnter.value) {
                             bestMatch.value = when {
                                 appResults.isNotEmpty() -> appResults.first()
                                 appShortcutResults.isNotEmpty() -> appShortcutResults.first()

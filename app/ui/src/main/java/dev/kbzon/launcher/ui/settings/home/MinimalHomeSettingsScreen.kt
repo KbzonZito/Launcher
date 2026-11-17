@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -77,7 +79,8 @@ fun MinimalHomeSettingsScreen() {
     val linkedApps by remember(linkedKeys) {
         if (linkedKeys.isEmpty()) flowOf(emptyList()) else searchableRepository.getByKeys(linkedKeys)
     }.collectAsStateWithLifecycle(emptyList())
-    var pickingFor by remember { mutableStateOf<String?>(null) } // "weather" | "calendar" | "clock"
+    var pickingFor by remember { mutableStateOf<String?>(null) }
+    var editingKeywords by remember { mutableStateOf(false) } // "weather" | "calendar" | "clock"
     val clockLabels = mapOf(
         MinimalClockStyle.Thin to R.string.fork_clock_thin,
         MinimalClockStyle.Bold to R.string.fork_clock_bold,
@@ -289,6 +292,31 @@ fun MinimalHomeSettingsScreen() {
         }
         item {
             PreferenceCategory(title = stringResource(R.string.fork_search_help_title)) {
+                // [fork] Fase 14: barra abajo, contactos y atajos con palabra clave.
+                val uiSettings: dev.kbzon.launcher.preferences.ui.UiSettings = org.koin.compose.koinInject()
+                val contactSettings: dev.kbzon.launcher.preferences.search.ContactSearchSettings = org.koin.compose.koinInject()
+                val bottomBar by uiSettings.bottomSearchBar.collectAsStateWithLifecycle(false)
+                val callOnTap by contactSettings.callOnTap.collectAsStateWithLifecycle(false)
+                SwitchPreference(
+                    title = stringResource(R.string.fork_search_bottom_bar),
+                    summary = stringResource(R.string.fork_search_bottom_bar_summary),
+                    icon = R.drawable.search_24px,
+                    value = bottomBar,
+                    onValueChanged = uiSettings::setBottomSearchBar,
+                )
+                SwitchPreference(
+                    title = stringResource(R.string.fork_search_call_on_tap),
+                    summary = stringResource(R.string.fork_search_call_on_tap_summary),
+                    icon = R.drawable.call_24px,
+                    value = callOnTap,
+                    onValueChanged = contactSettings::setCallOnTap,
+                )
+                Preference(
+                    title = stringResource(R.string.fork_search_keywords_title),
+                    summary = stringResource(R.string.fork_search_keywords_summary),
+                    icon = R.drawable.keyboard_24px,
+                    onClick = { editingKeywords = true },
+                )
                 Preference(
                     title = stringResource(R.string.fork_search_prefixes_title),
                     summary = stringResource(R.string.fork_search_prefixes_summary),
@@ -302,6 +330,8 @@ fun MinimalHomeSettingsScreen() {
             }
         }
     }
+
+    if (editingKeywords) SearchKeywordsDialog(onDismiss = { editingKeywords = false })
 
     DismissableBottomSheet(expanded = pickingFor != null, onDismissRequest = { pickingFor = null }) {
         val forWeather = pickingFor == "weather"
@@ -345,4 +375,51 @@ fun MinimalHomeSettingsScreen() {
             )
         }
     }
+}
+
+/** [fork] Fase 14: palabra clave de cada acción de búsqueda ("yt" → YouTube). */
+@Composable
+private fun SearchKeywordsDialog(onDismiss: () -> Unit) {
+    val actions: dev.kbzon.launcher.searchactions.SearchActionService = org.koin.compose.koinInject()
+    val settings: MinimalHomeSettings = org.koin.compose.koinInject()
+    val builders by remember { actions.getSearchActionBuilders() }.collectAsStateWithLifecycle(emptyList())
+    val overrides by settings.searchKeywords.collectAsStateWithLifecycle(emptyMap())
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.fork_search_keywords_title)) },
+        text = {
+            Column(Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())) {
+                Text(
+                    stringResource(R.string.fork_search_keywords_help),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 12.dp),
+                )
+                builders.forEach { builder ->
+                    val current = dev.kbzon.launcher.ui.search.SearchKeywords.keywordFor(builder, overrides).orEmpty()
+                    var text by remember(builder.key, current) { mutableStateOf(current) }
+                    androidx.compose.foundation.layout.Row(
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                    ) {
+                        Text(builder.label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                        androidx.compose.material3.OutlinedTextField(
+                            value = text,
+                            onValueChange = { v ->
+                                val clean = v.filterNot { it.isWhitespace() }.take(6)
+                                text = clean
+                                settings.setSearchKeyword(builder.key, clean)
+                            },
+                            singleLine = true,
+                            placeholder = { Text("—") },
+                            modifier = Modifier.width(96.dp),
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            androidx.compose.material3.TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) }
+        },
+    )
 }
