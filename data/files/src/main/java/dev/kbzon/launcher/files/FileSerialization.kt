@@ -1,5 +1,6 @@
 package dev.kbzon.launcher.files
 
+import dev.kbzon.launcher.plugin.config.StorageStrategy
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
@@ -7,13 +8,9 @@ import androidx.core.database.getStringOrNull
 import dev.kbzon.launcher.files.providers.LocalFile
 import dev.kbzon.launcher.files.providers.NextcloudFile
 import dev.kbzon.launcher.files.providers.OwncloudFile
-import dev.kbzon.launcher.files.providers.PluginFile
-import dev.kbzon.launcher.files.providers.PluginFileProvider
 import dev.kbzon.launcher.ktx.jsonObjectOf
 import dev.kbzon.launcher.permissions.PermissionGroup
 import dev.kbzon.launcher.permissions.PermissionsManager
-import dev.kbzon.launcher.plugin.PluginRepository
-import dev.kbzon.launcher.plugin.config.StorageStrategy
 import dev.kbzon.launcher.search.SavableSearchable
 import dev.kbzon.launcher.search.SearchableDeserializer
 import dev.kbzon.launcher.search.SearchableSerializer
@@ -195,86 +192,3 @@ internal class OwncloudFileDeserializer : SearchableDeserializer {
     }
 }
 
-internal class PluginFileSerializer : SearchableSerializer {
-    override fun serialize(searchable: SavableSearchable): String? {
-        searchable as PluginFile
-        return when (searchable.storageStrategy) {
-            StorageStrategy.StoreReference -> Json.Lenient.encodeToString(
-                SerializedFile(
-                    id = searchable.id,
-                    authority = searchable.authority,
-                    strategy = StorageStrategy.StoreReference
-                )
-            )
-
-            else -> {
-                Json.Lenient.encodeToString(
-                    SerializedFile(
-                        id = searchable.id,
-                        path = searchable.path,
-                        mimeType = searchable.mimeType,
-                        size = searchable.size,
-                        label = searchable.label,
-                        uri = searchable.uri.toString(),
-                        thumbnailUri = searchable.thumbnailUri?.toString(),
-                        isDirectory = searchable.isDirectory,
-                        authority = searchable.authority,
-                        timestamp = searchable.timestamp,
-                        metadata = searchable.metaData,
-                        owner = searchable.owner,
-                        strategy = StorageStrategy.StoreCopy,
-                    )
-                )
-            }
-        }
-    }
-
-    override val typePrefix: String
-        get() = PluginFile.Domain
-
-}
-
-internal class PluginFileDeserializer(
-    private val context: Context,
-    private val pluginRepository: PluginRepository,
-) : SearchableDeserializer {
-    override suspend fun deserialize(serialized: String): SavableSearchable? {
-        val json = Json.Lenient.decodeFromString<SerializedFile>(serialized)
-        val authority = json.authority ?: return null
-        val id = json.id ?: return null
-        val strategy = json.strategy ?: StorageStrategy.StoreCopy
-
-        val plugin = pluginRepository.get(authority).firstOrNull() ?: return null
-        if (!plugin.enabled) return null
-
-        return when (strategy) {
-            StorageStrategy.StoreReference -> {
-                PluginFileProvider(context, authority).get(id).getOrNull()
-            }
-
-            else -> {
-                val timestamp = json.timestamp ?: 0
-                PluginFile(
-                    id = id,
-                    path = json.path,
-                    mimeType = json.mimeType ?: "binary/octet-stream",
-                    size = json.size ?: 0,
-                    metaData = json.metadata ?: FileMetadata(),
-                    label = json.label ?: return null,
-                    uri = json.uri?.toUri() ?: return null,
-                    thumbnailUri = json.thumbnailUri?.toUri(),
-                    storageStrategy = StorageStrategy.StoreCopy,
-                    isDirectory = json.isDirectory ?: false,
-                    authority = authority,
-                    timestamp = timestamp,
-                    owner = json.owner,
-                    updatedSelf = {
-                        if (it !is PluginFile) UpdateResult.TemporarilyUnavailable()
-                        else PluginFileProvider(context, authority).refresh(it, timestamp)
-                            .asUpdateResult()
-                    }
-                )
-            }
-        }
-    }
-}

@@ -2,7 +2,6 @@ package dev.kbzon.launcher.locations
 
 import android.content.Context
 import dev.kbzon.launcher.devicepose.DevicePoseProvider
-import dev.kbzon.launcher.locations.providers.PluginLocationProvider
 import dev.kbzon.launcher.locations.providers.openstreetmaps.OsmLocationProvider
 import dev.kbzon.launcher.permissions.PermissionGroup
 import dev.kbzon.launcher.permissions.PermissionsManager
@@ -61,10 +60,10 @@ internal class LocationsRepository(
                 return@combineTransform
             }
 
-            val providers = settingsData.providers.map {
+            val providers = settingsData.providers.mapNotNull {
                 when (it) {
                     "openstreetmaps" -> osmLocationProvider
-                    else -> PluginLocationProvider(context, it)
+                    else -> null // [fork] plugins eliminados
                 }
             }
 

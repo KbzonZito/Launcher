@@ -65,6 +65,13 @@ fun AboutSettingsScreen() {
                         backStack.add(BuildInfoSettingsRoute)
                     }
                 )
+                Preference( // [fork] Fase 15: depuración movida aquí desde la lista principal
+                    title = stringResource(R.string.preference_screen_debug),
+                    summary = stringResource(R.string.preference_screen_debug_summary),
+                    onClick = {
+                        backStack.add(dev.kbzon.launcher.ui.settings.debug.DebugSettingsRoute)
+                    }
+                )
             }
         }
         item {

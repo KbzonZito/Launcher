@@ -81,7 +81,7 @@ fun GestureSettingsScreen() {
 
 
     val context = LocalContext.current
-    PreferenceScreen(title = stringResource(R.string.preference_screen_gestures)) {
+    PreferenceScreen(title = stringResource(R.string.fork_settings_gestures)) {
         item {
             PreferenceCategory {
                 val swipeDown by viewModel.swipeDown.collectAsStateWithLifecycle(null)

@@ -89,8 +89,6 @@ import dev.kbzon.launcher.data.customattrs.CustomAttributesRepository
 import dev.kbzon.launcher.ktx.isAtLeastApiLevel
 import dev.kbzon.launcher.permissions.PermissionGroup
 import dev.kbzon.launcher.permissions.PermissionsManager
-import dev.kbzon.launcher.plugin.PluginRepository
-import dev.kbzon.launcher.plugin.PluginType
 import dev.kbzon.launcher.search.Tag
 import dev.kbzon.launcher.search.calendar.CalendarListType
 import dev.kbzon.launcher.themes.colors.atTone
@@ -869,18 +867,11 @@ fun ColumnScope.ConfigureCalendarWidget(
 ) {
     val calendarRepository: CalendarRepository = koinInject()
     val permissionsManager: PermissionsManager = koinInject()
-    val pluginRepository: PluginRepository = koinInject()
     val calendars by remember {
         calendarRepository.getCalendars().map {
             it.sortedBy { it.name }
         }
     }.collectAsState(null)
-    val plugins by remember {
-        pluginRepository.findMany(
-            type = PluginType.Calendar,
-            enabled = true,
-        )
-    }.collectAsState(emptyList())
 
     val hasPermission by remember {
         permissionsManager.hasPermission(PermissionGroup.Calendar)
@@ -918,10 +909,10 @@ fun ColumnScope.ConfigureCalendarWidget(
 
     if (groups?.isNotEmpty() == true) {
         for (group in groups) {
-            val pluginName = remember(plugins, group.key) {
+            val pluginName = remember(group.key) {
                 if (group.key == "local") context.getString(R.string.preference_calendar_calendars)
                 else if (group.key == "tasks.org") context.getString(R.string.preference_search_tasks)
-                else plugins.find { it.authority == group.key }?.label
+                else null
             }
             if (pluginName != null) {
                 Text(
