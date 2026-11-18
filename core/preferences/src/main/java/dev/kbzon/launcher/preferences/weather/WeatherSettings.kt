@@ -31,7 +31,7 @@ sealed interface WeatherLocation {
 }
 
 data class WeatherSettingsData(
-    val provider: String = "metno",
+    val provider: String = "openmeteo",
     val autoLocation: Boolean = true,
     val location: LatLon? = null,
     val locationName: String? = null,

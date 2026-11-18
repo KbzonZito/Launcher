@@ -5,7 +5,8 @@ El crash reporter es local. Esta tabla lista **todo** lo que puede salir del tel
 
 | Función | Módulo | Destino | Qué se envía | Por defecto | Estado / plan |
 |---|---|---|---|---|---|
-| Clima (Met.no) | `data/weather` | `api.met.no` | Coordenadas **redondeadas a 2 decimales (~1 km)** + user agent con el paquete | Activo (proveedor por defecto) | ✅ Redondeo aplicado en fase 1 |
+| Clima (Open-Meteo) | `data/weather` | `api.open-meteo.com` | Coordenadas **redondeadas a 2 decimales (~1 km)**, sin clave ni identificador | Activo (proveedor por defecto desde la fase 16) | ✅ Redondeo aplicado |
+| Clima (Met.no) | `data/weather` | `api.met.no` | Coordenadas **redondeadas a 2 decimales (~1 km)** + user agent con el paquete, la huella de la firma y la URL del repo (sin datos personales) | Solo si se elige | ✅ Redondeo aplicado en fase 1 |
 | Clima (Bright Sky / OpenWeatherMap) | `data/weather` | `api.brightsky.dev`, `api.openweathermap.org` | Coordenadas a ~1 km (+ API key propia en OWM) | Solo si se elige | ✅ Redondeo aplicado en fase 1b |
 | Clima (Breezy Weather / plugins) | `data/weather` | Ninguno (lee de la app local) | — | Solo si se elige | ✅ Opción más privada |
 | Tipo de cambio | `data/currencies` | `ecb.europa.eu` | Nada personal (descarga un XML público cada hora) | ✅ Desactivado (fase 1b) | Se activa en ajustes del conversor |
@@ -19,7 +20,7 @@ Eliminado en la fase 1: **Nextcloud, ownCloud, WebDAV, cuentas** y **Wikipedia**
 ## Modo offline (fase 1b) ✅
 Ajustes → Privacidad → **Modo offline**. Con él activo:
 - La búsqueda ignora el filtro "online" (sin sitios web, lugares ni plugins online).
-- No se actualiza el clima de Met.no, Bright Sky ni OpenWeatherMap (Breezy Weather y los plugins siguen, porque son locales).
+- No se actualiza el clima de Open-Meteo, Met.no, Bright Sky ni OpenWeatherMap (Breezy Weather sigue, porque es local).
 - No se descarga el tipo de cambio.
 - Las imágenes remotas solo se muestran si ya estaban en caché.
 

@@ -2,5 +2,5 @@
 <resources>
     <!--<string name="openweathermap_key" translatable="false">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</string>-->
     <!--<string name="here_key" translatable="false">xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</string>-->
-    <!--<string name="metno_contact" translatable="false"></string>-->
+    <!-- metno_contact está en metno.xml -->
 </resources>

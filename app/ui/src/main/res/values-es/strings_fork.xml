@@ -198,4 +198,12 @@
     <string name="fork_settings_rail_list_summary">Lado del riel, orden por letra, ola, vista previa de notificaciones</string>
     <string name="fork_settings_search_extras">Barra, contactos y atajos</string>
     <string name="fork_settings_search_extras_summary">Barra abajo, tocar para llamar, atajos de búsqueda, prefijos</string>
+    <string name="fork_music_apps_title">Apps de música</string>
+    <string name="fork_music_apps_help">Elige qué apps aparecen al conectar audio y llevan ♪ en la lista. Sin ninguna elegida, se detectan los reproductores automáticamente.</string>
+    <string name="fork_music_apps_auto">Automático (reproductores detectados)</string>
+    <string name="fork_music_apps_detected">Detectada como reproductor</string>
+    <plurals name="fork_music_apps_count">
+        <item quantity="one">%d app elegida</item>
+        <item quantity="other">%d apps elegidas</item>
+    </plurals>
 </resources>

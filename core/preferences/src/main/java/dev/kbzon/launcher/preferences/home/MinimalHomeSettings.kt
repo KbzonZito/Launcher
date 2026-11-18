@@ -167,6 +167,12 @@ class MinimalHomeSettings internal constructor(
 
     fun setAudioMediaApps(enabled: Boolean) = dataStore.update { it.copy(minimalHomeAudioMediaApps = enabled) }
 
+    /** [fork] F16: apps de música elegidas a mano (paquetes, en orden). Vacío = detección automática. */
+    val musicApps: Flow<List<String>>
+        get() = dataStore.data.map { it.minimalHomeMusicApps }.distinctUntilChanged()
+
+    fun setMusicApps(packages: List<String>) = dataStore.update { it.copy(minimalHomeMusicApps = packages.distinct()) }
+
     val actionButtonPosition: Flow<ActionButtonPosition>
         get() = dataStore.data.map { it.minimalHomeActionButtonPosition }.distinctUntilChanged()
 

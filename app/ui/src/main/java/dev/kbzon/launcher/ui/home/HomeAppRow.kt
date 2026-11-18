@@ -82,6 +82,9 @@ import kotlin.math.roundToInt
  * - Punto y vista previa de la última notificación.
  */
 @OptIn(ExperimentalFoundationApi::class)
+/** [fork] F16: paquetes de música que se marcan con ♪ en la lista (vacío si no hay audio conectado). */
+internal val LocalMusicPackages = androidx.compose.runtime.staticCompositionLocalOf<Set<String>> { emptySet() }
+
 @Composable
 fun HomeAppRow(
     item: SavableSearchable,
@@ -209,8 +212,10 @@ fun HomeAppRow(
                     Spacer(Modifier.width(16.dp))
                 }
                 Column(Modifier.weight(1f, fill = false)) {
+                    // [fork] F16: como Niagara, ♪ junto a las apps de música mientras hay audio conectado.
+                    val musicMark = item is Application && item.componentName.packageName in LocalMusicPackages.current
                     Text(
-                        text = item.displayLabel,
+                        text = if (musicMark) item.displayLabel + "  ♪" else item.displayLabel,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = TextStyle(fontFamily = LocalAppFontFamily.current, fontSize = 22.sp, fontWeight = FontWeight.Normal, shadow = shadow),

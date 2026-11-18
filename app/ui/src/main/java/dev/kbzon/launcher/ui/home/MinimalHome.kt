@@ -247,8 +247,16 @@ fun MinimalHome(
     }
 
     val iconStyle by vm.iconStyle.collectAsState()
+    // [fork] F16: con audio Bluetooth conectado, las apps de música llevan ♪ en la lista.
+    val audioDeviceNow by remember { vm.bluetoothAudioDevice(context) }.collectAsState(null)
+    val audioAppsOn by vm.audioMediaAppsEnabled.collectAsState()
+    val musicApps by vm.mediaApps.collectAsState()
+    val musicPackages = remember(audioDeviceNow, audioAppsOn, musicApps) {
+        if (audioDeviceNow != null && audioAppsOn) musicApps.map { it.componentName.packageName }.toSet() else emptySet()
+    }
     CompositionLocalProvider(
         LocalContentColor provides contentColor,
+        LocalMusicPackages provides musicPackages,
         dev.kbzon.launcher.ui.component.LocalIconGlyphColor provides
             if (iconStyle == dev.kbzon.launcher.preferences.home.HomeIconStyle.Original) null else contentColor,
     ) {

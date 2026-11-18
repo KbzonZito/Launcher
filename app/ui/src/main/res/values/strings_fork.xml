@@ -199,4 +199,12 @@
     <string name="fork_settings_rail_list_summary">Rail side, order per letter, wave, notification previews</string>
     <string name="fork_settings_search_extras">Bar, contacts and keywords</string>
     <string name="fork_settings_search_extras_summary">Bottom bar, tap to call, search keywords, prefixes</string>
+    <string name="fork_music_apps_title">Music apps</string>
+    <string name="fork_music_apps_help">Pick which apps appear when audio connects and get a ♪ in the list. With none picked, players are detected automatically.</string>
+    <string name="fork_music_apps_auto">Automatic (detected players)</string>
+    <string name="fork_music_apps_detected">Detected as a music player</string>
+    <plurals name="fork_music_apps_count">
+        <item quantity="one">%d app picked</item>
+        <item quantity="other">%d apps picked</item>
+    </plurals>
 </resources>
