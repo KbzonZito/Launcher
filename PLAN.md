@@ -234,7 +234,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ✅ v0.5.0 |
 | **14** | Búsqueda minimalista 2.0 | ✅ v0.6.0 (parcial) |
 | **15** | Limpieza de ajustes heredados | ✅ v0.7.0 |
-| **16** | Uso real y estilo Niagara: errores del teléfono, clima global, apps de música elegibles, riel y lista más rápidos | ⏳ pendiente (§10) |
+| **16** | Uso real y estilo Niagara: errores del teléfono, clima global, apps de música elegibles, riel y lista más rápidos | ⏳ Entrega A hecha (v0.7.2); B y C pendientes (§10) |
 | ~~continuo~~ | ~~`upstream-sync` mensual por tag~~ — cancelado por el fork total | — |
 
 Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), apertura animada + Espacio privado en el candado + batería en el vistazo (PR #15), búsqueda minimalista (PR #14), teclado físico + borrar estadísticas + mapas offline (PR #13), identidad propia (PR #12). Pendientes: ver §9.
@@ -257,6 +257,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.6.0 | Fase 14: atajos de búsqueda con palabra clave (yt, p, g…), avisos de permiso en una línea, barra de búsqueda abajo y "tocar un contacto llama" en Ajustes → Home (publicada dentro de v0.7.0) |
 | v0.7.0 | Fase 15: Ajustes en tres grupos (Launcher · Aspecto · Sistema), fuera las opciones de la home de Kvaesitso y el código de plugins; primera release con las fases 12–15 |
 | v0.7.1 | Cierre de la Fase 15: Inicio y Alfabeto y lista separados, opciones de búsqueda dentro de Búsqueda, sin restos de plugins ni código muerto de la home de Kvaesitso — sin publicar aún |
+| v0.7.2 | Fase 16, entrega A: un "atrás" cierra la búsqueda, la barra invisible ya no queda en la home, gestos apagados al reordenar favoritos, menú de app como tarjeta con velo y atajos, datos guardados ilegibles se descartan en vez de cerrar la app, permisos al día al volver a la home y aviso para permitir el calendario — sin publicar aún |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -267,7 +268,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 **Las fases 9–15 están hechas (v0.7.0).** Lo que sigue es esta lista, en orden de prioridad. Marcar con [x] al terminar.
 
 **0. Fase 16 — lo encontrado usando el teléfono (detalle en §10)**
-- [ ] Entrega A (v0.7.2): salir de la búsqueda con un "atrás", home sin barra invisible, gestos apagados al editar favoritos, popups sin encimarse, error de caché, próximo evento en el vistazo.
+- [x] Entrega A (v0.7.2): salir de la búsqueda con un "atrás", home sin barra invisible, gestos apagados al editar favoritos, popups sin encimarse, error de caché, próximo evento en el vistazo.
 - [ ] Entrega B (v0.7.3): clima con Open-Meteo y MET Norway (gratis, global), apps de música elegibles.
 - [ ] Entrega C (v0.8.0): botón de acción más adentro, ola más amplia y sin letras juntas, apps por letra al instante y lista completa al soltar.
 
@@ -411,9 +412,10 @@ Incluye borrar los restos de plugins de la capa de datos (`NoPluginRepository` y
 Eliminar los ajustes heredados de Kvaesitso que no aplican a esta app (reloj y widgets de la home de Kvaesitso, dock, estilos de barra, etc.) y reorganizar en: Inicio · Riel y lista · Gestos y botón de acción · Búsqueda · Apariencia · Privacidad · Backup · Acerca de.
 
 ### Fase 16 — Uso real y estilo Niagara (v0.7.2 → v0.8.0)
-> Pendiente. Sale de usar la v0.7.0 en el teléfono (18-11-2026) y de un video de Niagara usado como referencia. Tres entregas; cada una termina con prueba en el emulador, PR y release.
+> Entrega A ✅ hecha (v0.7.2); B y C pendientes. Sale de usar la v0.7.0 en el teléfono (18-11-2026) y de un video de Niagara usado como referencia. Tres entregas; cada una termina con prueba en el emulador, PR y release.
 
-**Entrega A — Errores (v0.7.2)**
+**Entrega A — Errores (v0.7.2)** ✅
+> Hecha. **Búsqueda**: si el teclado se cierra con la barra todavía enfocada es que lo cerró el usuario, así que la búsqueda se cierra de una vez (desplazar los resultados quita el foco antes y no la cierra). **Home limpia**: en reposo la barra queda fuera de la pantalla, no solo transparente. **Reordenar favoritos** bloquea el scaffold, apaga los gestos, oculta el botón de acción y la zona del riel del otro borde, y "atrás" sale del modo. **Menú de app**: tarjeta propia (`HomeItemMenu.kt`) en un popup a pantalla completa con velo al 35 %, anclada a la fila y siempre dentro de la pantalla, con nombre, atajos de la app (como Niagara) y acciones. **Caché**: si un dato guardado no se puede leer, se descarta y se registra en vez de cerrar la app (no se pudo reproducir el error del teléfono; si vuelve, revisar Ajustes → Sobre → Depuración → Informe de fallos). **Próximo evento**: `PermissionsManager.onResume` no volvía a revisar el calendario (ni la ubicación, los contactos, Tasks ni llamadas), así que un permiso dado desde los Ajustes de Android no se notaba hasta reiniciar el launcher. Ahora se revisan, el vistazo avisa "Permitir calendario para ver tus eventos" cuando falta el permiso, y el formato es el de Niagara: "Reunión · 11:00 +2".
 1. **Salir de la búsqueda con un solo "atrás".** Hoy hay que pulsar varias veces: el primero cierra el teclado, otro borra el texto y otro vuelve. Un "atrás" debe cerrar el teclado, borrar la consulta y volver a la home de una vez (el gesto predictivo de `LauncherScaffold` y los `BackHandler` de la búsqueda compiten).
 2. **Home limpia.** La barra de búsqueda sigue abajo, invisible pero tocable (`MinimalHomeComponent.searchBarModifier` solo le pone `alpha(0f)`). En reposo debe quedar fuera de la pantalla o sin recibir toques, y aparecer solo al abrir la búsqueda.
 3. **Gestos apagados al editar.** Al reordenar favoritos siguen activos los gestos de la home: `homeGestures` solo se apaga con `editMode` y no con `reorderMode`. Apagar los gestos y bloquear el scaffold (`state.lock()`) en los dos modos.

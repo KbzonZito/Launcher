@@ -211,7 +211,9 @@ fun MinimalHome(
     var outerWidthPx by remember { mutableIntStateOf(1) }
     val buttonPosition by vm.actionButtonPosition.collectAsState()
     // B9: mientras se edita, el scaffold no reacciona a gestos (lock/unlock).
-    LaunchedEffect(editMode) { onEditModeChange(editMode) }
+    // [fork] F16: también al reordenar favoritos (antes los gestos seguían activos).
+    val editing = editMode || reorderMode
+    LaunchedEffect(editing) { onEditModeChange(editing) }
     val actionButtonEnabled by vm.actionButtonEnabled.collectAsState()
     val actionButtonActions by vm.actionButtonActions.collectAsState()
     val splitSwipeDown by vm.splitSwipeDown.collectAsState()
@@ -227,8 +229,9 @@ fun MinimalHome(
             if (editMode) { editMode = false; draftLayout = null }
         }
     }
-    BackHandler(enabled = editMode || quickMenuY != null || eventsPopup || openFolder != null) {
-        if (openFolder != null) openFolder = null else if (eventsPopup) eventsPopup = false else if (quickMenuY != null) quickMenuY = null else { editMode = false; draftLayout = null }
+    BackHandler(enabled = editMode || reorderMode || quickMenuY != null || eventsPopup || openFolder != null) {
+        if (openFolder != null) openFolder = null else if (eventsPopup) eventsPopup = false else if (quickMenuY != null) quickMenuY = null
+        else if (reorderMode) reorderMode = false else { editMode = false; draftLayout = null }
     }
     // B7: dónde va el botón según la posición elegida y el lado del alfabeto.
     val buttonAlign = when (buttonPosition) {
@@ -263,9 +266,9 @@ fun MinimalHome(
                         view.performHapticFeedback(HapticFeedbackConstants.GESTURE_END)
                         runAction(if (up) vm.twoFingerUp.value else vm.twoFingerDown.value)
                     },
-                    enabled = { !editMode },
+                    enabled = { !editing },
                     onLongPress = { pos ->
-                        if (!editMode) {
+                        if (!editing) {
                             view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                             quickMenuY = pos.y
                         }
@@ -453,7 +456,7 @@ fun MinimalHome(
             val onRailDoubleTap: (() -> Unit)? = if (railDoubleTapLock) ({ vm.lockScreen(context) }) else null
 
             // Zona invisible en el borde contrario: el riel funciona desde ambos lados.
-            if (railBothEdges && !editMode) {
+            if (railBothEdges && !editing) {
                 RailMirrorZone(
                     state = railState,
                     letters = railEntries,
@@ -489,7 +492,7 @@ fun MinimalHome(
                     .padding(horizontal = 8.dp),
             )
 
-            if (actionButtonEnabled && !editMode) {
+            if (actionButtonEnabled && !editing) {
                 HomeActionButton(
                     actions = actionButtonActions,
                     onAction = runAction,
@@ -693,6 +696,7 @@ private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?, onOpenEvents: () -> U
     val context = LocalContext.current
     val ahead by vm.eventsAhead.collectAsState()
     val hasLocation by vm.hasLocationPermission.collectAsState()
+    val hasCalendar by vm.hasCalendarPermission.collectAsState()
     val audioDevice by remember { vm.bluetoothAudioDevice(context) }.collectAsState(null)
     val audioAppsEnabled by vm.audioMediaAppsEnabled.collectAsState()
     val mediaApps by vm.mediaApps.collectAsState()
@@ -706,12 +710,21 @@ private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?, onOpenEvents: () -> U
 
     Column(Modifier.padding(top = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         // M2: próximo evento; al tocarlo, tarjeta con los de hoy y mañana.
+        if (!hasCalendar) {
+            GlanceItem(
+                icon = R.drawable.event_24px,
+                text = stringResource(R.string.fork_glance_allow_calendar),
+                style = style,
+                color = dim.copy(alpha = 0.6f),
+                onClick = { vm.requestCalendarPermission(context) },
+            )
+        }
         val next = ahead.firstOrNull { !it.allDay } ?: ahead.firstOrNull()
         next?.let { ev ->
             val more = ahead.size - 1
             GlanceItem(
                 icon = R.drawable.event_24px,
-                text = ev.glanceText(context) + if (more > 0) "   " + stringResource(R.string.fork_glance_more_events, more) else "",
+                text = ev.glanceText(context) + if (more > 0) "  " + stringResource(R.string.fork_glance_more_events, more) else "",
                 style = style,
                 color = dim,
                 onClick = onOpenEvents,
@@ -808,7 +821,8 @@ private fun CalendarEvent.glanceText(context: Context): String {
             else "${DateFormat.format("EEE", start)} $t"
         }
     }
-    return listOf(time, labelOverride ?: label).filter { it.isNotBlank() }.joinToString("  ")
+    // [fork] F16: como Niagara, primero el título y después la hora ("Reunión · 11:00").
+    return listOf(labelOverride ?: label, time).filter { it.isNotBlank() }.joinToString(" · ")
 }
 
 private fun Context.tryStart(intent: Intent) {
