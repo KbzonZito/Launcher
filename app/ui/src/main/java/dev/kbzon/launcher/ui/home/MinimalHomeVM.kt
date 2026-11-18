@@ -549,14 +549,22 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
         awaitClose { audio.unregisterAudioDeviceCallback(callback) }
     }
 
-    /** Apps de música instaladas (la última usada primero), hasta 4. */
+    /**
+     * Apps de música: las elegidas en Ajustes (en su orden, hasta 6) o, si no hay, las detectadas
+     * (la última usada primero), hasta 4.
+     */
     val mediaApps: StateFlow<List<Application>> = combine(
         apps,
         kotlinx.coroutines.flow.flow { emit(musicService.getInstalledPlayerPackages()) },
-    ) { all, players ->
-        val last = musicService.lastPlayerPackage
-        val pkgs = (listOfNotNull(last) + players).distinct()
-        pkgs.mapNotNull { p -> all.firstOrNull { it.componentName.packageName == p } }.take(4)
+        homeSettings.musicApps,
+    ) { all, players, chosen ->
+        val byPackage = all.associateBy { it.componentName.packageName }
+        if (chosen.isNotEmpty()) {
+            chosen.mapNotNull { byPackage[it] }.take(6)
+        } else {
+            val last = musicService.lastPlayerPackage
+            (listOfNotNull(last) + players).distinct().mapNotNull { byPackage[it] }.take(4)
+        }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun icon(searchable: SavableSearchable, size: Int): Flow<LauncherIcon?> =

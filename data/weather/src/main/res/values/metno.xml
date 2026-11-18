@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- [fork] F16: MET Norway pide identificar la app en el User-Agent. Se usa la página del proyecto,
+         sin datos personales. -->
+    <string name="metno_contact" translatable="false">https://github.com/KbzonZito/Launcher</string>
+</resources>

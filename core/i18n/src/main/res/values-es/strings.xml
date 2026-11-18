@@ -434,6 +434,7 @@
     <string name="preference_font">Fuente</string>
     <string name="preference_screen_appearance_summary">Personalizar el aspecto</string>
     <string name="provider_metno">MET Norway</string>
+    <string name="provider_openmeteo">Open-Meteo (mundial)</string>
     <string name="preference_automatic_location_summary">Utilizar los servicios de localización para determinar la ubicación automáticamente</string>
     <string name="preference_imperial_units_summary">Utilice grados Fahrenheit y millas por hora</string>
     <string name="preference_debug_cleanup_database_summary">Eliminar las entradas inservibles y no utilizadas de la base de datos del launcher</string>

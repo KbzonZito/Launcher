@@ -197,6 +197,18 @@ fun MinimalHomeSettingsScreen(section: HomeSettingsSection = HomeSettingsSection
                     value = audioApps,
                     onValueChanged = settings::setAudioMediaApps,
                 )
+                // [fork] F16: elegir a mano las apps de música.
+                val musicApps by settings.musicApps.collectAsStateWithLifecycle(emptyList())
+                var pickingMusicApps by remember { mutableStateOf(false) }
+                Preference(
+                    title = stringResource(R.string.fork_music_apps_title),
+                    summary = if (musicApps.isEmpty()) stringResource(R.string.fork_music_apps_auto)
+                    else androidx.compose.ui.res.pluralStringResource(R.plurals.fork_music_apps_count, musicApps.size, musicApps.size),
+                    icon = R.drawable.music_note_24px,
+                    enabled = audioApps,
+                    onClick = { pickingMusicApps = true },
+                )
+                MusicAppsSheet(expanded = pickingMusicApps, onDismiss = { pickingMusicApps = false })
                 SwitchPreference(
                     title = stringResource(R.string.fork_preference_media_player),
                     summary = stringResource(R.string.fork_preference_media_player_summary),

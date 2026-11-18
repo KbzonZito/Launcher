@@ -234,7 +234,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ✅ v0.5.0 |
 | **14** | Búsqueda minimalista 2.0 | ✅ v0.6.0 (parcial) |
 | **15** | Limpieza de ajustes heredados | ✅ v0.7.0 |
-| **16** | Uso real y estilo Niagara: errores del teléfono, clima global, apps de música elegibles, riel y lista más rápidos | ⏳ Entrega A hecha (v0.7.2); B y C pendientes (§10) |
+| **16** | Uso real y estilo Niagara: errores del teléfono, clima global, apps de música elegibles, riel y lista más rápidos | ⏳ Entregas A y B hechas (v0.7.2, v0.7.3); C pendiente (§10) |
 | ~~continuo~~ | ~~`upstream-sync` mensual por tag~~ — cancelado por el fork total | — |
 
 Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), apertura animada + Espacio privado en el candado + batería en el vistazo (PR #15), búsqueda minimalista (PR #14), teclado físico + borrar estadísticas + mapas offline (PR #13), identidad propia (PR #12). Pendientes: ver §9.
@@ -258,6 +258,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.7.0 | Fase 15: Ajustes en tres grupos (Launcher · Aspecto · Sistema), fuera las opciones de la home de Kvaesitso y el código de plugins; primera release con las fases 12–15 |
 | v0.7.1 | Cierre de la Fase 15: Inicio y Alfabeto y lista separados, opciones de búsqueda dentro de Búsqueda, sin restos de plugins ni código muerto de la home de Kvaesitso — sin publicar aún |
 | v0.7.2 | Fase 16, entrega A: un "atrás" cierra la búsqueda, la barra invisible ya no queda en la home, gestos apagados al reordenar favoritos, menú de app como tarjeta con velo y atajos, datos guardados ilegibles se descartan en vez de cerrar la app, permisos al día al volver a la home y aviso para permitir el calendario — sin publicar aún |
+| v0.7.3 | Fase 16, entrega B: clima con Open-Meteo (predeterminado, mundial, sin clave) y MET Norway funcionando, el clima ya no falla si el GPS tarda, apps de música elegibles a mano y ♪ en la lista con audio conectado — sin publicar aún |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -269,7 +270,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 **0. Fase 16 — lo encontrado usando el teléfono (detalle en §10)**
 - [x] Entrega A (v0.7.2): salir de la búsqueda con un "atrás", home sin barra invisible, gestos apagados al editar favoritos, popups sin encimarse, error de caché, próximo evento en el vistazo.
-- [ ] Entrega B (v0.7.3): clima con Open-Meteo y MET Norway (gratis, global), apps de música elegibles.
+- [x] Entrega B (v0.7.3): clima con Open-Meteo y MET Norway (gratis, global), apps de música elegibles.
 - [ ] Entrega C (v0.8.0): botón de acción más adentro, ola más amplia y sin letras juntas, apps por letra al instante y lista completa al soltar.
 
 **1. Probar en los dispositivos (antes de construir más)**
@@ -412,7 +413,7 @@ Incluye borrar los restos de plugins de la capa de datos (`NoPluginRepository` y
 Eliminar los ajustes heredados de Kvaesitso que no aplican a esta app (reloj y widgets de la home de Kvaesitso, dock, estilos de barra, etc.) y reorganizar en: Inicio · Riel y lista · Gestos y botón de acción · Búsqueda · Apariencia · Privacidad · Backup · Acerca de.
 
 ### Fase 16 — Uso real y estilo Niagara (v0.7.2 → v0.8.0)
-> Entrega A ✅ hecha (v0.7.2); B y C pendientes. Sale de usar la v0.7.0 en el teléfono (18-11-2026) y de un video de Niagara usado como referencia. Tres entregas; cada una termina con prueba en el emulador, PR y release.
+> Entregas A y B ✅ hechas (v0.7.2, v0.7.3); C pendiente. Sale de usar la v0.7.0 en el teléfono (18-11-2026) y de un video de Niagara usado como referencia. Tres entregas; cada una termina con prueba en el emulador, PR y release.
 
 **Entrega A — Errores (v0.7.2)** ✅
 > Hecha. **Búsqueda**: si el teclado se cierra con la barra todavía enfocada es que lo cerró el usuario, así que la búsqueda se cierra de una vez (desplazar los resultados quita el foco antes y no la cierra). **Home limpia**: en reposo la barra queda fuera de la pantalla, no solo transparente. **Reordenar favoritos** bloquea el scaffold, apaga los gestos, oculta el botón de acción y la zona del riel del otro borde, y "atrás" sale del modo. **Menú de app**: tarjeta propia (`HomeItemMenu.kt`) en un popup a pantalla completa con velo al 35 %, anclada a la fila y siempre dentro de la pantalla, con nombre, atajos de la app (como Niagara) y acciones. **Caché**: si un dato guardado no se puede leer, se descarta y se registra en vez de cerrar la app (no se pudo reproducir el error del teléfono; si vuelve, revisar Ajustes → Sobre → Depuración → Informe de fallos). **Próximo evento**: `PermissionsManager.onResume` no volvía a revisar el calendario (ni la ubicación, los contactos, Tasks ni llamadas), así que un permiso dado desde los Ajustes de Android no se notaba hasta reiniciar el launcher. Ahora se revisan, el vistazo avisa "Permitir calendario para ver tus eventos" cuando falta el permiso, y el formato es el de Niagara: "Reunión · 11:00 +2".
@@ -423,7 +424,8 @@ Eliminar los ajustes heredados de Kvaesitso que no aplican a esta app (reloj y w
 5. **Error de caché.** Hubo que borrar la caché para que la app volviera a abrir. Reproducir instalando la v0.7.0 encima de una versión vieja y leer logcat. Sospechas: favoritos o búsquedas guardadas de tipos de plugin ya borrados, o caché de íconos. Lo que no se pueda leer se descarta en vez de cerrar la app.
 6. **Próximo evento en el vistazo.** No aparece en el teléfono. Revisar permiso, calendarios visibles, eventos de todo el día y el filtro `isCompleted` de `eventsAhead`. Mostrarlo como Niagara: "Título · 11:00 +5".
 
-**Entrega B — Clima y música (v0.7.3)**
+**Entrega B — Clima y música (v0.7.3)** ✅
+> Hecha. **Clima**: proveedor nuevo `OpenMeteoProvider` (datos horarios de 7 días, códigos WMO, °C → K, viento en m/s), primero en la lista y predeterminado para instalaciones nuevas (quien ya tenía otro guardado lo conserva). MET Norway aparece con `metno_contact` = URL del repo. Un proveedor desconocido vuelve a Open-Meteo. El modo sin conexión ahora frena todos los proveedores de red (antes comparaba con `"brightsky"`, pero el id es `"dwd"`). **Además**: si el GPS no daba una ubicación nueva en 30 s, `timeout()` lanzaba una excepción y la actualización fallaba entera; ahora se usa la última ubicación conocida (probable causa de "Configurar el clima" en el teléfono). **Música**: Ajustes → Inicio → "Apps de música" abre una hoja con todas las apps (las elegidas en orden, luego las detectadas como reproductor, luego el resto). Si hay elegidas se usan esas (hasta 6); si no, la detección automática. Con audio Bluetooth conectado, esas apps llevan ♪ en la lista. Sin probar la ♪ con Bluetooth real (el emulador no tiene).
 1. **Más proveedores de clima, gratis y sin clave.** Hoy solo aparece Bright Sky (Servicio Meteorológico Alemán, con datos solo de Alemania). MET Norway está oculto porque falta el recurso `metno_contact`, y OpenWeatherMap porque necesita una clave.
    - Añadir **Open-Meteo** (global, gratis, sin clave) como predeterminado.
    - Activar **MET Norway** con un User-Agent genérico: nombre de la app y URL del repo, sin datos personales.

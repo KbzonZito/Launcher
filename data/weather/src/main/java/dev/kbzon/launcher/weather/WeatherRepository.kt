@@ -156,6 +156,13 @@ internal class WeatherRepositoryImpl(
 
     override fun getProviders(): Flow<List<WeatherProviderInfo>> {
         val providers = mutableListOf<WeatherProviderInfo>()
+        // [fork] F16: Open-Meteo primero (global, gratis, sin clave).
+        providers.add(
+            WeatherProviderInfo(
+                dev.kbzon.launcher.weather.openmeteo.OpenMeteoProvider.Id,
+                context.getString(R.string.provider_openmeteo)
+            )
+        )
         providers.add(
             WeatherProviderInfo(
                 BrightSkyProvider.Id,
@@ -207,7 +214,7 @@ class WeatherUpdateWorker(
         val provider = WeatherProvider.getInstance(settingsData.provider)
 
         // [fork] Breezy Weather lee de una app local; el resto usa internet.
-        if (settingsData.provider in setOf("metno", "owm", "brightsky") && privacySettings.offlineMode.first()) {
+        if (settingsData.provider != BreezyWeatherProvider.Id && privacySettings.offlineMode.first()) {
             Log.d("WeatherUpdateWorker", "Offline mode: skipping weather update")
             return Result.success()
         }
@@ -251,9 +258,13 @@ class WeatherUpdateWorker(
     }
 
     @OptIn(FlowPreview::class)
-    private suspend fun getLastKnownLocation(): LatLon? = locationProvider.getLocation(skipCache = true)
-        .timeout(30.seconds) // [fork] antes 10 min: el clima quedaba esperando la ubicación
-        .firstOrNull()
-        .or { locationProvider.lastCachedLocation }
-        ?.let { LatLon(it.latitude, it.longitude) }
+    private suspend fun getLastKnownLocation(): LatLon? =
+        // [fork] antes 10 min: el clima quedaba esperando la ubicación.
+        // F16: si no llega una ubicación nueva en 30 s se usa la última conocida; antes `timeout()` lanzaba
+        // una excepción que hacía fallar la actualización entera.
+        kotlinx.coroutines.withTimeoutOrNull(30.seconds) {
+            locationProvider.getLocation(skipCache = true).firstOrNull()
+        }
+            .or { locationProvider.lastCachedLocation }
+            ?.let { LatLon(it.latitude, it.longitude) }
 }

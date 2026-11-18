@@ -143,6 +143,8 @@ data class LauncherSettingsData internal constructor(
     // [fork] Fase 11
     val minimalHomeActionButton: Boolean = true,
     val minimalHomeAudioMediaApps: Boolean = true,
+    /** [fork] F16: paquetes elegidos a mano para la fila de música (en orden); vacío = automático. */
+    val minimalHomeMusicApps: List<String> = emptyList(),
     val minimalHomeActionButtonPosition: dev.kbzon.launcher.preferences.home.ActionButtonPosition = dev.kbzon.launcher.preferences.home.ActionButtonPosition.RailSide,
     val minimalHomeActionButtonActions: dev.kbzon.launcher.preferences.home.ActionButtonActions = dev.kbzon.launcher.preferences.home.ActionButtonActions(),
     val minimalHomeLayoutPortrait: dev.kbzon.launcher.preferences.home.HomeLayout = dev.kbzon.launcher.preferences.home.HomeLayout(),
@@ -211,7 +213,7 @@ data class LauncherSettingsData internal constructor(
 
     val stateTagsMultiline: Boolean = false,
 
-    val weatherProvider: String = "metno",
+    val weatherProvider: String = "openmeteo",
     val weatherAutoLocation: Boolean = true,
     val weatherLocation: LatLon? = null,
     val weatherLocationName: String? = null,
