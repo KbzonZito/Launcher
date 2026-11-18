@@ -1,6 +1,8 @@
 package dev.kbzon.launcher.ui.launcher.scaffold.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.widthIn
@@ -26,6 +28,7 @@ import dev.kbzon.launcher.ui.launcher.scaffold.LauncherScaffoldState
 import dev.kbzon.launcher.ui.launcher.search.SearchColumn
 import dev.kbzon.launcher.ui.launcher.search.SearchVM
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 internal class SearchComponent(
     private val reverse: Boolean = false,
     private val openKeyboard: Boolean = true,
@@ -58,6 +61,25 @@ internal class SearchComponent(
         SideEffect(isActive) {
             if (!isActive) {
                 searchVM.reset()
+            }
+        }
+
+        // [fork] F16: el "atrás" que cierra el teclado cierra también la búsqueda (antes eran dos o más).
+        // Cuando la app oculta el teclado (al desplazar, al tocar un resultado) antes pone el foco en false,
+        // así que un teclado que se cierra con la barra aún enfocada lo cerró el usuario.
+        val imeVisible = WindowInsets.isImeVisible
+        val imeWasVisible = remember { mutableStateOf(false) }
+        val lifecycle = androidx.lifecycle.compose.LocalLifecycleOwner.current.lifecycle
+        LaunchedEffect(imeVisible) {
+            if (imeVisible) {
+                imeWasVisible.value = true
+            } else if (imeWasVisible.value) {
+                imeWasVisible.value = false
+                if (isActive && state.isSearchBarFocused && state.isSettledOnSecondaryPage &&
+                    lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)
+                ) {
+                    state.navigateBack()
+                }
             }
         }
 

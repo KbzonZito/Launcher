@@ -141,6 +141,7 @@
     <string name="fork_events_tomorrow">Tomorrow</string>
     <string name="fork_glance_more_events">+%1$d</string>
     <string name="fork_glance_allow_location">Allow location for weather</string>
+    <string name="fork_glance_allow_calendar">Allow calendar to see your events</string>
     <string name="fork_preference_audio_media_apps">Music apps when audio connects</string>
     <string name="fork_preference_audio_media_apps_summary">When Bluetooth headphones or a speaker connect, show your music apps under the clock</string>
     <string name="fork_preference_letter_sort">Order within each letter</string>

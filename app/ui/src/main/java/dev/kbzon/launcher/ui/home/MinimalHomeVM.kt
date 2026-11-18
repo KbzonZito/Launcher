@@ -508,6 +508,16 @@ class MinimalHomeVM : ViewModel(), KoinComponent {
     val hasLocationPermission = permissionsManager.hasPermission(PermissionGroup.Location)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
 
+    // [fork] F16: sin permiso de calendario el próximo evento no aparecía y no había forma de saber por qué.
+    val hasCalendarPermission = permissionsManager.hasPermission(PermissionGroup.Calendar)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    fun requestCalendarPermission(context: Context) {
+        (context as? androidx.appcompat.app.AppCompatActivity)?.let {
+            permissionsManager.requestPermission(it, PermissionGroup.Calendar)
+        }
+    }
+
     fun requestLocationPermission(context: Context) {
         (context as? androidx.appcompat.app.AppCompatActivity)?.let {
             permissionsManager.requestPermission(it, PermissionGroup.Location)

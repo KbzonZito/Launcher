@@ -31,8 +31,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -62,6 +60,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.kbzon.launcher.notifications.Notification
@@ -113,6 +112,8 @@ fun HomeAppRow(
     var renamingFolder by remember { mutableStateOf(false) }
     // Límites de la fila en la ventana: la app se abre expandiéndose desde aquí.
     var rowBounds by remember { mutableStateOf<IntRect?>(null) }
+    // [fork] F16: la misma fila en coordenadas de pantalla, para anclar la tarjeta del menú.
+    var rowOnScreen by remember { mutableStateOf<IntRect?>(null) }
     val dragOffset = remember { Animatable(0f) }
     val canExpand = item is Application
     // M3: respuesta visual al tocar (píldora tenue + leve reducción con resorte).
@@ -132,6 +133,8 @@ fun HomeAppRow(
                     .onGloballyPositioned { coords ->
                         val r = coords.boundsInWindow()
                         rowBounds = IntRect(r.left.roundToInt(), r.top.roundToInt(), r.right.roundToInt(), r.bottom.roundToInt())
+                        val o = coords.positionOnScreen()
+                        rowOnScreen = IntRect(o.x.roundToInt(), o.y.roundToInt(), o.x.roundToInt() + coords.size.width, o.y.roundToInt() + coords.size.height)
                     }
                     .offset { IntOffset(dragOffset.value.roundToInt(), 0) }
                     .pointerInput(item.key, canExpand, swipeLeftTarget?.key) {
@@ -250,10 +253,11 @@ fun HomeAppRow(
             HomeItemMenu(
                 expanded = menuOpen,
                 onDismiss = { menuOpen = false },
+                anchor = rowOnScreen,
                 item = item,
                 vm = vm,
                 isHiddenItem = isHiddenItem,
-                onShowShortcuts = if (canExpand) ({ expanded = true }) else null,
+                onLaunchShortcut = { onLaunch(it, rowBounds) },
                 onCustomize = { sheetManager.showCustomizeSearchableModal(item) },
                 swipeLeftTarget = swipeLeftTarget,
                 onPickSwipeLeft = { pickSwipeLeft = true },
@@ -334,54 +338,6 @@ fun HomeAppRow(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun HomeItemMenu(
-    expanded: Boolean,
-    onDismiss: () -> Unit,
-    item: SavableSearchable,
-    vm: MinimalHomeVM,
-    isHiddenItem: Boolean,
-    onShowShortcuts: (() -> Unit)?,
-    onCustomize: () -> Unit,
-    swipeLeftTarget: SavableSearchable?,
-    onPickSwipeLeft: () -> Unit,
-    onReorderFavorites: (() -> Unit)?,
-    onFolder: () -> Unit,
-    onRenameFolder: () -> Unit,
-) {
-    val context = LocalContext.current
-    val pinned by remember(item.key) { vm.isPinned(item) }.collectAsState(false)
-    DropdownMenu(expanded = expanded, onDismissRequest = onDismiss) {
-        @Composable
-        fun entry(icon: Int, text: Int, action: () -> Unit) = DropdownMenuItem(
-            leadingIcon = { Icon(painterResource(icon), contentDescription = null) },
-            text = { Text(stringResource(text)) },
-            onClick = { onDismiss(); action() },
-        )
-        if (item is Tag) {
-            // Carpeta: solo renombrar, reordenar favoritos y eliminar (sus apps vuelven a favoritos).
-            entry(R.drawable.edit_24px, R.string.fork_folder_rename, onRenameFolder)
-            if (onReorderFavorites != null) entry(R.drawable.drag_indicator_24px, R.string.fork_reorder_title, onReorderFavorites)
-            entry(R.drawable.delete_24px, R.string.fork_folder_delete) { vm.deleteFolder(item) }
-            return@DropdownMenu
-        }
-        if (pinned) entry(R.drawable.star_24px_filled, R.string.fork_menu_unpin) { vm.unpin(item) }
-        else entry(R.drawable.star_24px, R.string.fork_menu_pin) { vm.pin(item) }
-        if (pinned && onReorderFavorites != null) entry(R.drawable.drag_indicator_24px, R.string.fork_reorder_title, onReorderFavorites)
-        if (onShowShortcuts != null) entry(R.drawable.apps_24px, R.string.fork_menu_shortcuts, onShowShortcuts)
-        if (!isHiddenItem) entry(R.drawable.create_new_folder_24px, R.string.fork_menu_folder, onFolder)
-        entry(R.drawable.swipe_left_alt_24px, if (swipeLeftTarget == null) R.string.fork_menu_swipe_left else R.string.fork_menu_swipe_left_change, onPickSwipeLeft)
-        if (swipeLeftTarget != null) entry(R.drawable.close_24px, R.string.fork_menu_swipe_left_clear) { vm.setSwipeLeftTarget(item, null) }
-        entry(R.drawable.edit_24px, R.string.fork_menu_customize, onCustomize)
-        if (isHiddenItem) entry(R.drawable.visibility_24px, R.string.fork_menu_unhide) { vm.unhide(item) }
-        else entry(R.drawable.visibility_off_24px, R.string.fork_menu_hide) { vm.hide(item) }
-        if (item is Application) {
-            entry(R.drawable.info_24px, R.string.fork_menu_app_info) { item.openAppDetails(context) }
-            entry(R.drawable.delete_24px, R.string.fork_menu_uninstall) { item.uninstall(context) }
         }
     }
 }

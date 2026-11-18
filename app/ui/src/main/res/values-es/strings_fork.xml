@@ -140,6 +140,7 @@
     <string name="fork_events_tomorrow">Mañana</string>
     <string name="fork_glance_more_events">+%1$d</string>
     <string name="fork_glance_allow_location">Permitir ubicación para el clima</string>
+    <string name="fork_glance_allow_calendar">Permitir calendario para ver tus eventos</string>
     <string name="fork_preference_audio_media_apps">Apps de música al conectar audio</string>
     <string name="fork_preference_audio_media_apps_summary">Al conectar auriculares o un parlante Bluetooth, mostrar tus apps de música bajo el reloj</string>
     <string name="fork_preference_letter_sort">Orden dentro de cada letra</string>

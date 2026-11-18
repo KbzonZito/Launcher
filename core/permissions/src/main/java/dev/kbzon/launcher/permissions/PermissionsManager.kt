@@ -300,6 +300,13 @@ internal class PermissionsManagerImpl(
     }
 
     override fun onResume() {
+        // [fork] F16: también los permisos que se pueden dar desde los Ajustes de Android; antes, si se
+        // daba el de calendario fuera de la app, el próximo evento no aparecía hasta reiniciar el launcher.
+        calendarPermissionState.value = checkPermissionOnce(PermissionGroup.Calendar)
+        tasksPermissionState.value = checkPermissionOnce(PermissionGroup.Tasks)
+        locationPermissionState.value = checkPermissionOnce(PermissionGroup.Location)
+        contactsPermissionState.value = checkPermissionOnce(PermissionGroup.Contacts)
+        callPermissionState.value = checkPermissionOnce(PermissionGroup.Call)
         externalStoragePermissionState.value = checkPermissionOnce(PermissionGroup.ExternalStorage)
         appShortcutsPermissionState.value = checkPermissionOnce(PermissionGroup.AppShortcuts)
         manageProfilesPermissionState.value = checkPermissionOnce(PermissionGroup.ManageProfiles)

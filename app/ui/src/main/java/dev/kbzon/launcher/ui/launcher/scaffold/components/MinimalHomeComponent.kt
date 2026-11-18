@@ -13,6 +13,7 @@ import androidx.compose.foundation.focusable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -47,9 +48,12 @@ internal object MinimalHomeComponent : ScaffoldComponent() {
     override val isAtTop: State<Boolean?> = derivedStateOf { activeList?.canScrollBackward != true }
     override val isAtBottom: State<Boolean?> = derivedStateOf { activeList?.canScrollForward != true }
 
-    /** Solo se llama en reposo: la barra de búsqueda aparece al deslizar hacia la búsqueda. */
+    /**
+     * Solo se llama en reposo: la barra de búsqueda aparece al deslizar hacia la búsqueda.
+     * [fork] F16: además de invisible, queda fuera de la pantalla; antes seguía abajo recibiendo toques.
+     */
     override fun searchBarModifier(state: LauncherScaffoldState, defaultModifier: Modifier): Modifier =
-        defaultModifier.alpha(0f)
+        defaultModifier.alpha(0f).offset { androidx.compose.ui.unit.IntOffset(0, 1 shl 16) }
 
     @Composable
     override fun Component(

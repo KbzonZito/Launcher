@@ -421,7 +421,16 @@ internal class SavableSearchableRepositoryImpl(
             CrashReporter.logException(e)
             null
         }
-        val searchable = deserializer?.deserialize(entity.serializedSearchable)
+        // [fork] F16: un dato guardado que ya no se puede leer (tipos de plugin borrados, formato viejo)
+        // se descarta en vez de cerrar la app; antes había que borrar la caché/datos para volver a abrirla.
+        val searchable = try {
+            deserializer?.deserialize(entity.serializedSearchable)
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            CrashReporter.logException(e)
+            null
+        }
         if (searchable == null) removeInvalidItem(entity.key)
         return SavedSearchable(
             key = entity.key,
