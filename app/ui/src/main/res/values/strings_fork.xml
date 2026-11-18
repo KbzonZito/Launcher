@@ -207,4 +207,5 @@
         <item quantity="one">%d app picked</item>
         <item quantity="other">%d apps picked</item>
     </plurals>
+    <string name="fork_full_list_folders">Folders</string>
 </resources>

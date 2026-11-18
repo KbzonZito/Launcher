@@ -44,6 +44,8 @@ internal object MinimalHomeComponent : ScaffoldComponent() {
 
     override val drawBackground: Boolean = false
     override val showSearchBar: Boolean = false
+    // F16: su lista nunca pasa por debajo de las barras; las franjas se veían como bandas claras.
+    override val systemBarScrims: Boolean = false
 
     override val isAtTop: State<Boolean?> = derivedStateOf { activeList?.canScrollBackward != true }
     override val isAtBottom: State<Boolean?> = derivedStateOf { activeList?.canScrollForward != true }

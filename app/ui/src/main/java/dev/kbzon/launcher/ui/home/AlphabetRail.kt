@@ -206,10 +206,20 @@ fun AlphabetRail(
                         if (waveStrength == 0f || state.heightPx == 0) return@graphicsLayer
                         val slot = state.heightPx.toFloat() / letters.size
                         val center = slot * (index + 0.5f)
-                        // B4: curva coseno ancha (~6 letras a cada lado): subida y bajada largas, sin pico.
-                        val distance = abs(lastY - center) / (slot * 6f)
+                        // [fork] F16: ola como Niagara.
+                        // 1) Horizontal: curva coseno muy ancha (casi medio riel a cada lado), así el alfabeto
+                        //    entero se dobla hacia el contenido en vez de abultarse solo cerca del dedo.
+                        val radius = max(slot * 9f, state.heightPx * 0.5f)
+                        val distance = abs(lastY - center) / radius
                         val influence = (if (distance < 1f) (1f + cos(PI.toFloat() * distance)) / 2f else 0f) * waveStrength
-                        val scale = 1f + (intensity.scale) * influence
+                        // 2) Vertical: "ojo de pez" alrededor del dedo; las letras cercanas se separan (hasta ~1,9×
+                        //    el espacio normal) para que no se junten, y las lejanas se corren un poco, sin cruzarse.
+                        val d = center - lastY
+                        val spread = slot * 1.4f
+                        val falloff = slot * 1.6f
+                        translationY = Math.signum(d) * spread * (1f - kotlin.math.exp(-abs(d) / falloff)) * waveStrength
+                        // 3) Agrandar poco (antes hasta 3×, y las letras se encimaban).
+                        val scale = 1f + intensity.scale * 0.25f * influence
                         scaleX = scale
                         scaleY = scale
                         translationX = (if (railOnLeft) 1f else -1f) * bulgePx * influence

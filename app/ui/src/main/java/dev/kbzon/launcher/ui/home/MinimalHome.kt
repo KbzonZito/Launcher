@@ -40,6 +40,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.SideEffect
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -161,6 +163,13 @@ fun MinimalHome(
     val waveIntensity by vm.waveIntensity.collectAsState()
     val railBothEdges by vm.railBothEdges.collectAsState()
     val railState = remember { RailState() }
+    // [fork] F16: al soltar una letra se muestra la lista completa (todas las letras) desplazada a esa letra.
+    // null = no hay lista completa; si no, la letra a la que se desplazó al abrirla.
+    var fullListLetter by remember { mutableStateOf<Char?>(null) }
+    // Letra visible arriba en la lista completa: se resalta en el riel mientras se desplaza.
+    var fullListCurrent by remember { mutableStateOf<Char?>(null) }
+    LaunchedEffect(selectedLetter) { if (selectedLetter == null) { fullListLetter = null; fullListCurrent = null } }
+    val folders by vm.folders.collectAsState()
 
     val railEntries = remember(appsByLetter.keys, hiddenApps.isNotEmpty(), usageSuggestions) {
         buildList {
@@ -241,7 +250,7 @@ fun MinimalHome(
     }
     // B6: si el botón queda a la izquierda o al centro, la lista le deja espacio abajo.
     val reserveForButton = actionButtonEnabled && buttonAlign != Alignment.BottomEnd && layout.buttonLift < 0.05f
-    val listBottomSpace = if (reserveForButton) 104.dp else 32.dp
+    val listBottomSpace = if (reserveForButton) ActionButtonInsetY + 56.dp + 24.dp else 32.dp
     fun updateDraft(transform: (HomeLayout) -> HomeLayout) {
         draftLayout = transform(draftLayout ?: storedLayout)
     }
@@ -338,15 +347,47 @@ fun MinimalHome(
                 }
                 val listSection: @Composable () -> Unit = {
                     CompositionLocalProvider(LocalHomeListMaxHeight provides listMaxHeight) {
+                        val dragging = !railState.touchY.isNaN()
                         AnimatedContent(
-                            targetState = selectedLetter,
+                            targetState = if (fullListLetter != null) FullListKey else selectedLetter,
                             transitionSpec = {
-                                (fadeIn(spring(stiffness = 900f)) + slideInVertically(spring(dampingRatio = 0.85f, stiffness = 700f)) { it / 8 })
-                                    .togetherWith(fadeOut(spring(stiffness = 1500f)) + slideOutVertically { -it / 12 })
+                                when {
+                                    // F16: mientras se arrastra por el riel, cambio casi instantáneo (como Niagara).
+                                    dragging -> fadeIn(tween(70)).togetherWith(fadeOut(tween(40)))
+                                    // Al soltar: de la sección de la letra a la lista completa, fundido corto.
+                                    targetState == FullListKey || initialState == FullListKey ->
+                                        fadeIn(tween(160)).togetherWith(fadeOut(tween(90)))
+                                    else -> (fadeIn(spring(stiffness = 900f)) + slideInVertically(spring(dampingRatio = 0.85f, stiffness = 700f)) { it / 8 })
+                                        .togetherWith(fadeOut(spring(stiffness = 1500f)) + slideOutVertically { -it / 12 })
+                                }
                             },
                             contentAlignment = Alignment.BottomStart,
                             label = "homeList",
-                        ) { letter ->
+                        ) { target ->
+                            if (target == FullListKey) {
+                                val ownListState = rememberLazyListState()
+                                SideEffect { onActiveListState(ownListState) }
+                                val sections = buildList {
+                                    appsByLetter.forEach { (l, apps) -> add(l.toString() to apps) }
+                                    if (folders.isNotEmpty()) add(stringResource(R.string.fork_full_list_folders) to folders)
+                                }
+                                HomeFullList(
+                                    sections = sections,
+                                    scrollTo = fullListLetter?.toString(),
+                                    vm = vm,
+                                    showIcons = showIcons,
+                                    notifications = notificationsByPackage,
+                                    showPreview = notificationPreviews,
+                                    shadow = shadow,
+                                    accent = accent,
+                                    listState = ownListState,
+                                    onLaunch = onLaunch,
+                                    onCurrentSection = { title -> fullListCurrent = title.singleOrNull() },
+                                    onHeaderTap = { vm.selectLetter(null) },
+                                )
+                                return@AnimatedContent
+                            }
+                            val letter = target as Char?
                             // B1: cada lista tiene su propio estado de scroll (antes se compartía entre la lista
                             // saliente y la entrante durante la transición, y los favoritos podían quedar desplazados).
                             val ownListState = rememberLazyListState()
@@ -450,6 +491,8 @@ fun MinimalHome(
             }
 
             val onRailLetter: (Char) -> Unit = { entry ->
+                fullListLetter = null // volver a arrastrar sale de la lista completa
+                fullListCurrent = null
                 when (entry) {
                     MinimalHomeVM.STAR -> vm.selectLetter(null)
                     MinimalHomeVM.HIDDEN -> Unit // se resuelve al soltar, para no pedir la huella al pasar
@@ -457,8 +500,11 @@ fun MinimalHome(
                 }
             }
             val onRailRelease: (Char) -> Unit = { entry ->
-                if (entry == MinimalHomeVM.HIDDEN) {
-                    HiddenItemsLock.requestUnlock { vm.selectLetter(MinimalHomeVM.HIDDEN) }
+                when (entry) {
+                    MinimalHomeVM.HIDDEN -> HiddenItemsLock.requestUnlock { vm.selectLetter(MinimalHomeVM.HIDDEN) }
+                    MinimalHomeVM.STAR, MinimalHomeVM.RECENT -> Unit
+                    // F16: soltar una letra abre la lista completa en esa letra (en pantallas anchas también).
+                    else -> if (appsByLetter.containsKey(entry)) fullListLetter = entry
                 }
             }
             val onRailDoubleTap: (() -> Unit)? = if (railDoubleTapLock) ({ vm.lockScreen(context) }) else null
@@ -483,7 +529,7 @@ fun MinimalHome(
             AlphabetRail(
                 state = railState,
                 letters = railEntries,
-                selected = selectedLetter ?: MinimalHomeVM.STAR,
+                selected = fullListCurrent ?: selectedLetter ?: MinimalHomeVM.STAR,
                 onLetter = onRailLetter,
                 onRelease = onRailRelease,
                 onDoubleTap = onRailDoubleTap,
@@ -508,8 +554,8 @@ fun MinimalHome(
                     modifier = Modifier
                         .align(buttonAlign)
                         .offset { IntOffset(0, -(layout.buttonLift * outerHeightPx).roundToInt()) }
-                        // B8: más adentro, en la zona cómoda del pulgar.
-                        .padding(horizontal = 32.dp, vertical = 24.dp),
+                        // B8: más adentro, en la zona cómoda del pulgar. F16: aún más, como Niagara (~52 dp del borde).
+                        .padding(horizontal = ActionButtonInsetX, vertical = ActionButtonInsetY),
                 )
             }
             if (actionButtonEnabled && editMode) {
@@ -520,7 +566,7 @@ fun MinimalHome(
                     modifier = Modifier
                         .align(buttonAlign)
                         .offset { IntOffset(dragX.roundToInt(), -(layout.buttonLift * outerHeightPx).roundToInt()) }
-                        .padding(horizontal = 32.dp, vertical = 24.dp)
+                        .padding(horizontal = ActionButtonInsetX, vertical = ActionButtonInsetY)
                         .size(56.dp)
                         .border(1.5.dp, accent, CircleShape)
                         .pointerInput(railOnLeft, buttonPosition) {
@@ -698,6 +744,82 @@ private fun HomeList(
     }
 }
 
+/** Clave de [AnimatedContent] para la lista completa (distinta de cualquier letra). */
+private object FullListKey
+
+/**
+ * [fork] F16: todas las letras en una sola lista con encabezados, como la de Niagara al soltar una letra.
+ * Se abre desplazada a [scrollTo] y avisa qué sección queda arriba para resaltarla en el riel.
+ */
+@Composable
+private fun HomeFullList(
+    sections: List<Pair<String, List<SavableSearchable>>>,
+    scrollTo: String?,
+    vm: MinimalHomeVM,
+    showIcons: Boolean,
+    notifications: Map<String, List<Notification>>,
+    showPreview: Boolean,
+    shadow: Shadow?,
+    accent: Color,
+    listState: LazyListState,
+    onLaunch: (SavableSearchable, IntRect?) -> Unit,
+    onCurrentSection: (String) -> Unit,
+    onHeaderTap: () -> Unit,
+) {
+    val swipeLeftTargets by vm.swipeLeftTargets.collectAsState()
+    // Índice plano de cada encabezado (encabezado + sus filas).
+    val headerIndex = remember(sections) {
+        var i = 0
+        sections.map { (title, items) -> (title to i).also { i += 1 + items.size } }
+    }
+    LaunchedEffect(scrollTo) {
+        val target = headerIndex.firstOrNull { it.first == scrollTo }?.second ?: return@LaunchedEffect
+        listState.scrollToItem(target)
+    }
+    val current by remember(headerIndex) {
+        derivedStateOf { headerIndex.lastOrNull { it.second <= listState.firstVisibleItemIndex }?.first }
+    }
+    LaunchedEffect(current) { current?.let(onCurrentSection) }
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxWidth().height(LocalHomeListMaxHeight.current),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        sections.forEach { (title, items) ->
+            item(key = "header:$title") {
+                Text(
+                    text = title,
+                    color = accent,
+                    style = TextStyle(
+                        fontFamily = LocalAppFontFamily.current,
+                        fontSize = if (title.length == 1) 28.sp else 18.sp,
+                        fontWeight = FontWeight.Light,
+                        shadow = shadow,
+                    ),
+                    modifier = Modifier
+                        .padding(top = 12.dp, bottom = 2.dp, start = 6.dp)
+                        .combinedClickable(interactionSource = null, indication = null, onClick = onHeaderTap),
+                )
+            }
+            items(items, key = { "$title:${it.key}" }) { item ->
+                HomeAppRow(
+                    item = item,
+                    vm = vm,
+                    showIcons = showIcons,
+                    notifications = (item as? Application)?.let { notifications[it.componentName.packageName] }.orEmpty(),
+                    showPreview = showPreview,
+                    isHiddenItem = false,
+                    shadow = shadow,
+                    accent = accent,
+                    onLaunch = onLaunch,
+                    swipeLeftTarget = swipeLeftTargets[item.key],
+                )
+            }
+        }
+    }
+}
+
 /** Próximo evento · clima · próxima alarma, cada uno abre su app. */
 @Composable
 private fun GlanceLine(vm: MinimalHomeVM, shadow: Shadow?, onOpenEvents: () -> Unit) {
@@ -866,3 +988,7 @@ private fun Context.openWeatherApp() {
 
 /** Alto máximo de la lista de la home (más alto en pantallas anchas). */
 private val LocalHomeListMaxHeight = staticCompositionLocalOf { 460.dp }
+
+/** [fork] F16: distancia del botón de acción a los bordes (antes 32 × 24 dp). */
+private val ActionButtonInsetX = 52.dp
+private val ActionButtonInsetY = 36.dp
