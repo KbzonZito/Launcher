@@ -41,7 +41,6 @@ fun FileSearchSettingsScreen() {
         }
     }
 
-    val enabledPlugins by viewModel.enabledPlugins.collectAsStateWithLifecycle(null)
 
     val loading by viewModel.loading
     PreferenceScreen(title = stringResource(R.string.preference_search_files)) {

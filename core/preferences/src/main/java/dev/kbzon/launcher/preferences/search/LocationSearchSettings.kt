@@ -39,18 +39,7 @@ class LocationSearchSettings internal constructor(
         }
     }
 
-    val enabledPlugins: Flow<Set<String>>
-        get() = launcherDataStore.data.map { it.locationSearchProviders - "openstreetmaps" }
 
-    fun setPluginEnabled(authority: String, enabled: Boolean) {
-        launcherDataStore.update {
-            if (enabled) {
-                it.copy(locationSearchProviders = it.locationSearchProviders + authority)
-            } else {
-                it.copy(locationSearchProviders = it.locationSearchProviders - authority)
-            }
-        }
-    }
 
     val searchRadius
         get() = launcherDataStore.data.map { it.locationSearchRadius }

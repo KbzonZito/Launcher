@@ -15,8 +15,8 @@
     <string name="fork_preference_incognito_summary">Don\'t record app launches: frequently used apps and search ranking stop learning</string>
     <string name="fork_preference_secure_screens">Protect search from screenshots</string>
     <string name="fork_preference_secure_screens_summary">Block screenshots and screen recording while search results or hidden apps are on screen</string>
-    <string name="fork_preference_screen_minimal_home">Minimal home</string>
-    <string name="fork_preference_screen_minimal_home_summary">Favorites list and alphabet rail</string>
+    <string name="fork_preference_screen_minimal_home">Home</string>
+    <string name="fork_preference_screen_minimal_home_summary">Clock, glance, font, icons, colors</string>
     <string name="fork_preference_minimal_home">Use minimal home</string>
     <string name="fork_preference_minimal_home_summary">Clock, glance line, favorites and an alphabet rail instead of the clock and widgets screen</string>
     <string name="fork_preference_minimal_home_icons">App icons</string>
@@ -194,4 +194,8 @@
     <string name="fork_settings_gestures_summary">Swipes, two fingers, action button</string>
     <string name="fork_settings_display">Display and wallpaper</string>
     <string name="fork_settings_display_summary">Wallpaper dim and blur, system bars, rotation</string>
+    <string name="fork_settings_rail_list">Alphabet and list</string>
+    <string name="fork_settings_rail_list_summary">Rail side, order per letter, wave, notification previews</string>
+    <string name="fork_settings_search_extras">Bar, contacts and keywords</string>
+    <string name="fork_settings_search_extras_summary">Bottom bar, tap to call, search keywords, prefixes</string>
 </resources>

@@ -234,6 +234,7 @@ Ya hay: Analog, Digital 1/2, Binary, Segment, Orbit, Custom. Agregar: números g
 | **13** | Estilo unificado, temas, fuentes, íconos estilo Niagara, más relojes | ✅ v0.5.0 |
 | **14** | Búsqueda minimalista 2.0 | ✅ v0.6.0 (parcial) |
 | **15** | Limpieza de ajustes heredados | ✅ v0.7.0 |
+| **16** | Uso real y estilo Niagara: errores del teléfono, clima global, apps de música elegibles, riel y lista más rápidos | ⏳ pendiente (§10) |
 | ~~continuo~~ | ~~`upstream-sync` mensual por tag~~ — cancelado por el fork total | — |
 
 Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), apertura animada + Espacio privado en el candado + batería en el vistazo (PR #15), búsqueda minimalista (PR #14), teclado físico + borrar estadísticas + mapas offline (PR #13), identidad propia (PR #12). Pendientes: ver §9.
@@ -255,6 +256,7 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.5.0 | Fase 13: fuente Manrope/Inter/sistema en toda la app, tamaño del texto de la home, 5 temas de color nuevos, íconos monocromo/contorno, relojes vertical/puntos/anillo, DESIGN.md (publicada dentro de v0.7.0) |
 | v0.6.0 | Fase 14: atajos de búsqueda con palabra clave (yt, p, g…), avisos de permiso en una línea, barra de búsqueda abajo y "tocar un contacto llama" en Ajustes → Home (publicada dentro de v0.7.0) |
 | v0.7.0 | Fase 15: Ajustes en tres grupos (Launcher · Aspecto · Sistema), fuera las opciones de la home de Kvaesitso y el código de plugins; primera release con las fases 12–15 |
+| v0.7.1 | Cierre de la Fase 15: Inicio y Alfabeto y lista separados, opciones de búsqueda dentro de Búsqueda, sin restos de plugins ni código muerto de la home de Kvaesitso — sin publicar aún |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -263,6 +265,11 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
 **Las fases 9–15 están hechas (v0.7.0).** Lo que sigue es esta lista, en orden de prioridad. Marcar con [x] al terminar.
+
+**0. Fase 16 — lo encontrado usando el teléfono (detalle en §10)**
+- [ ] Entrega A (v0.7.2): salir de la búsqueda con un "atrás", home sin barra invisible, gestos apagados al editar favoritos, popups sin encimarse, error de caché, próximo evento en el vistazo.
+- [ ] Entrega B (v0.7.3): clima con Open-Meteo y MET Norway (gratis, global), apps de música elegibles.
+- [ ] Entrega C (v0.8.0): botón de acción más adentro, ola más amplia y sin letras juntas, apps por letra al instante y lista completa al soltar.
 
 **1. Probar en los dispositivos (antes de construir más)**
 - [ ] Instalar v0.7.0 encima en el S24 Ultra y la Tab S9 y revisar: clima con datos reales, fila de apps de música con Bluetooth, que no aparezca la alarma fantasma de las 22:30, acción Recientes del botón, teclado físico de la Tab, vibración del riel, 120 Hz, dos dedos, reproductor.
@@ -282,7 +289,6 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 - [ ] Notificaciones en la lista: deslizar para descartar, tocar la vista previa para abrir la notificación.
 - [ ] Animación de cierre: la app vuelve a la fila de la que salió.
 - [ ] Widgets propios: batería de Galaxy Buds/Watch, temporizador/cronómetro, nota rápida; widgets de terceros incrustados en la home.
-- [ ] Elegir a mano las apps de la fila de música al conectar audio Bluetooth.
 - [ ] Orden "Usadas recientemente": si no se siente bien con el peso de uso, guardar la hora de la última apertura.
 
 **4. Rendimiento y calidad**
@@ -400,8 +406,41 @@ Decisiones tomadas (16-11-2026):
 
 ### Fase 15 — Limpieza de ajustes (v0.7.0)
 > ✅ Hecha. La lista principal quedó en tres grupos: **Launcher** (Home minimalista · Gestos y botón de acción · Búsqueda), **Aspecto** (Apariencia · Cuadrícula e íconos · Pantalla y fondo) y **Sistema** (Privacidad · Integraciones · Idioma · Copia de seguridad · Acerca de); Depuración pasó a Acerca de. Se quitaron de "Pantalla y fondo" el reloj, el dock, los widgets en la home y el estilo/posición de la barra de búsqueda de Kvaesitso (la posición está en Ajustes → Home). Se borró el código de plugins: proveedores de calendario, contactos, archivos, lugares y clima, `PluginRepository`/`NoPluginRepository`, la API y los contratos, y la opción de insignias de plugins. Se conservan la tabla de plugins de la base de datos (para no migrar) y `StorageStrategy`, que usan los datos guardados. Un proveedor de clima de plugin elegido antes vuelve a MET Norway.
+> **Cierre (v0.7.1):** "Inicio" y "Alfabeto y lista" quedaron como pantallas separadas (como pedía el plan), y las opciones propias de la búsqueda (barra abajo, tocar para llamar, atajos, prefijos) pasaron a Búsqueda → "Barra, contactos y atajos". Se quitaron los últimos restos de plugins (interruptores de plugins de contactos/lugares/archivos, sus preferencias y las insignias de plugins) y el código muerto de "Pantalla y fondo" (hoja del reloj, dock, estilo y posición de la barra de Kvaesitso).
 Incluye borrar los restos de plugins de la capa de datos (`NoPluginRepository` y proveedores `Plugin*`).
 Eliminar los ajustes heredados de Kvaesitso que no aplican a esta app (reloj y widgets de la home de Kvaesitso, dock, estilos de barra, etc.) y reorganizar en: Inicio · Riel y lista · Gestos y botón de acción · Búsqueda · Apariencia · Privacidad · Backup · Acerca de.
+
+### Fase 16 — Uso real y estilo Niagara (v0.7.2 → v0.8.0)
+> Pendiente. Sale de usar la v0.7.0 en el teléfono (18-11-2026) y de un video de Niagara usado como referencia. Tres entregas; cada una termina con prueba en el emulador, PR y release.
+
+**Entrega A — Errores (v0.7.2)**
+1. **Salir de la búsqueda con un solo "atrás".** Hoy hay que pulsar varias veces: el primero cierra el teclado, otro borra el texto y otro vuelve. Un "atrás" debe cerrar el teclado, borrar la consulta y volver a la home de una vez (el gesto predictivo de `LauncherScaffold` y los `BackHandler` de la búsqueda compiten).
+2. **Home limpia.** La barra de búsqueda sigue abajo, invisible pero tocable (`MinimalHomeComponent.searchBarModifier` solo le pone `alpha(0f)`). En reposo debe quedar fuera de la pantalla o sin recibir toques, y aparecer solo al abrir la búsqueda.
+3. **Gestos apagados al editar.** Al reordenar favoritos siguen activos los gestos de la home: `homeGestures` solo se apaga con `editMode` y no con `reorderMode`. Apagar los gestos y bloquear el scaffold (`state.lock()`) en los dos modos.
+4. **Sin elementos encimados.** El menú de opciones de una app se dibuja encima del reloj y del vistazo. Revisar todos los popups (menú de app, carpeta, eventos, menú rápido): tarjeta anclada a la fila como en Niagara, velo detrás y nada debajo que se vea a través. Revisar también con el reloj movido en Editar diseño.
+5. **Error de caché.** Hubo que borrar la caché para que la app volviera a abrir. Reproducir instalando la v0.7.0 encima de una versión vieja y leer logcat. Sospechas: favoritos o búsquedas guardadas de tipos de plugin ya borrados, o caché de íconos. Lo que no se pueda leer se descarta en vez de cerrar la app.
+6. **Próximo evento en el vistazo.** No aparece en el teléfono. Revisar permiso, calendarios visibles, eventos de todo el día y el filtro `isCompleted` de `eventsAhead`. Mostrarlo como Niagara: "Título · 11:00 +5".
+
+**Entrega B — Clima y música (v0.7.3)**
+1. **Más proveedores de clima, gratis y sin clave.** Hoy solo aparece Bright Sky (Servicio Meteorológico Alemán, con datos solo de Alemania). MET Norway está oculto porque falta el recurso `metno_contact`, y OpenWeatherMap porque necesita una clave.
+   - Añadir **Open-Meteo** (global, gratis, sin clave) como predeterminado.
+   - Activar **MET Norway** con un User-Agent genérico: nombre de la app y URL del repo, sin datos personales.
+   - Rotular Bright Sky "solo Alemania".
+   - Un proveedor desconocido vuelve a Open-Meteo.
+   - Actualizar `PRIVACY.md` con los hosts nuevos (las coordenadas siguen redondeadas a ~1 km).
+2. **Apps de música elegibles.** En Ajustes → Alfabeto y lista → "Apps de música", lista de apps instaladas con casillas y orden. Si no se elige ninguna, se usa la detección automática actual (`mediaApps`). Como Niagara, marcar con ♪ las apps de música en la lista mientras hay audio conectado.
+
+**Entrega C — Riel y lista como Niagara (v0.8.0)**
+1. **Botón de acción más hacia adentro**: de 32 dp a unos 48 dp del borde lateral y del inferior (en el video, unos 56 dp). La reserva de la lista se ajusta igual.
+2. **Ola más amplia.**
+   - La curva abarca casi todo el riel (en Niagara el alfabeto entero se dobla en diagonal), no solo las letras cercanas al dedo.
+   - Separar en vertical las letras cercanas al dedo para que no se junten.
+   - Hoy solo se mueven en horizontal con una ventana coseno estrecha (`AlphabetRail.kt`).
+   - Mantener la animación reducida del sistema.
+3. **Apps por letra más rápidas.**
+   - Al arrastrar, la sección de la letra (encabezado + apps) cambia al instante, con un fundido muy corto en lugar del deslizamiento actual del `AnimatedContent`, y se ubica cerca del dedo.
+   - Al soltar, se pasa a la **lista completa** de todas las letras con encabezados, desplazada a la letra soltada. Al final van las carpetas y los atajos del launcher.
+   - "Atrás" o el botón de inicio vuelven a los favoritos.
 
 ### Recomendaciones adicionales
 - **Primer arranque guiado**: elegir como launcher predeterminado y pedir cada permiso (notificaciones, calendario, contactos, accesibilidad para bloquear) explicando para qué sirve.

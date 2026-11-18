@@ -52,7 +52,6 @@ import dev.kbzon.launcher.ui.component.preferences.PreferenceCategory
 import dev.kbzon.launcher.ui.component.preferences.PreferenceScreen
 import dev.kbzon.launcher.ui.component.preferences.SliderPreference
 import dev.kbzon.launcher.ui.component.preferences.SwitchPreference
-import dev.kbzon.launcher.ui.launcher.widgets.clock.ConfigureClockWidgetSheet
 import dev.kbzon.launcher.ui.locals.LocalDarkTheme
 import dev.kbzon.launcher.ui.locals.LocalPreferDarkContentOverWallpaper
 import kotlinx.serialization.Serializable
@@ -67,15 +66,8 @@ fun HomescreenSettingsScreen() {
 
     val context = LocalContext.current
 
-    val dock by viewModel.dock.collectAsStateWithLifecycle(null)
-    val dockRows by viewModel.dockRows.collectAsStateWithLifecycle(1)
     val fixedRotation by viewModel.fixedRotation.collectAsStateWithLifecycle(null)
-    val widgetsOnHomeScreen by viewModel.widgetsOnHomeScreen.collectAsStateWithLifecycle(null)
     val editButton by viewModel.widgetEditButton.collectAsStateWithLifecycle(null)
-    val searchBarStyle by viewModel.searchBarStyle.collectAsStateWithLifecycle(null)
-    val searchBarColor by viewModel.searchBarColor.collectAsStateWithLifecycle(null)
-    val bottomSearchBar by viewModel.bottomSearchBar.collectAsStateWithLifecycle(null)
-    val fixedSearchBar by viewModel.fixedSearchBar.collectAsStateWithLifecycle(null)
     val lightStatusBar by viewModel.statusBarIcons.collectAsStateWithLifecycle(null)
     val dimWallpaper by viewModel.dimWallpaper.collectAsStateWithLifecycle()
     val blurWallpaper by viewModel.blurWallpaper.collectAsStateWithLifecycle()
@@ -214,164 +206,6 @@ fun HomescreenSettingsScreen() {
         }
     }
 
-    ConfigureClockWidgetSheet(
-        expanded = viewModel.showClockWidgetSheet,
-        onDismiss = { viewModel.showClockWidgetSheet = false }
-    )
 }
 
-@Composable
-fun SearchBarStylePreference(
-    title: String,
-    summary: String? = null,
-    value: SearchBarStyle?,
-    colors: SearchBarColors?,
-    onStyleChanged: (SearchBarStyle) -> Unit,
-    onColorsChanged: (SearchBarColors) -> Unit
-) {
-    var showDialog by remember { mutableStateOf(false) }
-    Preference(title = title, summary = summary, onClick = { showDialog = true })
 
-    DismissableBottomSheet(
-        expanded = showDialog,
-        onDismissRequest = {
-            showDialog = false
-        }
-    ) {
-        val styles = SearchBarStyle.entries
-
-        val darkColors =
-            LocalPreferDarkContentOverWallpaper.current && colors == SearchBarColors.Auto || colors == SearchBarColors.Dark
-
-        Box(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-                .navigationBarsPadding(),
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                for (style in styles) {
-                    Column {
-                        Row(
-                            modifier = Modifier
-                                .padding(top = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                text = stringResource(
-                                    when (style) {
-                                        SearchBarStyle.Transparent -> R.string.preference_search_bar_style_transparent
-                                        SearchBarStyle.Solid -> R.string.preference_search_bar_style_solid
-                                        SearchBarStyle.Hidden -> R.string.preference_search_bar_style_hidden
-                                    }
-                                ),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.weight(1f),
-                            )
-                            IconButton(
-                                onClick = {
-                                    onStyleChanged(style)
-                                }
-                            ) {
-                                Icon(
-                                    painterResource(
-                                        if (style == value) R.drawable.check_circle_24px_filled
-                                        else R.drawable.circle_24px
-                                    ),
-                                    contentDescription = null,
-                                    tint = if (style == value) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                )
-                            }
-                        }
-                        Box(
-                            modifier = Modifier
-                                .border(
-                                    if (style == value) 4.dp else 2.dp,
-                                    if (style == value) MaterialTheme.colorScheme.primary else Color.Transparent,
-                                    MaterialTheme.shapes.medium,
-                                )
-                                .clip(MaterialTheme.shapes.medium)
-                                .background(
-                                    when {
-                                        style != SearchBarStyle.Transparent -> MaterialTheme.colorScheme.inverseSurface
-                                        LocalDarkTheme.current != darkColors -> MaterialTheme.colorScheme.surfaceContainer
-                                        else -> MaterialTheme.colorScheme.inverseSurface
-                                    }
-                                )
-                                .height(IntrinsicSize.Min)
-                        ) {
-                            SearchBar(
-                                modifier = Modifier
-                                    .padding(16.dp),
-                                level = SearchBarLevel.Resting,
-                                style = style,
-                                value = "",
-                                onValueChange = {},
-                                readOnly = true,
-                                darkColors = darkColors,
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clickable {
-                                        onStyleChanged(style)
-                                    }
-                            )
-                        }
-                        if (style == SearchBarStyle.Transparent) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
-                            ) {
-                                ToggleButton(
-                                    modifier = Modifier.weight(1f),
-                                    checked = colors == SearchBarColors.Auto,
-                                    onCheckedChange = {
-                                        onColorsChanged(SearchBarColors.Auto)
-                                    },
-                                    shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
-                                ) {
-                                    Icon(
-                                        painterResource(R.drawable.auto_awesome_20dp),
-                                        contentDescription = null,
-                                    )
-                                }
-                                ToggleButton(
-                                    modifier = Modifier.weight(1f),
-                                    checked = colors == SearchBarColors.Light,
-                                    onCheckedChange = {
-                                        onColorsChanged(SearchBarColors.Light)
-                                    },
-                                    shapes = ButtonGroupDefaults.connectedMiddleButtonShapes(),
-                                ) {
-                                    Icon(
-                                        painterResource(R.drawable.light_mode_24px),
-                                        contentDescription = null,
-                                    )
-                                }
-                                ToggleButton(
-                                    modifier = Modifier.weight(1f),
-                                    checked = colors == SearchBarColors.Dark,
-                                    onCheckedChange = {
-                                        onColorsChanged(SearchBarColors.Dark)
-                                    },
-                                    shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                                ) {
-                                    Icon(
-                                        painterResource(R.drawable.dark_mode_24px),
-                                        contentDescription = null,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}

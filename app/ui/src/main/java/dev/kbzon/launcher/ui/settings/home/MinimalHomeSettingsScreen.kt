@@ -43,8 +43,18 @@ import org.koin.compose.koinInject
 @Serializable
 data object MinimalHomeSettingsRoute : NavKey
 
+/** [fork] Fase 15: "Riel y lista" en su propia pantalla. */
+@Serializable
+data object RailListSettingsRoute : NavKey
+
+/** [fork] Fase 15: opciones propias de la búsqueda (barra abajo, contactos, atajos, prefijos). */
+@Serializable
+data object MinimalSearchSettingsRoute : NavKey
+
+enum class HomeSettingsSection { Home, RailList, Search }
+
 @Composable
-fun MinimalHomeSettingsScreen() {
+fun MinimalHomeSettingsScreen(section: HomeSettingsSection = HomeSettingsSection.Home) {
     val settings: MinimalHomeSettings = koinInject()
     val enabled = true // [fork] la home minimalista ya no es opcional
     val showIcons by settings.showIcons.collectAsStateWithLifecycle(true)
@@ -103,8 +113,13 @@ fun MinimalHomeSettingsScreen() {
         )
     }
 
-    PreferenceScreen(title = stringResource(R.string.fork_preference_screen_minimal_home)) {
-        item {
+    val screenTitle = when (section) {
+        HomeSettingsSection.Home -> R.string.fork_preference_screen_minimal_home
+        HomeSettingsSection.RailList -> R.string.fork_settings_rail_list
+        HomeSettingsSection.Search -> R.string.fork_settings_search_extras
+    }
+    PreferenceScreen(title = stringResource(screenTitle)) {
+        if (section == HomeSettingsSection.Home) item {
             PreferenceCategory {
                 // [fork] Fase 13: estilo de íconos ("none" = sin íconos).
                 ListPreference(
@@ -162,25 +177,9 @@ fun MinimalHomeSettingsScreen() {
                     icon = R.drawable.palette_24px,
                     onClick = { themeBackStack.add(dev.kbzon.launcher.ui.settings.colorscheme.ColorSchemesSettingsRoute) },
                 )
-                SwitchPreference(
-                    title = stringResource(R.string.fork_preference_minimal_home_notification_previews),
-                    summary = stringResource(R.string.fork_preference_minimal_home_notification_previews_summary),
-                    icon = R.drawable.notifications_24px,
-                    value = notificationPreviews,
-                    onValueChanged = settings::setNotificationPreviews,
-                    enabled = enabled,
-                )
-                SwitchPreference(
-                    title = stringResource(R.string.fork_preference_minimal_home_rail_left),
-                    summary = stringResource(R.string.fork_preference_minimal_home_rail_left_summary),
-                    icon = R.drawable.gesture_24px,
-                    value = railOnLeft,
-                    onValueChanged = settings::setRailOnLeft,
-                    enabled = enabled,
-                )
             }
         }
-        item {
+        if (section == HomeSettingsSection.Home) item {
             PreferenceCategory(title = stringResource(R.string.fork_preference_category_clock)) {
                 ListPreference(
                     title = stringResource(R.string.fork_preference_clock_style),
@@ -231,8 +230,24 @@ fun MinimalHomeSettingsScreen() {
                 )
             }
         }
-        item {
+        if (section == HomeSettingsSection.RailList) item {
             PreferenceCategory(title = stringResource(R.string.fork_preference_category_rail)) {
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_minimal_home_notification_previews),
+                    summary = stringResource(R.string.fork_preference_minimal_home_notification_previews_summary),
+                    icon = R.drawable.notifications_24px,
+                    value = notificationPreviews,
+                    onValueChanged = settings::setNotificationPreviews,
+                    enabled = enabled,
+                )
+                SwitchPreference(
+                    title = stringResource(R.string.fork_preference_minimal_home_rail_left),
+                    summary = stringResource(R.string.fork_preference_minimal_home_rail_left_summary),
+                    icon = R.drawable.gesture_24px,
+                    value = railOnLeft,
+                    onValueChanged = settings::setRailOnLeft,
+                    enabled = enabled,
+                )
                 ListPreference(
                     title = stringResource(R.string.fork_preference_letter_sort),
                     icon = R.drawable.sort_24px,
@@ -279,8 +294,15 @@ fun MinimalHomeSettingsScreen() {
                 )
             }
         }
-        item {
+        if (section == HomeSettingsSection.Home) item {
             PreferenceCategory(title = stringResource(R.string.fork_preference_category_gestures)) {
+                val linkBackStack = dev.kbzon.launcher.ui.locals.LocalBackStack.current
+                Preference(
+                    title = stringResource(R.string.fork_settings_rail_list),
+                    summary = stringResource(R.string.fork_settings_rail_list_summary),
+                    icon = R.drawable.sort_24px,
+                    onClick = { linkBackStack.add(RailListSettingsRoute) },
+                )
                 val backStack = dev.kbzon.launcher.ui.locals.LocalBackStack.current
                 Preference(
                     title = stringResource(R.string.fork_preference_gestures_link),
@@ -290,7 +312,7 @@ fun MinimalHomeSettingsScreen() {
                 )
             }
         }
-        item {
+        if (section == HomeSettingsSection.Search) item {
             PreferenceCategory(title = stringResource(R.string.fork_search_help_title)) {
                 // [fork] Fase 14: barra abajo, contactos y atajos con palabra clave.
                 val uiSettings: dev.kbzon.launcher.preferences.ui.UiSettings = org.koin.compose.koinInject()
