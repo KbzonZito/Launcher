@@ -330,12 +330,18 @@ internal class LauncherScaffoldState(
 
     var isSearchBarFocused by mutableStateOf(config.homeComponent is SearchComponent)
 
+    // [fork] F16: el componente visible puede no querer franjas.
+    private val scrimsAllowed by derivedStateOf {
+        val component = if (!isSettledOnSecondaryPage) config.homeComponent else currentComponent ?: config.homeComponent
+        component.systemBarScrims
+    }
+
     val statusBarScrim by derivedStateOf {
-        !isAtTop
+        !isAtTop && scrimsAllowed
     }
 
     val navBarScrim by derivedStateOf {
-        !isAtBottom
+        !isAtBottom && scrimsAllowed
     }
 
     val darkStatusBarIcons by derivedStateOf {

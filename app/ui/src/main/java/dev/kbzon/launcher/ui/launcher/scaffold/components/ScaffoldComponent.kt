@@ -18,6 +18,9 @@ internal abstract class ScaffoldComponent {
      */
     open val drawBackground: Boolean = true
 
+    /** [fork] F16: franjas sobre las barras del sistema al desplazar. La home minimalista no las usa. */
+    open val systemBarScrims: Boolean = true
+
     /**
      * Show the search bar on this component, if search bar style is hidden.
      * For other styles, the search bar is always shown.

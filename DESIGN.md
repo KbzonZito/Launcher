@@ -32,7 +32,8 @@ Guía corta para que la home, la búsqueda, los menús, las hojas y los ajustes 
 - Radios: tarjetas y popups **28 dp**; píldora de toque en filas **14 dp**; íconos con la forma elegida en el tema de formas.
 - Márgenes laterales de la home: **56 dp** a cada lado (ancho del alfabeto), simétricos.
 - Filas: 9 dp de padding vertical, 2 dp entre filas. Popups: 20 dp de padding interior, 16–24 dp de margen a la pantalla, ancho máximo 400–420 dp.
-- Botón de acción a 32 dp del borde; la lista reserva 104 dp debajo cuando el botón queda a la izquierda o al centro.
+- Botón de acción a 52 dp del borde lateral y 36 dp del inferior; la lista reserva 116 dp debajo cuando el botón queda a la izquierda o al centro.
+- Lista completa (al soltar una letra): encabezado por letra de 28 sp Light en el color de acento, 12 dp de aire arriba; las carpetas van al final.
 
 ## Íconos
 - Estilos: **Original**, **Monocromo** (glifo de la capa monocroma de Android 13+, sin fondo, del color del texto), **Contorno** (el glifo dentro de un contorno de 1 dp) y **Sin íconos**. Monocromo y Contorno activan los íconos temáticos forzados, así la búsqueda queda igual.
@@ -42,4 +43,5 @@ Guía corta para que la home, la búsqueda, los menús, las hojas y los ajustes 
 - Toque en fila: escala 0,96 + píldora tenue, resorte `dampingRatio 0.6, stiffness 900`, vibración corta.
 - Popups: aparecen con `scaleIn` desde 0,85–0,9 (`dampingRatio 0.8, stiffness 700`) + fundido; salen con `scaleOut` a 0,92–0,95.
 - Aguja de minutos y anillo del reloj: resortes suaves (`stiffness 200–300`).
+- Riel: el alfabeto entero se dobla hacia el contenido (curva coseno de medio riel), las letras cerca del dedo se separan en vertical y apenas crecen (≤ 1,5×). Las apps de la letra cambian con un fundido de 70 ms mientras se arrastra; al soltar, fundido de 160 ms a la lista completa.
 - Respetar siempre la animación reducida del sistema cuando se añadan animaciones largas.

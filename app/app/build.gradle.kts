@@ -56,7 +56,7 @@ android {
         versionCode = System.getenv("VERSION_CODE_OVERRIDE")?.toIntOrNull()
             ?: providers.exec { commandLine("git", "rev-list", "--count", "HEAD") }
                 .standardOutput.asText.get().trim().toInt()
-        versionName = "0.7.3"
+        versionName = "0.8.0"
         signingConfig = if (hasPersonalSigning) personalSigning else null
     }
 

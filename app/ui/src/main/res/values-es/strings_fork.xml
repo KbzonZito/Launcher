@@ -206,4 +206,5 @@
         <item quantity="one">%d app elegida</item>
         <item quantity="other">%d apps elegidas</item>
     </plurals>
+    <string name="fork_full_list_folders">Carpetas</string>
 </resources>
