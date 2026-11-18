@@ -256,10 +256,10 @@ Hechos fuera de fase: mini reproductor (PR #17), backups cifrados (PR #16), aper
 | v0.5.0 | Fase 13: fuente Manrope/Inter/sistema en toda la app, tamaño del texto de la home, 5 temas de color nuevos, íconos monocromo/contorno, relojes vertical/puntos/anillo, DESIGN.md (publicada dentro de v0.7.0) |
 | v0.6.0 | Fase 14: atajos de búsqueda con palabra clave (yt, p, g…), avisos de permiso en una línea, barra de búsqueda abajo y "tocar un contacto llama" en Ajustes → Home (publicada dentro de v0.7.0) |
 | v0.7.0 | Fase 15: Ajustes en tres grupos (Launcher · Aspecto · Sistema), fuera las opciones de la home de Kvaesitso y el código de plugins; primera release con las fases 12–15 |
-| v0.7.1 | Cierre de la Fase 15: Inicio y Alfabeto y lista separados, opciones de búsqueda dentro de Búsqueda, sin restos de plugins ni código muerto de la home de Kvaesitso — sin publicar aún |
-| v0.7.2 | Fase 16, entrega A: un "atrás" cierra la búsqueda, la barra invisible ya no queda en la home, gestos apagados al reordenar favoritos, menú de app como tarjeta con velo y atajos, datos guardados ilegibles se descartan en vez de cerrar la app, permisos al día al volver a la home y aviso para permitir el calendario — sin publicar aún |
-| v0.7.3 | Fase 16, entrega B: clima con Open-Meteo (predeterminado, mundial, sin clave) y MET Norway funcionando, el clima ya no falla si el GPS tarda, apps de música elegibles a mano y ♪ en la lista con audio conectado — sin publicar aún |
-| v0.8.0 | Fase 16, entrega C: botón de acción más adentro, ola que dobla todo el alfabeto sin juntar letras, apps de cada letra al instante y lista completa al soltar, sin franjas de las barras del sistema en la home — sin publicar aún |
+| v0.7.1 | Cierre de la Fase 15: Inicio y Alfabeto y lista separados, opciones de búsqueda dentro de Búsqueda, sin restos de plugins ni código muerto de la home de Kvaesitso (publicada dentro de v0.8.0) |
+| v0.7.2 | Fase 16, entrega A: un "atrás" cierra la búsqueda, la barra invisible ya no queda en la home, gestos apagados al reordenar favoritos, menú de app como tarjeta con velo y atajos, datos guardados ilegibles se descartan en vez de cerrar la app, permisos al día al volver a la home y aviso para permitir el calendario (publicada dentro de v0.8.0) |
+| v0.7.3 | Fase 16, entrega B: clima con Open-Meteo (predeterminado, mundial, sin clave) y MET Norway funcionando, el clima ya no falla si el GPS tarda, apps de música elegibles a mano y ♪ en la lista con audio conectado (publicada dentro de v0.8.0) |
+| v0.8.0 | Fase 16, entrega C: botón de acción más adentro, ola que dobla todo el alfabeto sin juntar letras, apps de cada letra al instante y lista completa al soltar, sin franjas de las barras del sistema en la home; primera release con la fase 16 y el cierre de la 15 |
 
 Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y crear el tag `vX.Y.Z`; el CI publica el APK firmado en GitHub Releases.
 
@@ -267,7 +267,7 @@ Publicar: subir `versionName` en `app/app/build.gradle.kts`, mergear a `main` y 
 
 > Esta sección se mantiene al día en cada PR: lo hecho sale de aquí y pasa a la hoja de ruta (§7) o a las releases (§8). El detalle de cada fase está en §10.
 
-**Las fases 9–15 están hechas (v0.7.0).** Lo que sigue es esta lista, en orden de prioridad. Marcar con [x] al terminar.
+**Las fases 9–16 están hechas (v0.8.0).** Lo que sigue es esta lista, en orden de prioridad. Marcar con [x] al terminar.
 
 **0. Fase 16 — lo encontrado usando el teléfono (detalle en §10)**
 - [x] Entrega A (v0.7.2): salir de la búsqueda con un "atrás", home sin barra invisible, gestos apagados al editar favoritos, popups sin encimarse, error de caché, próximo evento en el vistazo.
